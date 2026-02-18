@@ -19,7 +19,7 @@ export default async (client: Client) => {
 
         typeCast: function (field, next) {
             // แปลง TINYINT(1) เป็น Boolean
-            if (field.type == "TINY" && field.length === 1) {
+            if (field.type === "TINY" && field.length === 1) {
                 return field.string() === "1";
             } else {
                 return next();

@@ -1,6 +1,7 @@
 import { Pool } from "mysql2/promise";
 import config from "../config";
 import Redis from "ioredis";
+import UserModel from "../models/UserModel";
 
 export default class Client {
     public config = config;
@@ -8,6 +9,7 @@ export default class Client {
     public Redis: Redis;
 
     public initModels() {
+        UserModel.init(this.config.mysql.table.user, this.DB);
     }
 
     public customLogger(message: string, ...rest: string[]) {

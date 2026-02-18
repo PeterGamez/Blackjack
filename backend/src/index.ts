@@ -1,18 +1,29 @@
 import { Hono } from "hono";
+import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
+import databaseHandler from "./handlers/databaseHandler";
+import Client from "./utils/Client";
+import route from "./route";
 
 const app = new Hono();
+const client = new Client();
 
-app.get("/", (c) => {
-    return c.text("Hello Hono!");
-});
+async function run() {
+    await databaseHandler(client);
+
+    app.use(logger(client.customLogger.bind(client)));
+
+    route(app, client);
+}
+
+run();
 
 serve(
     {
         fetch: app.fetch,
-        port: 3000,
+        port: client.config.port,
     },
     () => {
-        console.log(`Server running at http://localhost:3000`);
+        client.log("Hono", `Server running at http://localhost:${client.config.port}`);
     }
 );

@@ -1,5 +1,31 @@
 export default {
     port: parseInt(process.env.PORT || "3000"),
+
+    auth: {
+        jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
+        accessTokenTtl: "30m",
+        refreshTokenTtl: "1d",
+    },
+
+    verifyEmail: {
+        expiresIn: "24h",
+    },
+
+    email: {
+        host: process.env.EMAIL_HOST || "smtp.example.com",
+        port: parseInt(process.env.EMAIL_PORT || "587"),
+        secure: process.env.EMAIL_SECURE === "true",
+        auth: {
+            user: process.env.EMAIL_USER || "",
+            pass: process.env.EMAIL_PASS || "",
+        },
+        from: process.env.EMAIL_FROM || "",
+    },
+
+    app: {
+        url: process.env.APP_URL || "http://localhost:3000",
+    },
+
     mysql: {
         host: process.env.MYSQL_HOST || "localhost",
         port: parseInt(process.env.MYSQL_PORT || "3306"),

@@ -50,6 +50,7 @@ export default async (client: Client) => {
     });
 
     client.initModels();
+    client.initServices();
 
     return true;
 };

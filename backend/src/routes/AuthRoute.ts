@@ -133,6 +133,9 @@ export default async (app: Hono, client: Client) => {
             }
 
             const payload = client.JWT.verifyToken(refreshToken);
+            if (!payload) {
+                return c.json({ error: "Invalid or expired token" }, 400);
+            }
 
             const user = await UserModel.selectUser(payload.userId);
 

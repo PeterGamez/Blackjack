@@ -51,7 +51,7 @@ export class EmailVerification {
 
     public async sendVerificationEmail(userId: number, email: string): Promise<void> {
         const verificationToken = await this.generate(userId, email);
-        const verificationUrl = `${config.app.url}/api/auth/verify?token=${verificationToken}`;
+        const verificationUrl = `${config.app.url}/auth/verify?token=${verificationToken}`;
 
         const mailOptions = {
             from: config.email.from,

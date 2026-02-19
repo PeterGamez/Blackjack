@@ -7,12 +7,12 @@ export default class RedisService {
         this.Redis = Redis;
     }
 
-    public static async set(key: string, value: string) {
+    public static async set<T extends string>(key: string, value: T) {
         return await this.Redis.set(key, value);
     }
 
-    public static async get(key: string) {
-        return await this.Redis.get(key);
+    public static async get<T extends string>(key: string): Promise<T> {
+        return (await this.Redis.get(key)) as T;
     }
 
     public static async del(key: string) {
@@ -23,7 +23,7 @@ export default class RedisService {
         return await this.Redis.hset(key, field, value);
     }
 
-    public static async hmset(key: string, data: Record<string, string>) {
+    public static async hmset<T extends Record<string, string>>(key: string, data: T) {
         return await this.Redis.hmset(key, data);
     }
 

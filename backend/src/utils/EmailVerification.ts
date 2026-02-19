@@ -23,17 +23,23 @@ export class EmailVerification {
     }
 
     public async generate(userId: number, email: string): Promise<string> {
-        const token = crypto.randomBytes(32).toString("hex");
-        const data: EmailVerificationData = { userId: userId.toString(), email };
-        await RedisService.hmset(`${this.PREFIX}${token}`, data);
+        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const length = chars.length;
+
+        const token = Array.from(crypto.randomBytes(32))
+            .map((b) => chars[length])
+            .join("");
+
+        await RedisService.hmset<EmailVerificationData>(`${this.PREFIX}${token}`, { userId: userId.toString(), email });
         await RedisService.expire(`${this.PREFIX}${token}`, this.TTL);
+
         return token;
     }
 
     public async verify(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX}${token}`;
 
-        const value = (await RedisService.hgetall(key)) as EmailVerificationData;
+        const value = await RedisService.hgetall<EmailVerificationData>(key);
         if (!value) {
             return null;
         }

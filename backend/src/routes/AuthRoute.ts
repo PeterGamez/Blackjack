@@ -12,7 +12,7 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Missing required fields" }, 400);
             }
 
-            const existingUser = await UserModel.selectUserByNameOrEmail(email);
+            const existingUser = await UserModel.selectUserByUsernameOrEmail(username);
             if (existingUser) {
                 return c.json({ error: "Username or email already exists" }, 409);
             }
@@ -85,7 +85,7 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Missing username/email or password" }, 400);
             }
 
-            const user = await UserModel.selectUserByNameOrEmail(email);
+            const user = await UserModel.selectUserByUsernameOrEmail(email);
 
             if (!user) {
                 return c.json({ error: "Invalid credentials" }, 401);
@@ -112,7 +112,7 @@ export default (app: Hono, client: Client) => {
                 refreshToken,
                 user: {
                     id: user.id,
-                    name: user.name,
+                    username: user.username,
                     email: user.email,
                 },
             });

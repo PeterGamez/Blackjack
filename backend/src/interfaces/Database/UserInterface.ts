@@ -1,7 +1,7 @@
 import { InterfaceBase } from "./InterfaceBase";
 
 export interface UserInterface extends InterfaceBase {
-    name: string;
+    username: string;
     password: string;
     email: string;
     cash: number;

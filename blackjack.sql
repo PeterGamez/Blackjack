@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 19, 2026 at 01:54 PM
+-- Generation Time: Feb 19, 2026 at 03:37 PM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
 -- PHP Version: 8.2.29
 
@@ -30,10 +30,10 @@ SET time_zone = "+00:00";
 CREATE TABLE `code` (
   `id` int(11) NOT NULL,
   `code` varchar(255) NOT NULL,
-  `cash` int(11) NOT NULL DEFAULT 0,
-  `coins` int(11) NOT NULL DEFAULT 0,
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `type` varchar(255) NOT NULL,
   `usageCount` int(11) NOT NULL DEFAULT 0,
-  `isActive` int(11) NOT NULL DEFAULT 0,
+  `isActive` tinyint(1) NOT NULL DEFAULT 0,
   `expiredDate` datetime NOT NULL DEFAULT current_timestamp(),
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -99,7 +99,8 @@ CREATE TABLE `payment` (
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `cash` int(11) NOT NULL DEFAULT 0,
   `coins` int(11) NOT NULL DEFAULT 0,
@@ -132,45 +133,37 @@ CREATE TABLE `userSkin` (
 -- Indexes for table `code`
 --
 ALTER TABLE `code`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_code` (`code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `codeHistory`
 --
 ALTER TABLE `codeHistory`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_code_user` (`codeId`,`userId`),
-  ADD KEY `userId` (`userId`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `gameHistory`
 --
 ALTER TABLE `gameHistory`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `userId1` (`userId1`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `payment`
 --
 ALTER TABLE `payment`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_receipt` (`receiptRef`),
-  ADD KEY `userId` (`userId`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_email` (`email`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `userSkin`
 --
 ALTER TABLE `userSkin`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `userId` (`userId`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables

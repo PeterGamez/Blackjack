@@ -1,10 +1,6 @@
 import { Hono } from "hono";
 import Client from "../utils/Client";
 import UserModel from "../models/UserModel";
-import { hashPassword, comparePassword } from "../utils/Password";
-import { sendVerificationEmail } from "../utils/Email";
-import { generateAccessToken, generateRefreshToken, verifyToken } from "../utils/JWT";
-import { verifyEmailToken } from "../utils/Token";
 
 export default async (app: Hono, client: Client) => {
     app.post("/auth/register", async (c) => {
@@ -21,12 +17,12 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Username or email already exists" }, 409);
             }
 
-            const hashedPassword = await hashPassword(password);
+            const hashedPassword = await client.Password.hash(password);
 
             const userId = await UserModel.createUser(username, email, hashedPassword);
 
             try {
-                await sendVerificationEmail(userId, email);
+                await client.EmailVerification.sendVerificationEmail(userId, email);
             } catch (emailError) {
                 client.error("EMAIL", `Failed to send verification email: ${emailError}`);
             }
@@ -54,7 +50,7 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Missing verification token" }, 400);
             }
 
-            const payload = await verifyEmailToken(token);
+            const payload = await client.EmailVerification.verify(token);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 400);
             }
@@ -99,17 +95,17 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Please verify your email before logging in" }, 403);
             }
 
-            const isValidPassword = await comparePassword(password, user.password);
+            const isValidPassword = await client.Password.compare(password, user.password);
 
             if (!isValidPassword) {
                 return c.json({ error: "Invalid credentials" }, 401);
             }
 
-            const accessToken = generateAccessToken({
+            const accessToken = client.JWT.generateAccessToken({
                 userId: user.id,
             });
 
-            const refreshToken = generateRefreshToken({
+            const refreshToken = client.JWT.generateRefreshToken({
                 userId: user.id,
             });
 
@@ -141,7 +137,7 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Missing refresh token" }, 400);
             }
 
-            const payload = verifyToken(refreshToken);
+            const payload = client.JWT.verifyToken(refreshToken);
 
             const user = await UserModel.selectUser(payload.userId);
 
@@ -153,11 +149,11 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Account not verified" }, 403);
             }
 
-            const newAccessToken = generateAccessToken({
+            const newAccessToken = client.JWT.generateAccessToken({
                 userId: user.id,
             });
 
-            const newRefreshToken = generateRefreshToken({
+            const newRefreshToken = client.JWT.generateRefreshToken({
                 userId: user.id,
             });
 

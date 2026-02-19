@@ -3,11 +3,17 @@ import config from "../config";
 import Redis from "ioredis";
 import UserModel from "../models/UserModel";
 import RedisService from "../Services/RedisService";
+import { EmailVerification } from "./EmailVerification";
+import { JWT } from "./JWT";
+import { Password } from "./Password";
 
 export default class Client {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
+    public EmailVerification = new EmailVerification(config);
+    public JWT = new JWT();
+    public Password = new Password();
 
     public initModels() {
         UserModel.init(this.config.mysql.table.user, this.DB);

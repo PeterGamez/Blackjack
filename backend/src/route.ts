@@ -4,8 +4,8 @@ import Client from "./utils/Client";
 import AuthRoute from "./routes/AuthRoute";
 import UserRoute from "./routes/UserRoute";
 
-const authMiddleware = (client: Client) =>
-    createMiddleware(async (c, next) => {
+const authMiddleware = (client: Client) => {
+    return createMiddleware(async (c, next) => {
         const authHeader = c.req.header("Authorization");
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -27,6 +27,7 @@ const authMiddleware = (client: Client) =>
             return c.json({ error: "Invalid or expired token" }, 401);
         }
     });
+};
 
 export default async (app: Hono, client: Client) => {
     app.get("/", (c) => {

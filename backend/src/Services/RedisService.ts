@@ -12,7 +12,9 @@ export default class RedisService {
     }
 
     public static async get<T extends string>(key: string): Promise<T> {
-        return (await this.Redis.get(key)) as T;
+        const data = await this.Redis.get(key);
+        if (!data) return null;
+        return data as T;
     }
 
     public static async del(key: string) {
@@ -28,7 +30,9 @@ export default class RedisService {
     }
 
     public static async hgetall<T extends Record<string, string>>(key: string): Promise<T> {
-        return (await this.Redis.hgetall(key)) as T;
+        const data = await this.Redis.hgetall(key);
+        if (!data || Object.keys(data).length === 0) return null;
+        return data as T;
     }
 
     public static async expire(key: string, seconds: number) {

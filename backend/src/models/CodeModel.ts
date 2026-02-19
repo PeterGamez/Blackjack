@@ -9,4 +9,8 @@ export default class CodeModel {
         this.table = table;
         this.DB = DB;
     }
+
+    
+
+
 }

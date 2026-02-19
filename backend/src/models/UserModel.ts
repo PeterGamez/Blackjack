@@ -11,11 +11,11 @@ export default class UserModel {
         this.DB = DB;
     }
 
-    public static async createUser(username: string, email: string, password: string): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (username, email, password) VALUES (?, ?, ?)`;
+    public static async createUser(name: string, email: string, password: string): Promise<number> {
+        const sql = `INSERT INTO ${this.table} (name, email, password) VALUES (?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [username, email, password]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [name, email, password]);
             return result.insertId;
         } finally {
             connection.release();
@@ -33,11 +33,11 @@ export default class UserModel {
         }
     }
 
-    public static async selectUserByUsernameOrEmail(user: string): Promise<UserInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE username = ? OR email = ?`;
+    public static async selectUserByNameOrEmail(user: string): Promise<UserInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE name = ? OR email = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [user]);
+            const [rows] = await connection.execute(sql, [user, user]);
             return rows[0];
         } finally {
             connection.release();
@@ -45,7 +45,7 @@ export default class UserModel {
     }
 
     public static async verifyEmail(email: string): Promise<boolean> {
-        const sql = `UPDATE ${this.table} SET isVerifyEmail = true WHERE email = ?`;
+        const sql = `UPDATE ${this.table} SET isVerified = true WHERE email = ?`;
         const connection = await this.DB.getConnection();
         try {
             const [result] = await connection.execute<ResultSetHeader>(sql, [email]);

@@ -23,7 +23,6 @@
     /* Language and Environment */
     "target": "ESNext",
     "lib": [
-      "DOM",
       "ESNext",
     ],
     /* Completeness */

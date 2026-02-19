@@ -1,0 +1,1 @@
+export { EmailVerificationData } from "./EmailVerificationData";

@@ -8,30 +8,30 @@ export default class RedisService {
     }
 
     public static async set(key: string, value: string) {
-        return this.Redis.set(key, value);
+        return await this.Redis.set(key, value);
     }
 
     public static async get(key: string) {
-        return this.Redis.get(key);
+        return await this.Redis.get(key);
     }
 
     public static async del(key: string) {
-        return this.Redis.del(key);
+        return await this.Redis.del(key);
     }
 
     public static async hset(key: string, field: string, value: string) {
-        return this.Redis.hset(key, field, value);
+        return await this.Redis.hset(key, field, value);
     }
 
     public static async hmset(key: string, data: Record<string, string>) {
-        return this.Redis.hmset(key, data);
+        return await this.Redis.hmset(key, data);
     }
 
-    public static async hgetall(key: string) {
-        return this.Redis.hgetall(key);
+    public static async hgetall<T extends Record<string, string>>(key: string): Promise<T> {
+        return (await this.Redis.hgetall(key)) as T;
     }
 
     public static async expire(key: string, seconds: number) {
-        return this.Redis.expire(key, seconds);
+        return await this.Redis.expire(key, seconds);
     }
 }

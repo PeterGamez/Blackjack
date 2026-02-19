@@ -14,16 +14,16 @@ async function run() {
     app.use(logger(client.customLogger.bind(client)));
 
     route(app, client);
+
+    serve(
+        {
+            fetch: app.fetch,
+            port: client.config.port,
+        },
+        () => {
+            client.log("Hono", `Server running at ${client.config.app.url}`);
+        }
+    );
 }
 
 run();
-
-serve(
-    {
-        fetch: app.fetch,
-        port: client.config.port,
-    },
-    () => {
-        client.log("Hono", `Server running at ${client.config.app.url}`);
-    }
-);

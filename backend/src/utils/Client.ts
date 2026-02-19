@@ -2,7 +2,7 @@ import { Pool } from "mysql2/promise";
 import config from "../config";
 import Redis from "ioredis";
 import UserModel from "../models/UserModel";
-import RedisService from "../Services/RedisService";
+import RedisService from "../services/RedisService";
 import { EmailVerification } from "./EmailVerification";
 import { JWT } from "./JWT";
 import { Password } from "./Password";

@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import RedisService from "../Services/RedisService";
+import RedisService from "../services/RedisService";
 import config from "../config";
 import nodemailer from "nodemailer";
 import { EmailVerificationData } from "../interfaces/Cache";

@@ -3,7 +3,7 @@ export default {
 
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
-        accessTokenTtl: "30m",
+        accessTokenTtl: "1h",
         refreshTokenTtl: "1d",
     },
 

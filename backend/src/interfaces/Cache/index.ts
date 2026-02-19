@@ -1,1 +1,1 @@
-export { EmailVerificationData } from "./EmailVerificationData";
+export * from "./EmailVerificationData";

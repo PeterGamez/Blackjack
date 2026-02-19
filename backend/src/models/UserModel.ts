@@ -55,11 +55,11 @@ export default class UserModel {
         }
     }
 
-    public static async updateUser<T extends keyof UserType>(userId: string, type: T, value: UserType[T]): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE userId = ?`;
+    public static async updateUser<T extends keyof UserType>(id: number, type: T, value: UserType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute(sql, [value, userId]);
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

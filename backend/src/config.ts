@@ -24,6 +24,7 @@ export default {
 
     app: {
         url: process.env.APP_URL || "http://localhost:3000",
+        path: process.env.APP_PATH || "/",
     },
 
     mysql: {

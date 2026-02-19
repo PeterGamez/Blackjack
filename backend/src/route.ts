@@ -33,8 +33,13 @@ export default async (app: Hono, client: Client) => {
         return c.json({ message: "Hono + TypeScript Server" });
     });
 
-    AuthRoute(app, client);
+    app.route("/auth", AuthRoute(new Hono(), client));
 
     app.use("/*", authMiddleware(client));
-    UserRoute(app, client);
+
+    app.route("/user", UserRoute(new Hono(), client));
+
+    app.notFound((c) => {
+        return c.json({ error: "Not Found" }, 404);
+    });
 };

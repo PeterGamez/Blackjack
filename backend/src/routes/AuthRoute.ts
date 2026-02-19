@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import Client from "../utils/Client";
 import UserModel from "../models/UserModel";
 
-export default async (app: Hono, client: Client) => {
-    app.post("/auth/register", async (c) => {
+export default (app: Hono, client: Client) => {
+    app.post("/register", async (c) => {
         try {
             const body = await c.req.json();
             const { username, email, password } = body;
@@ -42,7 +42,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.get("/auth/verify", async (c) => {
+    app.get("/verify", async (c) => {
         try {
             const token = c.req.query("token");
 
@@ -76,7 +76,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.post("/auth/login", async (c) => {
+    app.post("/login", async (c) => {
         try {
             const body = await c.req.json();
             const { email, password } = body;
@@ -123,7 +123,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.post("/auth/refresh", async (c) => {
+    app.post("/refresh", async (c) => {
         try {
             const body = await c.req.json();
             const { refreshToken } = body;
@@ -161,4 +161,6 @@ export default async (app: Hono, client: Client) => {
             return c.json({ error: "Invalid or expired refresh token" }, 401);
         }
     });
+
+    return app;
 };

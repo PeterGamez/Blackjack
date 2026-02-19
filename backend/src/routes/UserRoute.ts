@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import Client from "../utils/Client";
 import UserModel from "../models/UserModel";
 
-export default async (app: Hono, client: Client) => {
-    app.get("/user/profile", async (c) => {
+export default (app: Hono, client: Client) => {
+    app.get("/profile", async (c) => {
         const payload = c.get("jwtPayload");
         const userId = payload.userId;
 
@@ -14,4 +14,6 @@ export default async (app: Hono, client: Client) => {
 
         return c.json({ user });
     });
+
+    return app;
 };

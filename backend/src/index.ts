@@ -6,8 +6,8 @@ import Client from "./utils/Client";
 import route from "./route";
 import { JWTPayload } from "./interfaces/JWTPayload";
 
-const app = new Hono();
 const client = new Client();
+const app = new Hono().basePath(client.config.app.path);
 
 async function run() {
     await databaseHandler(client);

@@ -42,4 +42,9 @@ export default async (app: Hono, client: Client) => {
     app.notFound((c) => {
         return c.json({ error: "Not Found" }, 404);
     });
+
+    app.onError((err, c) => {
+        console.error(`Error occurred during request to ${c.req.url}:`, err);
+        return c.json({ message: "Internal Server Error" }, 500);
+    });
 };

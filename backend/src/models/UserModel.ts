@@ -1,5 +1,6 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
 import { UserInterface } from "../interfaces/Database";
+import { UserType } from "../interfaces/Type";
 
 export default class UserModel {
     private static table: string;
@@ -49,6 +50,16 @@ export default class UserModel {
         try {
             const [result] = await connection.execute<ResultSetHeader>(sql, [email]);
             return result.affectedRows > 0;
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updateUser<T extends keyof UserType>(userId: string, type: T, value: UserType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE userId = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [value, userId]);
         } finally {
             connection.release();
         }

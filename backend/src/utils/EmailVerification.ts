@@ -2,6 +2,7 @@ import crypto from "crypto";
 import RedisService from "../Services/RedisService";
 import config from "../config";
 import nodemailer from "nodemailer";
+import { EmailVerificationData } from "../interfaces/Cache";
 
 export class EmailVerification {
     private readonly PREFIX = "email:verify:";
@@ -23,7 +24,8 @@ export class EmailVerification {
 
     public async generate(userId: number, email: string): Promise<string> {
         const token = crypto.randomBytes(32).toString("hex");
-        await RedisService.hmset(`${this.PREFIX}${token}`, { userId: userId.toString(), email: email });
+        const data: EmailVerificationData = { userId: userId.toString(), email };
+        await RedisService.hmset(`${this.PREFIX}${token}`, data);
         await RedisService.expire(`${this.PREFIX}${token}`, this.TTL);
         return token;
     }
@@ -31,7 +33,7 @@ export class EmailVerification {
     public async verify(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX}${token}`;
 
-        const value = await RedisService.hgetall(key);
+        const value = (await RedisService.hgetall(key)) as EmailVerificationData;
         if (!value) {
             return null;
         }

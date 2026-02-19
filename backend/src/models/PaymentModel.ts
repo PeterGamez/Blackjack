@@ -2,7 +2,7 @@ import { Pool, ResultSetHeader } from "mysql2/promise";
 import { PaymentInterface } from "../interfaces/Database";
 
 export default class PaymentModel {
-    private static table: string = "payment";
+    private static table: string;
     private static DB: Pool;
 
     public static init(table: string, DB: Pool) {

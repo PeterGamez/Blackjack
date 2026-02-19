@@ -30,5 +30,5 @@ export default class CodeModel {
         } finally {
             connection.release();
         }
-    }   
+    }
 }

@@ -10,7 +10,7 @@ export default class PaymentModel {
         this.DB = DB;
     }
 
-    public static async createPayment(userId: number, receiptRef: string, amount: number, currencyType: string): Promise<number> {
+    public static async createPayment(userId: number, receiptRef: string, amount: number, currencyType: PaymentInterface["currencyType"]): Promise<number> {
         const sql = `INSERT INTO ${this.table} (userId, receiptRef, amount, currencyType) VALUES (?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {

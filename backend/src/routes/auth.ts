@@ -101,13 +101,8 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Invalid credentials" }, 401);
             }
 
-            const accessToken = client.JWT.generateAccessToken({
-                userId: user.id,
-            });
-
-            const refreshToken = client.JWT.generateRefreshToken({
-                userId: user.id,
-            });
+            const accessToken = client.JWT.generateAccessToken(user);
+            const refreshToken = client.JWT.generateRefreshToken(user);
 
             client.log("AUTH", `User logged in: ${email}`);
 
@@ -149,13 +144,8 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Account not verified" }, 403);
             }
 
-            const newAccessToken = client.JWT.generateAccessToken({
-                userId: user.id,
-            });
-
-            const newRefreshToken = client.JWT.generateRefreshToken({
-                userId: user.id,
-            });
+            const newAccessToken = client.JWT.generateAccessToken(user);
+            const newRefreshToken = client.JWT.generateRefreshToken(user);
 
             client.log("AUTH", `Tokens refreshed for: ${user.id}`);
 

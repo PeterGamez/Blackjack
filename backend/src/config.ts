@@ -36,7 +36,12 @@ export default {
         database: process.env.MYSQL_DATABASE || "blackjack",
 
         table: {
+            codeHistory: "codeHistory",
+            code: "code",
+            gameHistory: "gameHistory",
+            payment: "payment",
             user: "user",
+            userSkin: "userSkin",
         },
     },
 

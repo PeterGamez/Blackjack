@@ -1,9 +1,9 @@
 import { Server as IOServer, Socket } from "socket.io";
 import type { RoomMessagePayload, RoomServerEvents } from "../interfaces/Socket";
-import RedisService from "./RedisService";
+import RedisService from "../services/RedisService";
 import Client from "../utils/Client";
 
-export default class RoomService {
+export default class RoomSocket {
     private static io: IOServer;
     private static client: Client;
 

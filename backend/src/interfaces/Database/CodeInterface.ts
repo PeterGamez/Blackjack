@@ -4,7 +4,7 @@ export interface CodeInterface extends InterfaceBase {
     code: string;
     amount: number;
     type: "cash" | "coins";
-    usageCount: number;
+    maxUses: number;
     isActive: boolean;
     expiredDate: Date;
 }

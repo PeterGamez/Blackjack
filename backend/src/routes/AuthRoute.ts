@@ -9,8 +9,11 @@ export default (app: Hono, client: Client) => {
 
     app.post("/register", async (c) => {
         try {
-            const body = await c.req.json();
-            const { username, email, password } = body;
+            const body = (await c.req.json()) as { username: string; email: string; password: string };
+
+            const username = body.username?.trim()?.toLowerCase();
+            const email = body.email?.trim()?.toLowerCase();
+            const password = body.password?.trim();
 
             if (!username || !email || !password) {
                 return c.json({ error: "Missing required fields" }, 400);
@@ -82,8 +85,10 @@ export default (app: Hono, client: Client) => {
 
     app.post("/login", async (c) => {
         try {
-            const body = await c.req.json();
-            const { username, password } = body;
+            const body = (await c.req.json()) as { username: string; password: string };
+
+            const username = body.username?.trim()?.toLowerCase();
+            const password = body.password?.trim();
 
             if (!username || !password) {
                 return c.json({ error: "Missing username/email or password" }, 400);
@@ -130,7 +135,7 @@ export default (app: Hono, client: Client) => {
 
     app.post("/refresh", async (c) => {
         try {
-            const body = await c.req.json();
+            const body = (await c.req.json()) as { refreshToken: string };
             const { refreshToken } = body;
 
             if (!refreshToken) {

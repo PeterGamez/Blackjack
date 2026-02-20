@@ -5,7 +5,6 @@ import databaseHandler from "./handlers/databaseHandler";
 import Client from "./utils/Client";
 import route from "./route";
 import { JWTPayload } from "./interfaces/JWTPayload";
-import SocketService from "./services/SocketService";
 
 const client = new Client();
 const app = new Hono().basePath(client.config.app.path);
@@ -14,6 +13,9 @@ async function run() {
     client.log("App", "Starting server...");
 
     await databaseHandler(client);
+
+    client.initModels();
+    client.initServices();
 
     app.use(logger(client.customLogger.bind(client)));
 
@@ -28,8 +30,6 @@ async function run() {
             client.log("Hono", `Server running at ${client.config.app.url}`);
         }
     );
-
-    SocketService.init(client);
 }
 
 run();

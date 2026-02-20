@@ -23,8 +23,8 @@ export default class SocketService {
 
         this.registerEvents();
 
-        this.httpServer.listen(client.config.socketPort, () => {
-            client.log("Socket.IO", `Socket server running on port ${client.config.socketPort}`);
+        this.httpServer.listen(client.config.socket.port, () => {
+            client.log("Socket.IO", `Socket server running on port ${client.config.socket.port}`);
         });
     }
 

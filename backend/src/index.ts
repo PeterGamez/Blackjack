@@ -7,7 +7,7 @@ import route from "./route";
 import { JWTPayload } from "./interfaces/JWTPayload";
 
 const client = new Client();
-const app = new Hono().basePath(client.config.app.path);
+const app = new Hono().basePath(client.config.api.path);
 
 async function run() {
     client.log("App", "Starting server...");
@@ -24,10 +24,10 @@ async function run() {
     serve(
         {
             fetch: app.fetch,
-            port: client.config.port,
+            port: client.config.api.port,
         },
         () => {
-            client.log("Hono", `Server running at http://localhost:${client.config.port}${client.config.app.path}`);
+            client.log("Hono", `Server running at http://localhost:${client.config.api.port}${client.config.api.path}`);
         }
     );
 }

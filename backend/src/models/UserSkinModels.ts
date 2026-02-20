@@ -21,7 +21,7 @@ export default class UserSkinModel {
         }
     }
 
-    public static async getUserSkins(userId: number): Promise<UserSkinInterface[]> {
+    public static async selectUserSkinByUserId(userId: number): Promise<UserSkinInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
         const connection = await this.DB.getConnection();
         try {

@@ -49,8 +49,5 @@ export default async (client: Client) => {
         console.error(err);
     });
 
-    client.initModels();
-    client.initServices();
-
     return true;
 };

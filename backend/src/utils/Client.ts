@@ -6,6 +6,12 @@ import RedisService from "../services/RedisService";
 import { EmailVerification } from "./EmailVerification";
 import { JWT } from "./JWT";
 import { Password } from "./Password";
+import SocketService from "../services/SocketService";
+import UserSkinModel from "../models/UserSkinModels";
+import CodeHistoryModel from "../models/CodeHistoryModel";
+import CodeModel from "../models/CodeModel";
+import GameHistoryModel from "../models/GameHistoryModel";
+import PaymentModel from "../models/PaymentModel";
 
 export default class Client {
     public config = config;
@@ -16,11 +22,17 @@ export default class Client {
     public Password = new Password();
 
     public initModels() {
+        CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);
+        CodeModel.init(this.config.mysql.table.code, this.DB);
+        GameHistoryModel.init(this.config.mysql.table.gameHistory, this.DB);
+        PaymentModel.init(this.config.mysql.table.payment, this.DB);
         UserModel.init(this.config.mysql.table.user, this.DB);
+        UserSkinModel.init(this.config.mysql.table.userSkin, this.DB);
     }
 
     public initServices() {
         RedisService.init(this.Redis);
+        SocketService.init(this);
     }
 
     public customLogger(message: string, ...rest: string[]) {

@@ -36,7 +36,7 @@ export default (app: Hono, client: Client) => {
                 201
             );
         } catch (error) {
-            client.error("AUTH", `Registration error:`);
+            client.error("AUTH", "Registration error: ");
             console.error(error);
             return c.json({ error: "Registration failed" }, 500);
         }
@@ -70,7 +70,7 @@ export default (app: Hono, client: Client) => {
 
             return c.json({ message: "Email verified successfully" });
         } catch (error) {
-            client.error("AUTH", `Verification error:`);
+            client.error("AUTH", "Email verification error: ");
             console.error(error);
             return c.json({ error: "Invalid or expired token" }, 400);
         }
@@ -114,10 +114,11 @@ export default (app: Hono, client: Client) => {
                     id: user.id,
                     username: user.username,
                     email: user.email,
+                    role: user.role,
                 },
             });
         } catch (error) {
-            client.error("AUTH", `Login error: `);
+            client.error("AUTH", "Login error: ");
             console.error(error);
             return c.json({ error: "Login failed" }, 500);
         }
@@ -157,7 +158,8 @@ export default (app: Hono, client: Client) => {
                 refreshToken: newRefreshToken,
             });
         } catch (error) {
-            client.error("AUTH", `Refresh error: ${error}`);
+            client.error("AUTH", "Token refresh error: ");
+            console.error(error);
             return c.json({ error: "Invalid or expired refresh token" }, 401);
         }
     });

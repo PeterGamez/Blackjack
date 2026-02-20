@@ -4,8 +4,9 @@ import UserModel from "../models/UserModel";
 
 export default (app: Hono, client: Client) => {
     app.post("/test", async (c) => {
-        await client.EmailVerification.sendVerificationEmail(12, "me@alltime.in.th");
+        await client.EmailVerification.sendVerificationEmail(12, "chanakan.kea@gmail.com");
     });
+
     app.post("/register", async (c) => {
         try {
             const body = await c.req.json();

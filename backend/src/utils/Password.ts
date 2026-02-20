@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 
 export class Password {
     public async hash(password: string): Promise<string> {

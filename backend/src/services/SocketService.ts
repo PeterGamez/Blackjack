@@ -1,6 +1,7 @@
 import { createServer, Server as HttpServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 import Client from "../utils/Client";
+import RoomService from "./RoomService";
 
 export default class SocketService {
     public static io: IOServer;
@@ -18,6 +19,8 @@ export default class SocketService {
             },
         });
 
+        RoomService.init(this.io, client);
+
         this.registerEvents();
 
         this.httpServer.listen(client.config.socketPort, () => {
@@ -28,23 +31,12 @@ export default class SocketService {
     private static registerEvents(): void {
         this.io.on("connection", (socket: Socket) => {
             this.client.log("Socket.IO", `Client connected: ${socket.id}`);
-
-            socket.on("client-message", (data) => {
-                this.client.log("Socket.IO", `Received message from ${socket.id}: ${data}`);
-                socket.emit("server-message", `Echo: ${data}`);
-            });
-            socket.on("disconnect", () => {
-                this.client.log("Socket.IO", `Client disconnected: ${socket.id}`);
-            });
+            RoomService.register(socket);
         });
     }
 
     public static emit(event: string, ...args: unknown[]): void {
         this.io.emit(event, ...args);
-    }
-
-    public static to(room: string) {
-        return this.io.to(room);
     }
 
     public static close(): void {

@@ -17,7 +17,7 @@ export default class Client {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
-    public EmailVerification = new EmailVerification(config);
+    public EmailVerification = new EmailVerification(this);
     public JWT = new JWT();
     public Password = new Password();
 

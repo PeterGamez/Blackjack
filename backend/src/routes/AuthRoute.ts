@@ -3,10 +3,6 @@ import Client from "../utils/Client";
 import UserModel from "../models/UserModel";
 
 export default (app: Hono, client: Client) => {
-    app.post("/test", async (c) => {
-        await client.EmailVerification.sendVerificationEmail(12, "chanakan.kea@gmail.com");
-    });
-
     app.post("/register", async (c) => {
         try {
             const body = (await c.req.json()) as { username: string; email: string; password: string };
@@ -97,17 +93,17 @@ export default (app: Hono, client: Client) => {
             const user = await UserModel.selectUserByUsernameOrEmail(username);
 
             if (!user) {
-                return c.json({ error: "Invalid credentials" }, 401);
-            }
-
-            if (!user.isVerified) {
-                return c.json({ error: "Please verify your email before logging in" }, 403);
+                return c.json({ error: "Username/email or password is incorrect" }, 401);
             }
 
             const isValidPassword = await client.Password.compare(password, user.password);
 
             if (!isValidPassword) {
-                return c.json({ error: "Invalid credentials" }, 401);
+                return c.json({ error: "Username/email or password is incorrect" }, 401);
+            }
+
+            if (!user.isVerified) {
+                return c.json({ error: "Please verify your email before logging in" }, 403);
             }
 
             const accessToken = client.JWT.generateAccessToken(user);

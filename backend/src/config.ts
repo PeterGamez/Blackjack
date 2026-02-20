@@ -1,6 +1,6 @@
 export default {
-    port: parseInt(process.env.PORT || "3000"),
-    socketPort: parseInt(process.env.SOCKET_PORT || "3001"),
+    port: parseInt(process.env.PORT || "3001"),
+    socketPort: parseInt(process.env.SOCKET_PORT || "3002"),
 
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
@@ -23,8 +23,10 @@ export default {
         from: process.env.EMAIL_FROM || "",
     },
 
+    site: {
+        url: process.env.SITE_URL || "http://localhost:3000",
+    },
     app: {
-        url: process.env.APP_URL || "http://localhost:3000",
         path: process.env.APP_PATH || "/",
     },
 

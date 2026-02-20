@@ -4,9 +4,11 @@ import { serve } from "@hono/node-server";
 import databaseHandler from "./handlers/databaseHandler";
 import Client from "./utils/Client";
 import route from "./route";
+import { JWTPayload } from "./interfaces/JWTPayload";
+import SocketService from "./services/SocketService";
 
-const app = new Hono();
 const client = new Client();
+const app = new Hono().basePath(client.config.app.path);
 
 async function run() {
     await databaseHandler(client);
@@ -24,6 +26,14 @@ async function run() {
             client.log("Hono", `Server running at ${client.config.app.url}`);
         }
     );
+
+    SocketService.init(client);
 }
 
 run();
+
+declare module "hono" {
+    interface ContextVariableMap {
+        jwtPayload: JWTPayload;
+    }
+}

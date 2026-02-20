@@ -38,4 +38,30 @@ export default class RedisService {
     public static async expire(key: string, seconds: number) {
         return await this.Redis.expire(key, seconds);
     }
+
+    public static async sadd(key: string, ...members: string[]) {
+        return await this.Redis.sadd(key, ...members);
+    }
+
+    public static async srem(key: string, ...members: string[]) {
+        return await this.Redis.srem(key, ...members);
+    }
+
+    public static async smembers(key: string): Promise<string[]> {
+        return await this.Redis.smembers(key);
+    }
+
+    public static async sismember(key: string, member: string): Promise<boolean> {
+        const result = await this.Redis.sismember(key, member);
+        return result === 1;
+    }
+
+    public static async scard(key: string): Promise<number> {
+        return await this.Redis.scard(key);
+    }
+
+    public static async smismember(key: string, ...members: string[]): Promise<boolean[]> {
+        const results = await this.Redis.smismember(key, ...members);
+        return results.map((r) => r === 1);
+    }
 }

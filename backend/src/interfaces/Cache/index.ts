@@ -1,1 +1,3 @@
-export { EmailVerificationData } from "./EmailVerificationData";
+export * from "./EmailVerificationData";
+export * from "./TableData";
+export * from "./TablePoolData";

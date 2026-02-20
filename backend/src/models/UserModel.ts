@@ -1,5 +1,6 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
 import { UserInterface } from "../interfaces/Database";
+import { UserType } from "../interfaces/Type";
 
 export default class UserModel {
     private static table: string;
@@ -36,7 +37,7 @@ export default class UserModel {
         const sql = `SELECT * FROM ${this.table} WHERE username = ? OR email = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [user]);
+            const [rows] = await connection.execute(sql, [user, user]);
             return rows[0];
         } finally {
             connection.release();
@@ -44,11 +45,21 @@ export default class UserModel {
     }
 
     public static async verifyEmail(email: string): Promise<boolean> {
-        const sql = `UPDATE ${this.table} SET isVerifyEmail = true WHERE email = ?`;
+        const sql = `UPDATE ${this.table} SET isVerified = true WHERE email = ?`;
         const connection = await this.DB.getConnection();
         try {
             const [result] = await connection.execute<ResultSetHeader>(sql, [email]);
             return result.affectedRows > 0;
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updateUser<T extends keyof UserType>(id: number, type: T, value: UserType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

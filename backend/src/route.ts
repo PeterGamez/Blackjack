@@ -1,11 +1,51 @@
 import { Hono } from "hono";
+import { createMiddleware } from "hono/factory";
 import Client from "./utils/Client";
-import auth from "./routes/auth";
+import AuthRoute from "./routes/AuthRoute";
+import UserRoute from "./routes/UserRoute";
+
+const authMiddleware = (client: Client) => {
+    return createMiddleware(async (c, next) => {
+        const authHeader = c.req.header("Authorization");
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        try {
+            const payload = client.JWT.verifyToken(token);
+            if (!payload) {
+                return c.json({ error: "Invalid or expired token" }, 401);
+            }
+
+            c.set("jwtPayload", payload);
+
+            await next();
+        } catch {
+            return c.json({ error: "Invalid or expired token" }, 401);
+        }
+    });
+};
 
 export default async (app: Hono, client: Client) => {
     app.get("/", (c) => {
-        return c.text("Hello Hono!");
+        return c.json({ message: "Hono + TypeScript Server" });
     });
 
-    auth(app, client);
+    app.route("/auth", AuthRoute(new Hono(), client));
+
+    app.use("/*", authMiddleware(client));
+
+    app.route("/user", UserRoute(new Hono(), client));
+
+    app.notFound((c) => {
+        return c.json({ error: "Not Found" }, 404);
+    });
+
+    app.onError((err, c) => {
+        console.error(`Error occurred during request to ${c.req.url}:`, err);
+        return c.json({ message: "Internal Server Error" }, 500);
+    });
 };

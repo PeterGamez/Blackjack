@@ -1,9 +1,10 @@
 export default {
     port: parseInt(process.env.PORT || "3000"),
+    socketPort: parseInt(process.env.SOCKET_PORT || "3001"),
 
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
-        accessTokenTtl: "30m",
+        accessTokenTtl: "1h",
         refreshTokenTtl: "1d",
     },
 
@@ -24,6 +25,7 @@ export default {
 
     app: {
         url: process.env.APP_URL || "http://localhost:3000",
+        path: process.env.APP_PATH || "/",
     },
 
     mysql: {

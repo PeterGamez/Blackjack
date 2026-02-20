@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import Client from "../utils/Client";
 import UserModel from "../models/UserModel";
 
-export default async (app: Hono, client: Client) => {
-    app.post("/auth/register", async (c) => {
+export default (app: Hono, client: Client) => {
+    app.post("/register", async (c) => {
         try {
             const body = await c.req.json();
             const { username, email, password } = body;
@@ -12,7 +12,7 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Missing required fields" }, 400);
             }
 
-            const existingUser = await UserModel.selectUserByUsernameOrEmail(email);
+            const existingUser = await UserModel.selectUserByUsernameOrEmail(username);
             if (existingUser) {
                 return c.json({ error: "Username or email already exists" }, 409);
             }
@@ -42,7 +42,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.get("/auth/verify", async (c) => {
+    app.get("/verify", async (c) => {
         try {
             const token = c.req.query("token");
 
@@ -76,7 +76,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.post("/auth/login", async (c) => {
+    app.post("/login", async (c) => {
         try {
             const body = await c.req.json();
             const { email, password } = body;
@@ -91,7 +91,7 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "Invalid credentials" }, 401);
             }
 
-            if (!user.isVerifyEmail) {
+            if (!user.isVerified) {
                 return c.json({ error: "Please verify your email before logging in" }, 403);
             }
 
@@ -123,7 +123,7 @@ export default async (app: Hono, client: Client) => {
         }
     });
 
-    app.post("/auth/refresh", async (c) => {
+    app.post("/refresh", async (c) => {
         try {
             const body = await c.req.json();
             const { refreshToken } = body;
@@ -133,6 +133,9 @@ export default async (app: Hono, client: Client) => {
             }
 
             const payload = client.JWT.verifyToken(refreshToken);
+            if (!payload) {
+                return c.json({ error: "Invalid or expired token" }, 400);
+            }
 
             const user = await UserModel.selectUser(payload.userId);
 
@@ -140,7 +143,7 @@ export default async (app: Hono, client: Client) => {
                 return c.json({ error: "User not found" }, 401);
             }
 
-            if (!user.isVerifyEmail) {
+            if (!user.isVerified) {
                 return c.json({ error: "Account not verified" }, 403);
             }
 
@@ -158,4 +161,6 @@ export default async (app: Hono, client: Client) => {
             return c.json({ error: "Invalid or expired refresh token" }, 401);
         }
     });
+
+    return app;
 };

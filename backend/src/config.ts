@@ -1,5 +1,6 @@
 export default {
     port: parseInt(process.env.PORT || "3000"),
+    socketPort: parseInt(process.env.SOCKET_PORT || "3001"),
 
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",

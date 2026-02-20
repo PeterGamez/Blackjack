@@ -244,18 +244,21 @@
 
 #### 4.2.1 Authentication API
 
-| ID | Endpoint |
-|----|----------|
-| API-AUTH-01 | Login |
-| API-AUTH-02 | Register |
-| API-AUTH-03 | Logout |
-| API-AUTH-04 | Get Current User |
+| ID | Method | Endpoint | Auth | คำอธิบาย |
+|----|--------|----------|------|----------|
+| API-AUTH-01 | `POST` | `/auth/login` | ไม่ต้องการ | เข้าสู่ระบบ คืน `accessToken` และ `refreshToken` |
+| API-AUTH-02 | `POST` | `/auth/register` | ไม่ต้องการ | สมัครสมาชิก ส่งอีเมลยืนยัน |
+| API-AUTH-03 | `GET` | `/auth/verify?token=` | ไม่ต้องการ | ยืนยันอีเมลด้วย token |
+| API-AUTH-04 | `POST` | `/auth/refresh` | ไม่ต้องการ | รีเฟรช access token ด้วย refresh token |
 
 #### 4.2.2 User Profile API
 
+| ID | Method | Endpoint | Auth | คำอธิบาย |
+|----|--------|----------|------|----------|
+| API-USER-01 | `GET` | `/user/profile` | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ปัจจุบัน |
+
 | ID | Endpoint |
 |----|----------|
-| API-USER-01 | Get Profile |
 | API-USER-02 | Update Profile |
 | API-USER-03 | Get Stats |
 

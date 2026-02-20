@@ -274,31 +274,61 @@
 | API-MATCH-02 | Cancel Match |
 | API-MATCH-03 | Match Status |
 
-#### 4.2.5 Table API
+#### 4.2.5 Table Socket Events (Socket.IO)
 
-| ID | Endpoint |
-|----|----------|
-| API-TABLE-01 | Create Table |
-| API-TABLE-02 | List Tables |
-| API-TABLE-03 | Join Table |
-| API-TABLE-04 | Leave Table |
+**Client → Server**
 
-#### 4.2.6 Gameplay API
+| Event | Payload | Ack | คำอธิบาย |
+|-------|---------|-----|----------|
+| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าร่วมโต๊ะ |
+| `room:leave` | `tableId: string` | `{ ok, message? }` | ออกจากโต๊ะ |
+| `room:message` | `{ tableId, data }` | `{ ok, message? }` | ส่งข้อมูลไปยังผู้เล่นในโต๊ะ |
 
-| ID | Endpoint |
-|----|----------|
-| API-GAME-01 | Start Game |
-| API-GAME-02 | Player Action |
-| API-GAME-03 | Get Game State |
-| API-GAME-04 | Result |
+**Server → Client**
 
-#### 4.2.7 Spectator API
+| Event | Payload | คำอธิบาย |
+|-------|---------|----------|
+| `room:state` | `{ tableId, members[] }` | สถานะห้องปัจจุบัน (broadcast ทุกคนในห้อง) |
+| `room:player-joined` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นเข้าร่วม |
+| `room:player-left` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นออก |
+| `room:data` | `{ tableId, from, data }` | ข้อมูลที่ผู้เล่นส่งมา (relay) |
+| `room:error` | `message: string` | แจ้ง error |
 
-| ID | Endpoint |
-|----|----------|
-| API-SPEC-01 | Watch Table |
-| API-SPEC-02 | Place Bet |
-| API-SPEC-03 | Bet Status |
+#### 4.2.6 Gameplay Socket Events (Socket.IO)
+
+**Client → Server**
+
+| Event | Payload | Ack | คำอธิบาย |
+|-------|---------|-----|----------|
+| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าร่วมโต๊ะเกม |
+| `room:message` | `{ tableId, data: { action } }` | `{ ok, message? }` | ส่ง action ของผู้เล่น เช่น Hit, Stand |
+
+**Server → Client**
+
+| Event | Payload | คำอธิบาย |
+|-------|---------|----------|
+| `room:state` | `{ tableId, members[] }` | สถานะห้อง |
+| `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลลัพธ์ |
+| `room:error` | `message: string` | แจ้ง error |
+
+#### 4.2.7 Spectator Socket Events (Socket.IO)
+
+**Client → Server**
+
+| Event | Payload | Ack | คำอธิบาย |
+|-------|---------|-----|----------|
+| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าชมโต๊ะในฐานะผู้ชม |
+| `room:leave` | `tableId: string` | `{ ok, message? }` | ออกจากโต๊ะ |
+| `room:message` | `{ tableId, data: { bet, side } }` | `{ ok, message? }` | ส่งข้อมูลการเดิมพันของผู้ชม |
+
+**Server → Client**
+
+| Event | Payload | คำอธิบาย |
+|-------|---------|----------|
+| `room:state` | `{ tableId, members[] }` | สถานะห้อง |
+| `room:player-joined` | `{ tableId, socketId }` | มีผู้ชมเข้าร่วม |
+| `room:player-left` | `{ tableId, socketId }` | ผู้ชมออกจากห้อง |
+| `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลเดิมพัน |
 
 #### 4.2.8 Currency & Payment API
 

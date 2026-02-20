@@ -114,6 +114,7 @@ export default (app: Hono, client: Client) => {
                     id: user.id,
                     username: user.username,
                     email: user.email,
+                    role: user.role,
                 },
             });
         } catch (error) {

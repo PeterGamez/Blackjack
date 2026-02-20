@@ -45,7 +45,8 @@ export default async (app: Hono, client: Client) => {
     });
 
     app.onError((err, c) => {
-        console.error(`Error occurred during request to ${c.req.url}:`, err);
+        client.error("Hono", "Unhandled error occurred");
+        console.error(err);
         return c.json({ message: "Internal Server Error" }, 500);
     });
 };

@@ -1,7 +1,7 @@
 {
   "module": "dist/index.js",
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun run build && bun run .",
     "build": "tsc",
     "format": "prettier --write src/**/*.ts --config .prettierrc.js"
   },

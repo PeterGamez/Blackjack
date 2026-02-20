@@ -11,6 +11,8 @@ const client = new Client();
 const app = new Hono().basePath(client.config.app.path);
 
 async function run() {
+    client.log("App", "Starting server...");
+
     await databaseHandler(client);
 
     app.use(logger(client.customLogger.bind(client)));

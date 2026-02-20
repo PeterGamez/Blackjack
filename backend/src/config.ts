@@ -1,6 +1,14 @@
 export default {
-    port: parseInt(process.env.PORT || "3001"),
-    socketPort: parseInt(process.env.SOCKET_PORT || "3002"),
+    site: {
+        url: process.env.SITE_URL || "http://localhost:3000",
+    },
+    api: {
+        path: process.env.API_PATH || "/",
+        port: parseInt(process.env.API_PORT || "3001"),
+    },
+    socket: {
+        port: parseInt(process.env.SOCKET_PORT || "3002"),
+    },
 
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
@@ -21,13 +29,6 @@ export default {
             pass: process.env.EMAIL_PASS || "",
         },
         from: process.env.EMAIL_FROM || "",
-    },
-
-    site: {
-        url: process.env.SITE_URL || "http://localhost:3000",
-    },
-    app: {
-        path: process.env.APP_PATH || "/",
     },
 
     mysql: {

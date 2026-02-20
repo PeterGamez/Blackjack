@@ -1,42 +1,55 @@
 import crypto from "crypto";
 import RedisService from "../services/RedisService";
-import config from "../config";
 import nodemailer from "nodemailer";
 import { EmailVerificationData } from "../interfaces/Cache";
+import Client from "./Client";
 
 export class EmailVerification {
     private readonly PREFIX = "email:verify:";
     private readonly TTL = 24 * 60 * 60;
 
+    private client: Client;
+
     private transporter: nodemailer.Transporter;
 
-    public constructor(c: typeof config) {
+    private html(verificationUrl: string): string {
+        return `
+            <h1>Email Verification</h1>
+            <p>Thank you for registering! Please click the link below to verify your email address:</p>
+            <a href="${verificationUrl}">Verify Email</a>
+            <p>${verificationUrl}</p>
+            <p>This link will expire in ${this.client.config.verifyEmail.expiresIn} hours.</p>
+            <p>If you did not create an account, please ignore this email.</p>
+        `;
+    }
+
+    public constructor(client: Client) {
+        this.client = client;
+
         this.transporter = nodemailer.createTransport({
-            host: c.email.host,
-            port: c.email.port,
-            secure: c.email.secure,
+            host: client.config.email.host,
+            port: client.config.email.port,
+            secure: client.config.email.secure,
             auth: {
-                user: c.email.auth.user,
-                pass: c.email.auth.pass,
+                user: client.config.email.auth.user,
+                pass: client.config.email.auth.pass,
             },
         });
     }
 
-    public async generate(userId: number, email: string): Promise<string> {
-        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        const length = chars.length;
+    public async sendVerificationEmail(userId: number, email: string): Promise<void> {
+        const verificationToken = await this.generate(userId, email);
+        const verificationUrl = `${this.client.config.site.url}/auth/verify?token=${verificationToken}`;
 
-        const token = Array.from(crypto.randomBytes(32))
-            .map((b) => chars[length])
-            .join("");
-
-        await RedisService.hmset<EmailVerificationData>(`${this.PREFIX}${token}`, { userId: userId.toString(), email });
-        await RedisService.expire(`${this.PREFIX}${token}`, this.TTL);
-
-        return token;
+        await this.transporter.sendMail({
+            from: this.client.config.email.from,
+            to: email,
+            subject: "Verify Your Email - Blackjack",
+            html: this.html(verificationUrl),
+        });
     }
 
-    public async verify(token: string): Promise<{ userId: number; email: string }> {
+    public async verify(token: string): Promise<{ userId: number; email: string } | null> {
         const key = `${this.PREFIX}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);
@@ -49,23 +62,17 @@ export class EmailVerification {
         return { userId: parseInt(value.userId), email: value.email };
     }
 
-    public async sendVerificationEmail(userId: number, email: string): Promise<void> {
-        const verificationToken = await this.generate(userId, email);
-        const verificationUrl = `${config.app.url}/auth/verify?token=${verificationToken}`;
+    private async generate(userId: number, email: string): Promise<string> {
+        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const length = chars.length;
 
-        const mailOptions = {
-            from: config.email.from,
-            to: email,
-            subject: "Verify Your Email - Blackjack",
-            html: `
-            <h1>Email Verification</h1>
-            <p>Thank you for registering! Please click the link below to verify your email address:</p>
-            <a href="${verificationUrl}">Verify Email</a>
-            <p>This link will expire in ${config.verifyEmail.expiresIn} hours.</p>
-            <p>If you did not create an account, please ignore this email.</p>
-        `,
-        };
+        const token = Array.from(crypto.randomBytes(32))
+            .map((b) => chars[b % length])
+            .join("");
 
-        await this.transporter.sendMail(mailOptions);
+        await RedisService.hmset<EmailVerificationData>(`${this.PREFIX}${token}`, { userId: userId.toString(), email });
+        await RedisService.expire(`${this.PREFIX}${token}`, this.TTL);
+
+        return token;
     }
 }

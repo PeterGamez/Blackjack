@@ -27,7 +27,7 @@ async function run() {
             port: client.config.port,
         },
         () => {
-            client.log("Hono", `Server running at ${client.config.app.url}`);
+            client.log("Hono", `Server running at http://localhost:${client.config.port}${client.config.app.path}`);
         }
     );
 }

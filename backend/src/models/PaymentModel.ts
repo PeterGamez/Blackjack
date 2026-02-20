@@ -21,7 +21,7 @@ export default class PaymentModel {
         }
     }
 
-    public static async getPaymentByReceipt(receiptRef: string): Promise<PaymentInterface | null> {
+    public static async selectPaymentByReceipt(receiptRef: string): Promise<PaymentInterface | null> {
         const sql = `SELECT * FROM ${this.table} WHERE receiptRef = ?`;
         const connection = await this.DB.getConnection();
         try {

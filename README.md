@@ -2,8 +2,6 @@
 
 ## Software Requirements Specification (SRS)
 
----
-
 ## 1. Introduction
 
 ### 1.1 Purpose
@@ -19,7 +17,9 @@
 | คำ | ความหมาย |
 |----|-----------|
 | Coin | เงินที่หาได้ในเกม |
-| Token | เงินพรีเมียม (เติมเงิน) |
+| Cash | เงินพรีเมียม (เติมเงิน) |
+| Viewer | ผู้ชมที่ดูเกมและเดิมพันผลลัพธ์ได้ |
+| Player | ผู้เล่น |
 | Dealer | เจ้ามือ |
 
 ---
@@ -34,19 +34,9 @@
 
 | Class | สิทธิ์ |
 |-------|--------|
-| Guest | ดูหน้าเว็บได้ แต่เล่นไม่ได้ |
-| Player | เล่นเกมได้ |
-| Admin | จัดการระบบ |
-
-### 2.3 Operating Environment
-
-- **Browser:** Chrome, Edge, Firefox
-- **Platform:** Desktop
-
-### 2.4 Constraints
-
-- ต้องใช้ฐานข้อมูล SQL
-- ต้องรองรับผู้เล่นพร้อมกัน ≥ 100 คน
+| guest | ดูหน้าเว็บได้ แต่เล่นไม่ได้ |
+| user | ผู้เล่นทั่วไป |
+| admin | จัดการระบบ |
 
 ---
 
@@ -101,9 +91,9 @@
 
 | ID | Requirement |
 |----|-------------|
-| FR-3-07 | ผู้เล่นต้องใช้ Token เพื่อเข้าเล่น |
-| FR-3-08 | ระบบต้องหัก Token ก่อนเริ่มเกม |
-| FR-3-09 | ผู้ชนะต้องได้รับ Token เป็นรางวัล |
+| FR-3-07 | ผู้เล่นต้องใช้ Cash เพื่อเข้าเล่น |
+| FR-3-08 | ระบบต้องหัก Cash ก่อนเริ่มเกม |
+| FR-3-09 | ผู้ชนะต้องได้รับ Cash เป็นรางวัล |
 | FR-3-10 | ระบบต้องอัปเดตอันดับหลังจบเกม |
 
 ---
@@ -129,16 +119,16 @@
 |----|-------------|
 | FR-5-01 | ผู้ใช้ต้องเข้าชมโต๊ะที่กำลังเล่นอยู่ได้ |
 | FR-5-02 | ระบบต้องแสดงสถานะเกมปัจจุบันของโต๊ะ |
-| FR-5-03 | ผู้ชมต้องสามารถเดิมพันผลลัพธ์ได้โดยไม่ต้องเข้าร่วมเล่น |
-| FR-5-04 | ผู้ชมต้องเดิมพันฝั่ง Player ได้ในอัตรา 1:1 |
-| FR-5-05 | ผู้ชมต้องเดิมพันฝั่ง Banker ได้ในอัตรา 0.9:1 |
+| FR-5-03 | Viewer ต้องสามารถเดิมพันผลลัพธ์ได้โดยไม่ต้องเข้าร่วมเล่น |
+| FR-5-04 | Viewer ต้องเดิมพันฝั่ง Player ได้ในอัตรา 1:1 |
+| FR-5-05 | Viewer ต้องเดิมพันฝั่ง Banker ได้ในอัตรา 0.9:1 |
 | FR-5-06 | ระบบต้องคำนวณเงินรางวัลอัตโนมัติ |
 | FR-5-07 | ระบบต้องเพิ่มเงินรางวัลให้ผู้เดิมพันที่ชนะ |
 | FR-5-08 | ระบบต้องหักเงินเดิมพันก่อนเริ่มรอบ |
-| FR-5-09 | ผู้ชมต้องไม่สามารถควบคุมเกมแทนผู้เล่น |
-| FR-5-10 | ผู้ชมต้องไม่สามารถเดิมพันหลังเริ่มรอบ |
+| FR-5-09 | Viewer ต้องไม่สามารถควบคุมเกมแทนผู้เล่น |
+| FR-5-10 | Viewer ต้องไม่สามารถเดิมพันหลังเริ่มรอบ |
 | FR-5-11 | ระบบต้องล็อกการเดิมพันเมื่อแจกไพ่ใบแรก |
-| FR-5-12 | ผู้ชมต้องออกจากโต๊ะได้ตลอดเวลา |
+| FR-5-12 | Viewer ต้องออกจากโต๊ะได้ตลอดเวลา |
 
 ---
 
@@ -149,7 +139,7 @@
 | ID | Requirement |
 |----|-------------|
 | FR-6-01 | ผู้เล่นต้องมี Coin balance |
-| FR-6-02 | ผู้เล่นต้องมี Token balance |
+| FR-6-02 | ผู้เล่นต้องมี Cash balance |
 | FR-6-03 | ระบบต้องหักเงินเมื่อเดิมพัน |
 | FR-6-04 | ระบบต้องเพิ่มเงินเมื่อชนะ |
 | FR-6-05 | ระบบต้องแสดงยอดเงินล่าสุดแบบ realtime |
@@ -174,7 +164,7 @@
 | ID | Requirement |
 |----|-------------|
 | FR-8-01 | ระบบต้องแสดงอันดับผู้เล่น |
-| FR-8-02 | ระบบต้องจัดอันดับตาม Rank score หรือ Token |
+| FR-8-02 | ระบบต้องจัดอันดับตาม Rank score หรือ Cash |
 | FR-8-03 | ระบบต้องอัปเดตอันดับแบบ realtime |
 
 ---
@@ -189,7 +179,7 @@
 |----|-------------|
 | FR-9-01 | ระบบต้องมีร้านค้า Skin |
 | FR-9-02 | ระบบต้องแสดงรายการ Skin พร้อมราคา |
-| FR-9-03 | ผู้เล่นต้องซื้อ Skin ด้วย Coin หรือ Token ได้ |
+| FR-9-03 | ผู้เล่นต้องซื้อ Skin ด้วย Coin หรือ Cash ได้ |
 | FR-9-04 | ระบบต้องหักเงินหลังซื้อสำเร็จ |
 | FR-9-05 | ระบบต้องเพิ่ม Skin ลง Inventory ผู้เล่น |
 
@@ -234,9 +224,9 @@
 | UI-06 | Gameplay Page | หน้าหลักสำหรับเล่นเกม Blackjack |
 | UI-07 | Table Settings Page | หน้าตั้งค่าโต๊ะสำหรับการสร้างห้อง เช่น จำนวนเดิมพันหรือกติกาโต๊ะ |
 | UI-08 | Table Selection Page | หน้าสำหรับเลือกโต๊ะที่ต้องการเข้าเดิมพัน |
-| UI-09 | Spectator Page | หน้าสำหรับดูเกมที่กำลังเล่นและเดิมพันแบบผู้ชม |
+| UI-09 | Spectator Page | หน้าสำหรับดูเกมที่กำลังเล่นและเดิมพันแบบ Viewer |
 | UI-10 | Result Overlay | หน้าต่างแสดงผลแพ้ชนะหลังจบรอบ |
-| UI-11 | Payment Page | หน้าสำหรับเติม Token หรือทำธุรกรรม |
+| UI-11 | Payment Page | หน้าสำหรับเติม Cash หรือทำธุรกรรม |
 | UI-12 | Skin Shop Page | หน้าร้านค้าสำหรับซื้อ Skin |
 | UI-13 | Inventory Page | หน้าคลัง Item และ Skin ของผู้เล่น |
 
@@ -244,23 +234,25 @@
 
 #### 4.2.1 Authentication API
 
-| ID | Method | Endpoint | Auth | คำอธิบาย |
-|----|--------|----------|------|----------|
-| API-AUTH-01 | `POST` | `/auth/login` | ไม่ต้องการ | เข้าสู่ระบบ คืน `accessToken` และ `refreshToken` |
-| API-AUTH-02 | `POST` | `/auth/register` | ไม่ต้องการ | สมัครสมาชิก ส่งอีเมลยืนยัน |
-| API-AUTH-03 | `GET` | `/auth/verify?token=` | ไม่ต้องการ | ยืนยันอีเมลด้วย token |
-| API-AUTH-04 | `POST` | `/auth/refresh` | ไม่ต้องการ | รีเฟรช access token ด้วย refresh token |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-AUTH-01 | `POST` | `/auth/register` | `{username, email, password}` | None | สมัครสมาชิก ส่งอีเมลยืนยัน |
+| API-AUTH-02 | `GET` | `/auth/verify?token=` | None | None | ยืนยันอีเมลด้วย parameter token |
+| API-AUTH-03 | `POST` | `/auth/login` | `{username, password}` | None | เข้าสู่ระบบ คืน access token และ refresh token |
+| API-AUTH-04 | `POST` | `/auth/refresh` | `{refreshToken}` | None | รีเฟรช access token ด้วย refresh token |
 
 #### 4.2.2 User Profile API
 
-| ID | Method | Endpoint | Auth | คำอธิบาย |
-|----|--------|----------|------|----------|
-| API-USER-01 | `GET` | `/user/profile` | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ปัจจุบัน |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ข้อมูลโปรไฟล์ผู้ใช้ |
 
 | ID | Endpoint |
 |----|----------|
-| API-USER-02 | Update Profile |
-| API-USER-03 | Get Stats |
+| API-USER-02 | Get Stats |
+| API-USER-03 | Update Profile |
+| API-USER-04 | Transaction History |
+| API-USER-05 | Game History |
 
 #### 4.2.3 Lobby & Mode API
 
@@ -277,7 +269,24 @@
 | API-MATCH-02 | Cancel Match |
 | API-MATCH-03 | Match Status |
 
-#### 4.2.5 Table Socket Events (Socket.IO)
+#### 4.2.5 Payment API
+
+| ID | Endpoint |
+|----|----------|
+| API-PAYMENT-01 | Purchase Cash |
+
+#### 4.2.6 Skin System API
+
+| ID | Endpoint |
+|----|----------|
+| API-SKIN-01 | List Skins |
+| API-SKIN-02 | Buy Skin |
+| API-SKIN-03 | Inventory |
+| API-SKIN-04 | Equip Skin |
+
+### 4.3 Socket.IO Events
+
+#### 4.3.1 Table Socket Events
 
 **Client → Server**
 
@@ -297,7 +306,7 @@
 | `room:data` | `{ tableId, from, data }` | ข้อมูลที่ผู้เล่นส่งมา (relay) |
 | `room:error` | `message: string` | แจ้ง error |
 
-#### 4.2.6 Gameplay Socket Events (Socket.IO)
+#### 4.3.2 Gameplay Socket Events (Socket.IO)
 
 **Client → Server**
 
@@ -314,77 +323,23 @@
 | `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลลัพธ์ |
 | `room:error` | `message: string` | แจ้ง error |
 
-#### 4.2.7 Spectator Socket Events (Socket.IO)
+#### 4.3.3 Spectator Socket Events (Socket.IO)
 
 **Client → Server**
 
 | Event | Payload | Ack | คำอธิบาย |
 |-------|---------|-----|----------|
-| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าชมโต๊ะในฐานะผู้ชม |
+| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าชมโต๊ะในฐานะ Viewer |
 | `room:leave` | `tableId: string` | `{ ok, message? }` | ออกจากโต๊ะ |
-| `room:message` | `{ tableId, data: { bet, side } }` | `{ ok, message? }` | ส่งข้อมูลการเดิมพันของผู้ชม |
+| `room:message` | `{ tableId, data: { bet, side } }` | `{ ok, message? }` | ส่งข้อมูลการเดิมพันของ Viewer |
 
 **Server → Client**
 
 | Event | Payload | คำอธิบาย |
 |-------|---------|----------|
 | `room:state` | `{ tableId, members[] }` | สถานะห้อง |
-| `room:player-joined` | `{ tableId, socketId }` | มีผู้ชมเข้าร่วม |
-| `room:player-left` | `{ tableId, socketId }` | ผู้ชมออกจากห้อง |
+| `room:player-joined` | `{ tableId, socketId }` | มี Viewer เข้าร่วม |
+| `room:player-left` | `{ tableId, socketId }` | Viewer ออกจากห้อง |
 | `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลเดิมพัน |
 
-#### 4.2.8 Currency & Payment API
-
-| ID | Endpoint |
-|----|----------|
-| API-WALLET-01 | Get Balance |
-| API-WALLET-02 | Transaction History |
-| API-PAY-01 | Purchase Token |
-
-#### 4.2.9 Skin System API
-
-| ID | Endpoint |
-|----|----------|
-| API-SKIN-01 | List Skins |
-| API-SKIN-02 | Buy Skin |
-| API-SKIN-03 | Inventory |
-| API-SKIN-04 | Equip Skin |
-
-#### 4.2.10 System API
-
-| ID | Endpoint |
-|----|----------|
-| API-SYS-01 | Server Status |
-| API-SYS-02 | Version Info |
-
 ---
-
-## 5. Non-Functional Requirements
-
-| ID | Requirement |
-|----|-------------|
-| NFR-01 | หน้าเว็บต้องโหลด ≤ 2 วินาที |
-| NFR-02 | ระบบต้อง uptime ≥ 99% |
-| NFR-03 | รองรับผู้เล่นพร้อมกัน ≥ 500 คน |
-
----
-
-## 6. Database Requirements
-
-Tables ที่ต้องมี:
-
-| Table | คำอธิบาย |
-|-------|-----------|
-| `users` | ข้อมูลผู้ใช้งาน |
-| `payment` | ข้อมูลการชำระเงิน |
-| `gameHistory` | ประวัติการเล่นเกม |
-| `userSkin` | Skin ที่ผู้เล่นครอบครอง |
-| `code` | รหัส/คูปอง |
-| `codeHistory` | ประวัติการใช้รหัส |
-
----
-
-## 7. Business Rules
-
-- ผู้เล่นต้องมี Coin ≥ bet ถึงจะเล่นได้
-- Blackjack = 21 แต้มด้วย 2 ใบแรก

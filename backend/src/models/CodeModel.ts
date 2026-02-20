@@ -10,18 +10,18 @@ export default class CodeModel {
         this.DB = DB;
     }
 
-    public static async createCode(id: number, code: string, amount: number, type: CodeInterface["type"]): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (id, code) VALUES (?, ?)`;
+    public static async createCode(code: string, amount: number, type: CodeInterface["type"]): Promise<number> {
+        const sql = `INSERT INTO ${this.table} (code, amount, type) VALUES (?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [, code]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [code, amount, type]);
             return result.insertId;
         } finally {
             connection.release();
         }
     }
 
-    public static async getCodeByCode(code: string): Promise<CodeInterface | null> {
+    public static async selectCodeByCode(code: string): Promise<CodeInterface | null> {
         const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
         const connection = await this.DB.getConnection();
         try {

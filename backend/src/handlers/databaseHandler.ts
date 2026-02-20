@@ -16,6 +16,7 @@ export default async (client: Client) => {
         queueLimit: 0,
         enableKeepAlive: true,
         keepAliveInitialDelay: 0,
+        connectTimeout: 20000,
 
         typeCast: function (field, next) {
             // แปลง TINYINT(1) เป็น Boolean

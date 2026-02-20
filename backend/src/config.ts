@@ -5,11 +5,11 @@ export default {
     auth: {
         jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
         accessTokenTtl: "1h",
-        refreshTokenTtl: "1d",
+        refreshTokenTtl: "24h",
     },
 
     verifyEmail: {
-        expiresIn: "24h",
+        expiresIn: "24", // hours
     },
 
     email: {

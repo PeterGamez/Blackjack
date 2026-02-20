@@ -22,12 +22,12 @@ export class EmailVerification {
         });
     }
 
-    public async generate(userId: number, email: string): Promise<string> {
+    private async generate(userId: number, email: string): Promise<string> {
         const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         const length = chars.length;
 
         const token = Array.from(crypto.randomBytes(32))
-            .map((b) => chars[length])
+            .map((b) => chars[b % length])
             .join("");
 
         await RedisService.hmset<EmailVerificationData>(`${this.PREFIX}${token}`, { userId: userId.toString(), email });
@@ -36,7 +36,7 @@ export class EmailVerification {
         return token;
     }
 
-    public async verify(token: string): Promise<{ userId: number; email: string }> {
+    public async verify(token: string): Promise<{ userId: number; email: string } | null> {
         const key = `${this.PREFIX}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);
@@ -53,7 +53,7 @@ export class EmailVerification {
         const verificationToken = await this.generate(userId, email);
         const verificationUrl = `${config.app.url}/auth/verify?token=${verificationToken}`;
 
-        const mailOptions = {
+        await this.transporter.sendMail({
             from: config.email.from,
             to: email,
             subject: "Verify Your Email - Blackjack",
@@ -64,8 +64,6 @@ export class EmailVerification {
             <p>This link will expire in ${config.verifyEmail.expiresIn} hours.</p>
             <p>If you did not create an account, please ignore this email.</p>
         `,
-        };
-
-        await this.transporter.sendMail(mailOptions);
+        });
     }
 }

@@ -21,7 +21,7 @@ export default class CodeHistoryModel {
         }
     }
 
-    public static async getCodeHistoryByUserId(userId: number): Promise<CodeHistoryInterface[]> {
+    public static async selectCodeHistoryByUserId(userId: number): Promise<CodeHistoryInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
         const connection = await this.DB.getConnection();
         try {

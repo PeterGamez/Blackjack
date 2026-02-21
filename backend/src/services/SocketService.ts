@@ -1,15 +1,15 @@
 import { createServer, Server as HttpServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
-import Client from "../utils/Client";
+import Server from "../utils/Server";
 import RoomService from "../socket/RoomSocket";
 
 export default class SocketService {
     public static io: IOServer;
     private static httpServer: HttpServer;
-    private static client: Client;
+    private static server: Server;
 
-    public static init(client: Client) {
-        this.client = client;
+    public static init(server: Server) {
+        this.server = server;
         this.httpServer = createServer();
 
         this.io = new IOServer(this.httpServer, {
@@ -19,18 +19,18 @@ export default class SocketService {
             },
         });
 
-        RoomService.init(this.io, client);
+        RoomService.init(this.io, server);
 
         this.registerEvents();
 
-        this.httpServer.listen(client.config.socket.port, () => {
-            client.log("Socket.IO", `Socket server running on port ${client.config.socket.port}`);
+        this.httpServer.listen(server.config.socket.port, () => {
+            server.log("Socket.IO", `Socket server running on port ${server.config.socket.port}`);
         });
     }
 
     private static registerEvents(): void {
         this.io.on("connection", (socket: Socket) => {
-            this.client.log("Socket.IO", `Client connected: ${socket.id}`);
+            this.server.log("Socket.IO", `Client connected: ${socket.id}`);
             RoomService.register(socket);
         });
     }

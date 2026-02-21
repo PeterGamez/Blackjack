@@ -1,17 +1,17 @@
 import { Server as IOServer, Socket } from "socket.io";
 import type { RoomMessagePayload, RoomServerEvents } from "../interfaces/Socket";
 import RedisService from "../services/RedisService";
-import Client from "../utils/Client";
+import Server from "../utils/Server";
 
 export default class RoomSocket {
     private static io: IOServer;
-    private static client: Client;
+    private static server: Server;
 
     private static readonly ROOM_PREFIX = "socket:room:";
 
-    public static init(io: IOServer, client: Client): void {
+    public static init(io: IOServer, server: Server): void {
         this.io = io;
-        this.client = client;
+        this.server = server;
     }
 
     public static roomKey(tableId: string): string {
@@ -51,7 +51,7 @@ export default class RoomSocket {
         await RedisService.sadd(this.redisKey(tableId), socket.id);
         const members = await RedisService.smembers(this.redisKey(tableId));
 
-        this.client.log("RoomService", `${socket.id} joined room ${tableId}`);
+        this.server.log("RoomService", `${socket.id} joined room ${tableId}`);
 
         this.emitToRoom(tableId, "room:state", { tableId, members });
         this.broadcastToRoom(tableId, socket.id, "room:player-joined", {
@@ -70,7 +70,7 @@ export default class RoomSocket {
             await RedisService.del(this.redisKey(tableId));
         }
 
-        this.client.log("RoomService", `${socket.id} left room ${tableId}`);
+        this.server.log("RoomService", `${socket.id} left room ${tableId}`);
 
         const members = await RedisService.smembers(this.redisKey(tableId));
 
@@ -124,7 +124,7 @@ export default class RoomSocket {
         });
 
         socket.on("disconnect", async () => {
-            this.client.log("RoomService", `Client disconnected: ${socket.id}`);
+            this.server.log("RoomService", `Client disconnected: ${socket.id}`);
             await this.leaveAll(socket);
         });
     }

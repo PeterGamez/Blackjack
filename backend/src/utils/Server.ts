@@ -13,7 +13,7 @@ import CodeModel from "../models/CodeModel";
 import GameHistoryModel from "../models/GameHistoryModel";
 import PaymentModel from "../models/PaymentModel";
 
-export default class Client {
+export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;

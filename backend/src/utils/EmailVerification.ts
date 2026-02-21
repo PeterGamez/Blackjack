@@ -2,13 +2,13 @@ import crypto from "crypto";
 import RedisService from "../services/RedisService";
 import nodemailer from "nodemailer";
 import { EmailVerificationData } from "../interfaces/Cache";
-import Client from "./Client";
+import Server from "./Server";
 
 export class EmailVerification {
     private readonly PREFIX = "email:verify:";
     private readonly TTL = 24 * 60 * 60;
 
-    private client: Client;
+    private server: Server;
 
     private transporter: nodemailer.Transporter;
 
@@ -18,31 +18,31 @@ export class EmailVerification {
             <p>Thank you for registering! Please click the link below to verify your email address:</p>
             <a href="${verificationUrl}">Verify Email</a>
             <p>${verificationUrl}</p>
-            <p>This link will expire in ${this.client.config.verifyEmail.expiresIn} hours.</p>
+            <p>This link will expire in ${this.server.config.verifyEmail.expiresIn} hours.</p>
             <p>If you did not create an account, please ignore this email.</p>
         `;
     }
 
-    public constructor(client: Client) {
-        this.client = client;
+    public constructor(server: Server) {
+        this.server = server;
 
         this.transporter = nodemailer.createTransport({
-            host: client.config.email.host,
-            port: client.config.email.port,
-            secure: client.config.email.secure,
+            host: server.config.email.host,
+            port: server.config.email.port,
+            secure: server.config.email.secure,
             auth: {
-                user: client.config.email.auth.user,
-                pass: client.config.email.auth.pass,
+                user: server.config.email.auth.user,
+                pass: server.config.email.auth.pass,
             },
         });
     }
 
     public async sendVerificationEmail(userId: number, email: string): Promise<void> {
         const verificationToken = await this.generate(userId, email);
-        const verificationUrl = `${this.client.config.site.url}/auth/verify?token=${verificationToken}`;
+        const verificationUrl = `${this.server.config.site.url}/auth/verify?token=${verificationToken}`;
 
         await this.transporter.sendMail({
-            from: this.client.config.email.from,
+            from: this.server.config.email.from,
             to: email,
             subject: "Verify Your Email - Blackjack",
             html: this.html(verificationUrl),

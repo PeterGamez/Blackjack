@@ -1,14 +1,14 @@
 import { createPool } from "mysql2/promise";
-import Client from "../utils/Client";
+import Server from "../utils/Server";
 import Redis from "ioredis";
 
-export default async (client: Client) => {
+export default async (server: Server) => {
     const pool = createPool({
-        host: client.config.mysql.host,
-        port: client.config.mysql.port,
-        user: client.config.mysql.user,
-        password: client.config.mysql.password,
-        database: client.config.mysql.database,
+        host: server.config.mysql.host,
+        port: server.config.mysql.port,
+        user: server.config.mysql.user,
+        password: server.config.mysql.password,
+        database: server.config.mysql.database,
         waitForConnections: true,
         connectionLimit: 10,
         maxIdle: 10,
@@ -29,24 +29,24 @@ export default async (client: Client) => {
     });
 
     pool.on("enqueue", () => {
-        client.warn("Database", "Waiting for available connection slot!");
+        server.warn("Database", "Waiting for available connection slot!");
     });
 
     const connection = await pool.getConnection();
     connection.release();
 
-    client.DB = pool;
+    server.DB = pool;
 
-    client.log("Database", "MySQL Connected!");
+    server.log("Database", "MySQL Connected!");
 
-    client.Redis = new Redis(client.config.redis);
+    server.Redis = new Redis(server.config.redis);
 
-    client.Redis.on("ready", () => {
-        client.log("Redis", `Connected to Redis DB ${client.config.redis.db}`);
+    server.Redis.on("ready", () => {
+        server.log("Redis", `Connected to Redis DB ${server.config.redis.db}`);
     });
 
-    client.Redis.on("error", (err) => {
-        client.error("Redis", "Redis Error");
+    server.Redis.on("error", (err) => {
+        server.error("Redis", "Redis Error");
         console.error(err);
     });
 

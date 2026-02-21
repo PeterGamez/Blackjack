@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
-import Client from "./utils/Client";
+import Server from "./utils/Server";
 import AuthRoute from "./routes/AuthRoute";
 import UserRoute from "./routes/UserRoute";
 
-const authMiddleware = (client: Client) => {
+const authMiddleware = (server: Server) => {
     return createMiddleware(async (c, next) => {
         const authHeader = c.req.header("Authorization");
 
@@ -15,7 +15,7 @@ const authMiddleware = (client: Client) => {
         const token = authHeader.split(" ")[1];
 
         try {
-            const payload = client.JWT.verifyToken(token);
+            const payload = server.JWT.verifyToken(token);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 401);
             }
@@ -29,23 +29,23 @@ const authMiddleware = (client: Client) => {
     });
 };
 
-export default async (app: Hono, client: Client) => {
+export default async (app: Hono, server: Server) => {
     app.get("/", (c) => {
         return c.json({ message: "Hono + TypeScript Server" });
     });
 
-    app.route("/auth", AuthRoute(new Hono(), client));
+    app.route("/auth", AuthRoute(new Hono(), server));
 
-    app.use("/*", authMiddleware(client));
+    app.use("/*", authMiddleware(server));
 
-    app.route("/user", UserRoute(new Hono(), client));
+    app.route("/user", UserRoute(new Hono(), server));
 
     app.notFound((c) => {
         return c.json({ error: "Not Found" }, 404);
     });
 
     app.onError((err, c) => {
-        client.error("Hono", "Unhandled error occurred");
+        server.error("Hono", "Unhandled error occurred");
         console.error(err);
         return c.json({ message: "Internal Server Error" }, 500);
     });

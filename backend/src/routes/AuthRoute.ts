@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import Client from "../utils/Client";
+import Server from "../utils/Server";
 import UserModel from "../models/UserModel";
 
-export default (app: Hono, client: Client) => {
+export default (app: Hono, server: Server) => {
     app.post("/register", async (c) => {
         try {
             const body = (await c.req.json()) as { username: string; email: string; password: string };
@@ -20,17 +20,17 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Username or email already exists" }, 409);
             }
 
-            const hashedPassword = await client.Password.hash(password);
+            const hashedPassword = await server.Password.hash(password);
 
             const userId = await UserModel.createUser(username, email, hashedPassword);
 
             try {
-                await client.EmailVerification.sendVerificationEmail(userId, email);
+                await server.EmailVerification.sendVerificationEmail(userId, email);
             } catch (emailError) {
-                client.error("EMAIL", `Failed to send verification email: ${emailError}`);
+                server.error("EMAIL", `Failed to send verification email: ${emailError}`);
             }
 
-            client.log("AUTH", `User registered: ${email}`);
+            server.log("AUTH", `User registered: ${email}`);
 
             return c.json(
                 {
@@ -39,21 +39,22 @@ export default (app: Hono, client: Client) => {
                 201
             );
         } catch (error) {
-            client.error("AUTH", "Registration error: ");
+            server.error("AUTH", "Registration error: ");
             console.error(error);
             return c.json({ error: "Registration failed" }, 500);
         }
     });
 
-    app.get("/verify", async (c) => {
+    app.post("/verify", async (c) => {
         try {
-            const token = c.req.query("token");
+            const body = (await c.req.json()) as { token: string };
+            const { token } = body;
 
             if (!token) {
                 return c.json({ error: "Missing verification token" }, 400);
             }
 
-            const payload = await client.EmailVerification.verify(token);
+            const payload = await server.EmailVerification.verify(token);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 400);
             }
@@ -69,11 +70,11 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            client.log("AUTH", `Email verified: ${email}`);
+            server.log("AUTH", `Email verified: ${email}`);
 
             return c.json({ message: "Email verified successfully" });
         } catch (error) {
-            client.error("AUTH", "Email verification error: ");
+            server.error("AUTH", "Email verification error: ");
             console.error(error);
             return c.json({ error: "Invalid or expired token" }, 400);
         }
@@ -96,7 +97,7 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Username/email or password is incorrect" }, 401);
             }
 
-            const isValidPassword = await client.Password.compare(password, user.password);
+            const isValidPassword = await server.Password.compare(password, user.password);
 
             if (!isValidPassword) {
                 return c.json({ error: "Username/email or password is incorrect" }, 401);
@@ -106,10 +107,10 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Please verify your email before logging in" }, 403);
             }
 
-            const accessToken = client.JWT.generateAccessToken(user);
-            const refreshToken = client.JWT.generateRefreshToken(user);
+            const accessToken = server.JWT.generateAccessToken(user);
+            const refreshToken = server.JWT.generateRefreshToken(user);
 
-            client.log("AUTH", `User logged in: ${user.id}`);
+            server.log("AUTH", `User logged in: ${user.id}`);
 
             return c.json({
                 message: "Login successful",
@@ -123,7 +124,7 @@ export default (app: Hono, client: Client) => {
                 },
             });
         } catch (error) {
-            client.error("AUTH", "Login error: ");
+            server.error("AUTH", "Login error: ");
             console.error(error);
             return c.json({ error: "Login failed" }, 500);
         }
@@ -138,7 +139,7 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Missing refresh token" }, 400);
             }
 
-            const payload = client.JWT.verifyToken(refreshToken);
+            const payload = server.JWT.verifyToken(refreshToken);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 400);
             }
@@ -153,17 +154,17 @@ export default (app: Hono, client: Client) => {
                 return c.json({ error: "Account not verified" }, 403);
             }
 
-            const newAccessToken = client.JWT.generateAccessToken(user);
-            const newRefreshToken = client.JWT.generateRefreshToken(user);
+            const newAccessToken = server.JWT.generateAccessToken(user);
+            const newRefreshToken = server.JWT.generateRefreshToken(user);
 
-            client.log("AUTH", `Tokens refreshed for: ${user.id}`);
+            server.log("AUTH", `Tokens refreshed for: ${user.id}`);
 
             return c.json({
                 accessToken: newAccessToken,
                 refreshToken: newRefreshToken,
             });
         } catch (error) {
-            client.error("AUTH", "Token refresh error: ");
+            server.error("AUTH", "Token refresh error: ");
             console.error(error);
             return c.json({ error: "Invalid or expired refresh token" }, 401);
         }

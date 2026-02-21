@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import Client from "../utils/Client";
+import Server from "../utils/Server";
 import UserModel from "../models/UserModel";
 import UserSkinModel from "../models/UserSkinModels";
 import { UserInterface } from "../interfaces/Database";
 
-export default (app: Hono, client: Client) => {
+export default (app: Hono, server: Server) => {
     app.get("/me", async (c) => {
         const payload = c.get("jwtPayload");
         const userId = payload.userId;

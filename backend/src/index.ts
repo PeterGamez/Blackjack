@@ -2,32 +2,32 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
 import databaseHandler from "./handlers/databaseHandler";
-import Client from "./utils/Client";
+import Server from "./utils/Server";
 import route from "./route";
 import { JWTPayload } from "./interfaces/JWTPayload";
 
-const client = new Client();
-const app = new Hono().basePath(client.config.api.path);
+const server = new Server();
+const app = new Hono().basePath(server.config.api.path);
 
 async function run() {
-    client.log("App", "Starting server...");
+    server.log("App", "Starting server...");
 
-    await databaseHandler(client);
+    await databaseHandler(server);
 
-    client.initModels();
-    client.initServices();
+    server.initModels();
+    server.initServices();
 
-    app.use(logger(client.customLogger.bind(client)));
+    app.use(logger(server.customLogger.bind(server)));
 
-    route(app, client);
+    route(app, server);
 
     serve(
         {
             fetch: app.fetch,
-            port: client.config.api.port,
+            port: server.config.api.port,
         },
         () => {
-            client.log("Hono", `Server running at http://localhost:${client.config.api.port}${client.config.api.path}`);
+            server.log("Hono", `Server running at http://localhost:${server.config.api.port}${server.config.api.path}`);
         }
     );
 }

@@ -237,7 +237,7 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-AUTH-01 | `POST` | `/auth/register` | `{username, email, password}` | None | สมัครสมาชิก ส่งอีเมลยืนยัน |
-| API-AUTH-02 | `GET` | `/auth/verify?token=` | None | None | ยืนยันอีเมลด้วย parameter token |
+| API-AUTH-02 | `POST` | `/auth/verify` | `${token}` | None | ยืนยันอีเมลด้วย parameter token |
 | API-AUTH-03 | `POST` | `/auth/login` | `{username, password}` | None | เข้าสู่ระบบ คืน access token และ refresh token |
 | API-AUTH-04 | `POST` | `/auth/refresh` | `{refreshToken}` | None | รีเฟรช access token ด้วย refresh token |
 

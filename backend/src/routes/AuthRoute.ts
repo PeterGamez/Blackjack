@@ -45,9 +45,10 @@ export default (app: Hono, server: Server) => {
         }
     });
 
-    app.get("/verify", async (c) => {
+    app.post("/verify", async (c) => {
         try {
-            const token = c.req.query("token");
+            const body = (await c.req.json()) as { token: string };
+            const { token } = body;
 
             if (!token) {
                 return c.json({ error: "Missing verification token" }, 400);

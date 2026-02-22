@@ -245,53 +245,41 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-USER-01 | `GET` | `/user/me` | None | Bearer | ข้อมูลโปรไฟล์ผู้ใช้ + skins |
-| API-USER-02 | `PUT` | `/user/me` | `{username?, email?}` | Bearer | แก้ไข username หรือ email |
-| API-USER-03 | `PUT` | `/user/me/password` | `{currentPassword, newPassword}` | Bearer | เปลี่ยนรหัสผ่าน |
-| API-USER-04 | `POST` | `/user/code/redeem` | `{code}` | Bearer | แลก voucher code รับ cash/coins |
-| API-USER-05 | `POST` | `/user/payment` | `{receiptRef, amount, currencyType}` | Bearer | ส่งใบเสร็จเพื่อเติมเงิน |
-| API-USER-06 | `GET` | `/user/payment` | None | Bearer | ประวัติการชำระเงินของตัวเอง |
-| API-USER-07 | `GET` | `/user/history` | None | Bearer | ประวัติเกมของตัวเอง |
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
+| API-USER-02 | `GET` | `/user/stats` | None | Bearer | ดึงสถิติการเล่นของผู้ใช้ เช่น จำนวนเกม ชนะ/แพ้ Rank score |
+| API-USER-03 | `PATCH` | `/user/profile` | `{username?, avatar?, email?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ เช่น username รูปโปรไฟล์ อีเมล หรือรหัสผ่าน (field: email, password เป็น optional) |
+| API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Cash ของผู้ใช้ |
+| API-USER-05 | `GET` | `/user/history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ พร้อมผลแพ้ชนะและเงินที่ได้รับ |
 
 #### 4.2.3 Lobby & Mode API
 
-| ID | Method | Endpoint | Query | Auth | คำอธิบาย |
-|----|--------|----------|-------|------|----------|
-| API-LOBBY-01 | — | — | — | — | Get Game Modes (TBD) |
-| API-LOBBY-02 | `GET` | `/leaderboard` | `sortBy=cash\|coins&limit=10` | Bearer | อันดับผู้เล่น (แสดงเฉพาะ id, username, cash, coins) |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-LOBBY-01 | `GET` | `/lobby/modes` | None | Bearer | ดึงรายการโหมดเกมที่รองรับ เช่น QuickPlay และ Rank Mode พร้อมรายละเอียด |
+| API-LOBBY-02 | `GET` | `/lobby/leaderboard` | None | Bearer | ดึงอันดับผู้เล่นสูงสุดจากคะแนน Rank หรือ Cash |
 
 #### 4.2.4 Matchmaking API
 
-| ID | Endpoint |
-|----|----------|
-| API-MATCH-01 | Find Match |
-| API-MATCH-02 | Cancel Match |
-| API-MATCH-03 | Match Status |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-MATCH-01 | `POST` | `/match/find` | `{mode, betAmount}` | Bearer | เริ่มค้นหาคู่แข่งตามโหมดและจำนวนเดิมพันที่เลือก |
+| API-MATCH-02 | `POST` | `/match/cancel` | `{matchId}` | Bearer | ยกเลิกการค้นหาคู่แข่งที่กำลังรอ |
+| API-MATCH-03 | `GET` | `/match/status` | None | Bearer | ดึงสถานะการจับคู่ปัจจุบันของผู้ใช้ |
 
 #### 4.2.5 Payment API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-PAYMENT-01 | `POST` | `/user/payment` | `{receiptRef, amount, currencyType}` | Bearer | ส่งใบเสร็จเพื่อเติมเงิน (ดู API-USER-05) |
-| API-PAYMENT-02 | `GET` | `/user/payment` | None | Bearer | ประวัติการชำระเงิน (ดู API-USER-06) |
+| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Cash เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
 
 #### 4.2.6 Skin System API
 
-| ID | Endpoint |
-|----|----------|
-| API-SKIN-01 | List Skins (TBD) |
-| API-SKIN-02 | Buy Skin (TBD) |
-| API-SKIN-03 | Inventory (TBD) |
-| API-SKIN-04 | Equip Skin (TBD) |
-
-#### 4.2.7 Admin API
-
-| ID | Method | Endpoint | Body / Query | Auth | คำอธิบาย |
-|----|--------|----------|--------------|------|----------|
-| API-ADMIN-01 | `GET` | `/admin/codes` | None | Bearer + admin | ดูรายการ voucher code ทั้งหมด |
-| API-ADMIN-02 | `POST` | `/admin/code` | `{code, amount, type}` | Bearer + admin | สร้าง voucher code ใหม่ |
-| API-ADMIN-03 | `PATCH` | `/admin/code/:id` | `{code?, amount?, type?, isActive?, expiredDate?}` | Bearer + admin | แก้ไข / เปิด-ปิด code |
-| API-ADMIN-04 | `GET` | `/admin/leaderboard` | `sortBy=cash\|coins&limit=10` | Bearer + admin | อันดับผู้เล่นพร้อมข้อมูลเต็ม |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-SKIN-01 | `GET` | `/skin/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดที่มีในร้านค้า พร้อมราคาและประเภท |
+| API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Cash และเพิ่มเข้า Inventory |
+| API-SKIN-03 | `GET` | `/skin/inventory` | None | Bearer | ดึงรายการ Skin ที่ผู้ใช้ครอบครองและ Skin ที่กำลังใช้งาน |
+| API-SKIN-04 | `POST` | `/skin/equip` | `{skinId}` | Bearer | เลือก Skin ที่ต้องการใช้งาน ระบบจะบันทึกและใช้ Skin นี้ในเกม |
 
 ### 4.3 Socket.IO Events
 

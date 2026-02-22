@@ -64,15 +64,4 @@ export default class UserModel {
             connection.release();
         }
     }
-
-    public static async selectAllUsersOrderBy(field: "cash" | "coins", limit = 10): Promise<UserInterface[]> {
-        const sql = `SELECT * FROM ${this.table} ORDER BY ${field} DESC LIMIT ?`;
-        const connection = await this.DB.getConnection();
-        try {
-            const [rows] = await connection.execute(sql, [limit]);
-            return rows as UserInterface[];
-        } finally {
-            connection.release();
-        }
-    }
 }

@@ -245,21 +245,20 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-USER-01 | `GET` | `/user/me` | None | Bearer | ข้อมูลโปรไฟล์ผู้ใช้ |
-
-| ID | Endpoint |
-|----|----------|
-| API-USER-02 | Get Stats |
-| API-USER-03 | Update Profile |
-| API-USER-04 | Transaction History |
-| API-USER-05 | Game History |
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ข้อมูลโปรไฟล์ผู้ใช้ + skins |
+| API-USER-02 | `PUT` | `/user/me` | `{username?, email?}` | Bearer | แก้ไข username หรือ email |
+| API-USER-03 | `PUT` | `/user/me/password` | `{currentPassword, newPassword}` | Bearer | เปลี่ยนรหัสผ่าน |
+| API-USER-04 | `POST` | `/user/code/redeem` | `{code}` | Bearer | แลก voucher code รับ cash/coins |
+| API-USER-05 | `POST` | `/user/payment` | `{receiptRef, amount, currencyType}` | Bearer | ส่งใบเสร็จเพื่อเติมเงิน |
+| API-USER-06 | `GET` | `/user/payment` | None | Bearer | ประวัติการชำระเงินของตัวเอง |
+| API-USER-07 | `GET` | `/user/history` | None | Bearer | ประวัติเกมของตัวเอง |
 
 #### 4.2.3 Lobby & Mode API
 
-| ID | Endpoint |
-|----|----------|
-| API-LOBBY-01 | Get Game Modes |
-| API-LOBBY-02 | Get Leaderboard |
+| ID | Method | Endpoint | Query | Auth | คำอธิบาย |
+|----|--------|----------|-------|------|----------|
+| API-LOBBY-01 | — | — | — | — | Get Game Modes (TBD) |
+| API-LOBBY-02 | `GET` | `/leaderboard` | `sortBy=cash\|coins&limit=10` | Bearer | อันดับผู้เล่น (แสดงเฉพาะ id, username, cash, coins) |
 
 #### 4.2.4 Matchmaking API
 
@@ -271,18 +270,28 @@
 
 #### 4.2.5 Payment API
 
-| ID | Endpoint |
-|----|----------|
-| API-PAYMENT-01 | Purchase Cash |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-PAYMENT-01 | `POST` | `/user/payment` | `{receiptRef, amount, currencyType}` | Bearer | ส่งใบเสร็จเพื่อเติมเงิน (ดู API-USER-05) |
+| API-PAYMENT-02 | `GET` | `/user/payment` | None | Bearer | ประวัติการชำระเงิน (ดู API-USER-06) |
 
 #### 4.2.6 Skin System API
 
 | ID | Endpoint |
 |----|----------|
-| API-SKIN-01 | List Skins |
-| API-SKIN-02 | Buy Skin |
-| API-SKIN-03 | Inventory |
-| API-SKIN-04 | Equip Skin |
+| API-SKIN-01 | List Skins (TBD) |
+| API-SKIN-02 | Buy Skin (TBD) |
+| API-SKIN-03 | Inventory (TBD) |
+| API-SKIN-04 | Equip Skin (TBD) |
+
+#### 4.2.7 Admin API
+
+| ID | Method | Endpoint | Body / Query | Auth | คำอธิบาย |
+|----|--------|----------|--------------|------|----------|
+| API-ADMIN-01 | `GET` | `/admin/codes` | None | Bearer + admin | ดูรายการ voucher code ทั้งหมด |
+| API-ADMIN-02 | `POST` | `/admin/code` | `{code, amount, type}` | Bearer + admin | สร้าง voucher code ใหม่ |
+| API-ADMIN-03 | `PATCH` | `/admin/code/:id` | `{code?, amount?, type?, isActive?, expiredDate?}` | Bearer + admin | แก้ไข / เปิด-ปิด code |
+| API-ADMIN-04 | `GET` | `/admin/leaderboard` | `sortBy=cash\|coins&limit=10` | Bearer + admin | อันดับผู้เล่นพร้อมข้อมูลเต็ม |
 
 ### 4.3 Socket.IO Events
 

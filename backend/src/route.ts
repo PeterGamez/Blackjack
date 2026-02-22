@@ -3,6 +3,8 @@ import { createMiddleware } from "hono/factory";
 import Server from "./utils/Server";
 import AuthRoute from "./routes/AuthRoute";
 import UserRoute from "./routes/UserRoute";
+import AdminRoute from "./routes/AdminRoute";
+import UserModel from "./models/UserModel";
 
 const authMiddleware = (server: Server) => {
     return createMiddleware(async (c, next) => {
@@ -39,6 +41,21 @@ export default async (app: Hono, server: Server) => {
     app.use("/*", authMiddleware(server));
 
     app.route("/user", UserRoute(new Hono(), server));
+    app.route("/admin", AdminRoute(new Hono(), server));
+
+    // GET /leaderboard — public top players
+    app.get("/leaderboard", async (c) => {
+        const sortBy = (c.req.query("sortBy") as "cash" | "coins") || "cash";
+        const limit = parseInt(c.req.query("limit") || "10");
+
+        if (!["cash", "coins"].includes(sortBy)) {
+            return c.json({ error: "Invalid sortBy. Must be 'cash' or 'coins'" }, 400);
+        }
+
+        const users = await UserModel.selectAllUsersOrderBy(sortBy, limit);
+        const sanitized = users.map(({ id, username, cash, coins }) => ({ id, username, cash, coins }));
+        return c.json(sanitized);
+    });
 
     app.notFound((c) => {
         return c.json({ error: "Not Found" }, 404);

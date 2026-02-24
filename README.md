@@ -245,44 +245,39 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-USER-01 | `GET` | `/user/me` | None | Bearer | ข้อมูลโปรไฟล์ผู้ใช้ |
-
-| ID | Endpoint |
-|----|----------|
-| API-USER-02 | Get Stats |
-| API-USER-03 | Update Profile |
-| API-USER-04 | Transaction History |
-| API-USER-05 | Game History |
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
+| API-USER-02 | `GET` | `/user/stats` | None | Bearer | ดึงสถิติการเล่นของผู้ใช้ เช่น จำนวนเกม ชนะ/แพ้ Rank score |
+| API-USER-03 | `PATCH` | `/user/profile` | `{avatar?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
+| API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Cash ของผู้ใช้ |
+| API-USER-05 | `GET` | `/user/history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ พร้อมผลแพ้ชนะและเงินที่ได้รับ |
 
 #### 4.2.3 Lobby & Mode API
 
-| ID | Endpoint |
-|----|----------|
-| API-LOBBY-01 | Get Game Modes |
-| API-LOBBY-02 | Get Leaderboard |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-LOBBY-01 | `GET` | `/lobby/modes` | None | Bearer | ดึงรายการโหมดเกมที่รองรับ เช่น QuickPlay และ Rank Mode พร้อมรายละเอียด |
+| API-LOBBY-02 | `GET` | `/lobby/leaderboard` | None | Bearer | ดึงอันดับผู้เล่นสูงสุดจากคะแนน Rank หรือ Cash |
 
 #### 4.2.4 Matchmaking API
 
-| ID | Endpoint |
-|----|----------|
-| API-MATCH-01 | Find Match |
-| API-MATCH-02 | Cancel Match |
-| API-MATCH-03 | Match Status |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-MATCH-01 | `POST` | `/match/find` | `{mode, betAmount}` | Bearer | เริ่มค้นหาคู่แข่งตามโหมดและจำนวนเดิมพันที่เลือก |
+| API-MATCH-02 | `POST` | `/match/cancel` | `{matchId}` | Bearer | ยกเลิกการค้นหาคู่แข่งที่กำลังรอ |
+| API-MATCH-03 | `GET` | `/match/status` | None | Bearer | ดึงสถานะการจับคู่ปัจจุบันของผู้ใช้ |
 
 #### 4.2.5 Payment API
 
-| ID | Endpoint |
-|----|----------|
-| API-PAYMENT-01 | Purchase Cash |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Cash เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
 
 #### 4.2.6 Skin System API
 
-| ID | Endpoint |
-|----|----------|
-| API-SKIN-01 | List Skins |
-| API-SKIN-02 | Buy Skin |
-| API-SKIN-03 | Inventory |
-| API-SKIN-04 | Equip Skin |
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-SKIN-01 | `GET` | `/skin/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดที่มีในร้านค้า พร้อมราคาและประเภท |
+| API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Cash และเพิ่มเข้า Inventory |
 
 ### 4.3 Socket.IO Events
 

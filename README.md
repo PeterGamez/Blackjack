@@ -247,7 +247,7 @@
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
 | API-USER-02 | `GET` | `/user/stats` | None | Bearer | ดึงสถิติการเล่นของผู้ใช้ เช่น จำนวนเกม ชนะ/แพ้ Rank score |
-| API-USER-03 | `PATCH` | `/user/profile` | `{username?, avatar?, email?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ เช่น username รูปโปรไฟล์ อีเมล หรือรหัสผ่าน (field: email, password เป็น optional) |
+| API-USER-03 | `PATCH` | `/user/profile` | `{avatar?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
 | API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Cash ของผู้ใช้ |
 | API-USER-05 | `GET` | `/user/history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ พร้อมผลแพ้ชนะและเงินที่ได้รับ |
 
@@ -278,8 +278,6 @@
 |----|--------|----------|------|------|----------|
 | API-SKIN-01 | `GET` | `/skin/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดที่มีในร้านค้า พร้อมราคาและประเภท |
 | API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Cash และเพิ่มเข้า Inventory |
-| API-SKIN-03 | `GET` | `/skin/inventory` | None | Bearer | ดึงรายการ Skin ที่ผู้ใช้ครอบครองและ Skin ที่กำลังใช้งาน |
-| API-SKIN-04 | `POST` | `/skin/equip` | `{skinId}` | Bearer | เลือก Skin ที่ต้องการใช้งาน ระบบจะบันทึกและใช้ Skin นี้ในเกม |
 
 ### 4.3 Socket.IO Events
 

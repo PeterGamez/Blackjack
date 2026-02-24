@@ -1,4 +1,4 @@
-# Blackjack Web Application
+# Twenty-One Degrees - Blackjack
 
 ## Software Requirements Specification (SRS)
 
@@ -6,7 +6,7 @@
 
 ### 1.1 Purpose
 
-เอกสารนี้อธิบายความต้องการของระบบ Blackjack Web App เพื่อใช้เป็นแนวทางในการพัฒนา ทดสอบ และตรวจสอบระบบ
+เอกสารนี้อธิบายความต้องการของระบบ Twenty-One Degrees เพื่อใช้เป็นแนวทางในการพัฒนา ทดสอบ และตรวจสอบระบบ
 
 ### 1.2 Scope
 

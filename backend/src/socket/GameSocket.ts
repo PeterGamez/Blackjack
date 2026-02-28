@@ -32,7 +32,10 @@ const calcValue = (hand: Card[]): number => {
         value += card.value;
         if (card.rank === "A") aces++;
     }
-    while (value > 21 && aces > 0) { value -= 10; aces--; }
+    while (value > 21 && aces > 0) {
+        value -= 10;
+        aces--;
+    }
     return value;
 };
 

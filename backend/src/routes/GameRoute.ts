@@ -42,8 +42,7 @@ const createDeck = (): Card[] => {
     for (let i = 0; i < 6; i++) {
         for (const suit of suits) {
             for (const rank of ranks) {
-                const value =
-                    rank === "A" ? 11 : rank === "J" || rank === "Q" || rank === "K" ? 10 : parseInt(rank);
+                const value = rank === "A" ? 11 : rank === "J" || rank === "Q" || rank === "K" ? 10 : parseInt(rank);
                 newDeck.push({ suit, rank, value });
             }
         }
@@ -101,7 +100,7 @@ export default (app: Hono, server: Server) => {
                 playerValue,
                 dealerValue,
                 result: "pending",
-                reward: 0
+                reward: 0,
             };
 
             await saveGameState(gameState);
@@ -116,7 +115,7 @@ export default (app: Hono, server: Server) => {
                 dealerHand: [dealerHand[0]], // Only show first card
                 playerValue,
                 dealerValue,
-                deck: JSON.stringify(deck.slice(4)) // Save remaining deck
+                deck: JSON.stringify(deck.slice(4)), // Save remaining deck
             });
         } catch (error) {
             server.error("GameRoute", `Error starting game: ${error}`);
@@ -168,7 +167,7 @@ export default (app: Hono, server: Server) => {
                     playerValue: newPlayerValue,
                     status: "bust",
                     result: "lose",
-                    deck: JSON.stringify(updatedDeck)
+                    deck: JSON.stringify(updatedDeck),
                 });
             }
 
@@ -176,7 +175,7 @@ export default (app: Hono, server: Server) => {
                 playerHand,
                 playerValue: newPlayerValue,
                 status: "hit",
-                deck: JSON.stringify(updatedDeck)
+                deck: JSON.stringify(updatedDeck),
             });
         } catch (error) {
             server.error("GameRoute", `Error on hit: ${error}`);
@@ -249,7 +248,7 @@ export default (app: Hono, server: Server) => {
                 dealerValue,
                 result,
                 reward,
-                status: "game-over"
+                status: "game-over",
             });
         } catch (error) {
             server.error("GameRoute", `Error on stand: ${error}`);

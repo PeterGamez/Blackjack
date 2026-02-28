@@ -29,12 +29,28 @@ export default function ProfilePage() {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("user")
+    localStorage.removeItem("cached_username")
+    localStorage.removeItem("cached_coins")
+    localStorage.removeItem("cached_cash")
     router.push("/login")
   }
 
   if (!user) {
     return (
       <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          style={{
+            marginBottom: "20px",
+            padding: "6px 12px",
+            background: "#ccc",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ← Back
+        </button>
         <p>No profile data. Please login first.</p>
         <button onClick={() => router.push("/login")}>Go to Login</button>
       </div>
@@ -43,6 +59,20 @@ export default function ProfilePage() {
 
   return (
     <div style={{ padding: "40px", maxWidth: "400px", margin: "100px auto", background: "white", border: "1px solid #ccc" }}>
+      <button
+        type="button"
+        onClick={() => router.back()}
+        style={{
+          alignSelf: "flex-start",
+          marginBottom: "20px",
+          padding: "6px 12px",
+          background: "#ccc",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        ← Back
+      </button>
       <h2>Profile</h2>
       <p><strong>ID:</strong> {user.id}</p>
       <p><strong>Username:</strong> {user.username}</p>

@@ -10,12 +10,15 @@ export default function Home() {
   const buttonStyle = (name: string) => ({
     width: "350px",
     padding: "200px 200px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     fontSize: "20px",
     fontWeight: "bold",
     background: "#4da6ff",
     color: "black",
     border: "3px solid #2b7cd3",
-    transform: "skewX(-20deg)",
+    /* removed skew transform to make button normal */
     cursor: "pointer",
     transition: "0.2s",
     whiteSpace: "nowrap",
@@ -37,12 +40,12 @@ export default function Home() {
 }}
     >
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/Qmode")}
         onMouseEnter={() => setHovered("skin")}
         onMouseLeave={() => setHovered(null)}
         style={buttonStyle("skin")}
       >
-        <span style={{ display: "inline-block", transform: "skewX(20deg)" }}>
+        <span style={{ display: "inline-block" }}>
           QuickPlay
         </span>
       </button>
@@ -53,7 +56,7 @@ export default function Home() {
         onMouseLeave={() => setHovered(null)}
         style={buttonStyle("Gambling")}
       >
-        <span style={{ display: "inline-block", transform: "skewX(20deg)" }}>
+        <span style={{ display: "inline-block" }}>
           Rank
         </span>
       </button>

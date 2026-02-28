@@ -72,6 +72,19 @@ export default function LoginPage() {
           gap: "20px",
         }}
       >
+        <button
+          type="button"
+          onClick={() => router.back()}
+          style={{
+            alignSelf: "flex-start",
+            padding: "6px 12px",
+            background: "#ccc",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ← Back
+        </button>
         <h2 style={{ textAlign: "center" }}>Login</h2>
 
         <input

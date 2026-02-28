@@ -35,9 +35,25 @@ export default function Home() {
     }
   }
 
+  // load cache from localStorage on mount
   useEffect(() => {
+    const cachedUsername = localStorage.getItem("cached_username")
+    const cachedCoins = localStorage.getItem("cached_coins")
+    const cachedCash = localStorage.getItem("cached_cash")
+
+    if (cachedUsername) setUsername(cachedUsername)
+    if (cachedCoins) setCoins(Number(cachedCoins))
+    if (cachedCash) setCash(Number(cachedCash))
+
     loadProfile()
   }, [])
+
+  // save to cache whenever username, coins, or cash change
+  useEffect(() => {
+    if (username) localStorage.setItem("cached_username", username)
+    if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
+    if (cash > 0) localStorage.setItem("cached_cash", cash.toString())
+  }, [username, coins, cash])
 
   const buttonStyle = (name: string) => ({
     width: "350px",
@@ -78,10 +94,14 @@ export default function Home() {
           padding: "20px 40px"
         }}
       >
-        <div style={{
-          border: "2px solid #3b82f6",
-          padding: "10px 20px"
-        }}>
+        <div
+          style={{
+            border: "2px solid #3b82f6",
+            padding: "10px 20px",
+            cursor: "pointer"
+          }}
+          onClick={() => router.push("/profile")}
+        >
           {username || "username"}
         </div>
 

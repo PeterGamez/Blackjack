@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
+import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import databaseHandler from "./handlers/databaseHandler";
 import Server from "./utils/Server";
@@ -18,6 +19,12 @@ async function run() {
     server.initServices();
 
     app.use(logger(server.customLogger.bind(server)));
+    app.use(cors({
+        origin: "*",
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+    }));
 
     route(app, server);
 

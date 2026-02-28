@@ -20,6 +20,7 @@ export default function AuthPage() {
   const [regPassword, setRegPassword] = useState("")
   const [regConfirm, setRegConfirm] = useState("")
   const [regMessage, setRegMessage] = useState("")
+  const [regLoading, setRegLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +54,7 @@ export default function AuthPage() {
       setRegMessage("Passwords do not match")
       return
     }
+    setRegLoading(true)
     try {
       const res = await fetch(`${config.apiUrl}/auth/register`, {
         method: "POST",
@@ -69,6 +71,7 @@ export default function AuthPage() {
     } catch {
       setRegMessage("Server error")
     }
+    setRegLoading(false)
   }
 
   const inputStyle: React.CSSProperties = {
@@ -162,8 +165,9 @@ export default function AuthPage() {
                   background: "#4da6ff",
                   border: "none",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: loginLoading ? "not-allowed" : "pointer",
                   fontSize: "15px",
+                  opacity: loginLoading ? 0.6 : 1,
                 }}
               >
                 {loginLoading ? "Logging in..." : "Login"}
@@ -204,16 +208,18 @@ export default function AuthPage() {
               )}
               <button
                 onClick={handleRegister}
+                disabled={regLoading}
                 style={{
                   padding: "12px",
                   background: "#4da6ff",
                   border: "none",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: regLoading ? "not-allowed" : "pointer",
                   fontSize: "15px",
+                  opacity: regLoading ? 0.6 : 1,
                 }}
               >
-                Register
+                {regLoading ? "Registering..." : "Register"}
               </button>
             </div>
           )}

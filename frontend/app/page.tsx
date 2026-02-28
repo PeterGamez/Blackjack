@@ -9,7 +9,7 @@ export default function Home() {
   const [hovered, setHovered] = useState<string | null>(null)
   const [username, setUsername] = useState<string>("")
   const [coins, setCoins] = useState<number>(0)
-  const [cash, setCash] = useState<number>(0)
+  const [tokens, setTokens] = useState<number>(0)
 
   // load profile from backend
   const loadProfile = async () => {
@@ -27,8 +27,8 @@ export default function Home() {
       if (typeof data.coins === "number") {
         setCoins(data.coins)
       }
-      if (typeof data.cash === "number") {
-        setCash(data.cash)
+      if (typeof data.tokens === "number") {
+        setTokens(data.tokens)
       }
     } catch (err) {
       console.error("failed to load profile", err)
@@ -39,21 +39,21 @@ export default function Home() {
   useEffect(() => {
     const cachedUsername = localStorage.getItem("cached_username")
     const cachedCoins = localStorage.getItem("cached_coins")
-    const cachedCash = localStorage.getItem("cached_cash")
+    const cachedTokens = localStorage.getItem("cached_tokens")
 
     if (cachedUsername) setUsername(cachedUsername)
     if (cachedCoins) setCoins(Number(cachedCoins))
-    if (cachedCash) setCash(Number(cachedCash))
+    if (cachedTokens) setTokens(Number(cachedTokens))
 
     loadProfile()
   }, [])
 
-  // save to cache whenever username, coins, or cash change
+  // save to cache whenever username, coins, or tokens change
   useEffect(() => {
     if (username) localStorage.setItem("cached_username", username)
     if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
-    if (cash > 0) localStorage.setItem("cached_cash", cash.toString())
-  }, [username, coins, cash])
+    if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
+  }, [username, coins, tokens])
 
   const buttonStyle = (name: string) => ({
     width: "350px",
@@ -110,7 +110,7 @@ export default function Home() {
             🪙 {coins}
           </div>
           <div style={{ border: "2px solid #3b82f6", padding: "10px 20px" }}>
-            {cash} $ +
+            🎫 {tokens}
           </div>
         </div>
       </div>

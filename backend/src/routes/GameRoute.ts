@@ -236,7 +236,7 @@ export default (app: Hono, server: Server) => {
             game.status = "completed";
             await saveGameState(game);
 
-            // Update user coins and cash
+            // Update user coins and tokens
             const user = await UserModel.selectUser(userId);
             if (user) {
                 await UserModel.updateUser(userId, "coins", user.coins + reward);

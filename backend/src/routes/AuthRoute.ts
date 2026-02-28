@@ -7,7 +7,7 @@ export default (app: Hono, server: Server) => {
         try {
             let body: { username: string; email: string; password: string };
             try {
-                body = (await c.req.json()) as { username: string; email: string; password: string };
+                body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
@@ -59,7 +59,7 @@ export default (app: Hono, server: Server) => {
         try {
             let body: { token: string };
             try {
-                body = (await c.req.json()) as { token: string };
+                body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
@@ -99,7 +99,7 @@ export default (app: Hono, server: Server) => {
         try {
             let body: { username: string; password: string };
             try {
-                body = (await c.req.json()) as { username: string; password: string };
+                body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
@@ -154,7 +154,7 @@ export default (app: Hono, server: Server) => {
         try {
             let body: { refreshToken: string };
             try {
-                body = (await c.req.json()) as { refreshToken: string };
+                body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }

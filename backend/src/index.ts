@@ -19,12 +19,14 @@ async function run() {
     server.initServices();
 
     app.use(logger(server.customLogger.bind(server)));
-    app.use(cors({
-        origin: "*",
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    }));
+    app.use(
+        cors({
+            origin: "*",
+            allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allowHeaders: ["Content-Type", "Authorization"],
+            credentials: true,
+        })
+    );
 
     route(app, server);
 

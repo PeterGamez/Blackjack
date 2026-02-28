@@ -130,14 +130,13 @@ export default (app: Hono, server: Server) => {
             const accessToken = server.JWT.generateAccessToken(user);
             const refreshToken = server.JWT.generateRefreshToken(user);
 
-            server.log("AUTH", `User logged in: ${user.id}`);
+            server.log("AUTH", `User logged in: ${user.id} | ${user.username} | ${user.email}`);
 
             return c.json({
                 message: "Login successful",
                 accessToken,
                 refreshToken,
                 user: {
-                    id: user.id,
                     username: user.username,
                     email: user.email,
                     role: user.role,

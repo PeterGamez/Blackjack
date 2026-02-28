@@ -83,7 +83,7 @@ export default class GameSocket {
         const gameKey = this.gameKey(gameId);
         await RedisService.del(gameKey);
         await RedisService.hmset(gameKey, state as unknown as Record<string, string>);
-        await RedisService.expire(gameKey, 86400); // 24 hours
+        await RedisService.expire(gameKey, 86400);
     }
 
     public static async getGameState(gameId: number): Promise<GameState | null> {
@@ -145,7 +145,6 @@ export default class GameSocket {
     }
 
     public static register(socket: Socket): void {
-        /* game:start — creates game, deals cards, deducts bet */
         socket.on("game:start", async (payload: { userId: number; gameType: "quick_ai" | "quick_player" | "rank_player"; bet: number }, ack) => {
             const { userId, gameType, bet } = payload;
             if (!userId || !bet || bet <= 0) {
@@ -193,7 +192,7 @@ export default class GameSocket {
                     ok: true,
                     gameId,
                     playerHand,
-                    dealerHand: [dealerHand[0]], // hide second dealer card
+                    dealerHand: [dealerHand[0]],
                     playerValue,
                     bet,
                     coins: user.coins - bet,
@@ -204,7 +203,6 @@ export default class GameSocket {
             }
         });
 
-        /* game:hit — draws one card for the player */
         socket.on("game:hit", async (payload: { gameId: number; userId: number }, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
@@ -251,7 +249,6 @@ export default class GameSocket {
             }
         });
 
-        /* game:stand — dealer plays, computes result, rewards coins */
         socket.on("game:stand", async (payload: { gameId: number; userId: number }, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
@@ -269,7 +266,6 @@ export default class GameSocket {
                 const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
                 const deck: Card[] = JSON.parse(gameState.deck);
 
-                // Dealer draws until >= 17
                 while (calcValue(dealerHand) < 17 && deck.length > 0) {
                     dealerHand.push(deck.shift()!);
                 }
@@ -318,7 +314,6 @@ export default class GameSocket {
             }
         });
 
-        /* game:leave */
         socket.on("game:leave", async (payload: { gameId: number; userId: number }, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {

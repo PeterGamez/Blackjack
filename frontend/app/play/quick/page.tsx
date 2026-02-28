@@ -1,11 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Qmode() {
   const router = useRouter()
   const [hovered, setHovered] = useState<string | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken")
+    if (!token) router.replace("/auth")
+  }, [])
 
   const buttonStyle = (name: string) => ({
     width: "350px",
@@ -31,36 +36,44 @@ export default function Qmode() {
   return (
     <div
       style={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        gap: "30px"
+        gap: "30px",
       }}
     >
-      <h2 style={{ margin: 0 }}>Quick Play</h2>
+      <button
+        onClick={() => router.push("/play")}
+        style={{ position: "absolute", top: "20px", left: "20px", padding: "8px 16px", background: "#ccc", border: "none", cursor: "pointer", borderRadius: "4px", color: "black" }}
+      >
+        ← Back
+      </button>
+      <h2 style={{ margin: 0, fontSize: "28px", letterSpacing: "2px" }}>⚡ Quick Play</h2>
+      <p style={{ margin: 0, color: "#aaa" }}>Play without rank pressure</p>
 
       <div style={{ display: "flex", gap: "40px" }}>
         <button
-          onClick={() => router.push("/Qmode/VsDealer")}
+          onClick={() => router.push("/play/quick/dealer")}
           onMouseEnter={() => setHovered("A")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("A")}
         >
           <span style={{ display: "inline-block" }}>
-            VsDealer
+            Play with Dealer
           </span>
         </button>
 
         <button
-          onClick={() => router.push("/Qmode/VsPlayer")}
+          onClick={() => router.push("/play/quick/player")}
           onMouseEnter={() => setHovered("B")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("B")}
         >
           <span style={{ display: "inline-block" }}>
-            VsPlayer
+            Play with Player
           </span>
         </button>
       </div>

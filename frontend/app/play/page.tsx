@@ -1,11 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Home() {
   const router = useRouter()
   const [hovered, setHovered] = useState<string | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken")
+    if (!token) router.replace("/auth")
+  }, [])
 
   const buttonStyle = (name: string) => ({
     width: "350px",
@@ -32,15 +37,28 @@ export default function Home() {
   return (
     <div
       style={{
+  position: "relative",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   height: "100vh",
-  gap: "50px"
+  gap: "50px",
 }}
     >
       <button
-        onClick={() => router.push("/Qmode")}
+        onClick={() => router.push("/")}
+        style={{ position: "absolute", top: "20px", left: "20px", padding: "8px 16px", background: "#ccc", border: "none", cursor: "pointer", borderRadius: "4px" }}
+      >
+        ← Back
+      </button>
+
+      <div style={{ position: "absolute", top: "80px", textAlign: "center" }}>
+        <h2 style={{ margin: 0, fontSize: "28px", letterSpacing: "2px" }}>🃏 Select Mode</h2>
+        <p style={{ margin: "8px 0 0", color: "#aaa" }}>Choose how you want to play</p>
+      </div>
+
+      <button
+        onClick={() => router.push("/play/quick")}
         onMouseEnter={() => setHovered("skin")}
         onMouseLeave={() => setHovered(null)}
         style={buttonStyle("skin")}
@@ -51,7 +69,7 @@ export default function Home() {
       </button>
       
       <button
-        onClick={() => router.push("/Gambling")}
+        onClick={() => router.push("/play/rank")}
         onMouseEnter={() => setHovered("Gambling")}
         onMouseLeave={() => setHovered(null)}
         style={buttonStyle("Gambling")}

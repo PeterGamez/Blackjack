@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
-import config from "../../config"
+import config from "../../../config"
 import { io, Socket } from "socket.io-client"
 
 interface Card {
@@ -13,7 +13,7 @@ interface Card {
 
 type GameStatus = "betting" | "playing" | "game-over"
 
-export default function VsDealer() {
+export default function Dealer() {
   const router = useRouter()
   const socketRef = useRef<Socket | null>(null)
   const [gameStatus, setGameStatus] = useState<GameStatus>("betting")
@@ -41,7 +41,7 @@ export default function VsDealer() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
-    if (!token) { router.push("/login"); return }
+    if (!token) { router.push("/auth"); return }
 
     const cachedCoins = localStorage.getItem("cached_coins")
     if (cachedCoins) setPlayerChips(Number(cachedCoins))
@@ -110,8 +110,12 @@ export default function VsDealer() {
       setMessage("Invalid bet amount")
       return
     }
-    if (!socketRef.current || !userId) {
+    if (!socketRef.current) {
       setMessage("Not connected")
+      return
+    }
+    if (!userId) {
+      setMessage("User not loaded yet, please wait")
       return
     }
 
@@ -139,7 +143,7 @@ export default function VsDealer() {
   }
 
   const hit = () => {
-    if (isLoading || !socketRef.current) return
+    if (isLoading || !socketRef.current || !gameId || !userId) return
     setIsLoading(true)
     socketRef.current.emit(
       "game:hit",
@@ -157,7 +161,7 @@ export default function VsDealer() {
   }
 
   const stand = () => {
-    if (isLoading || !socketRef.current) return
+    if (isLoading || !socketRef.current || !gameId || !userId) return
     setIsLoading(true)
     socketRef.current.emit("game:stand", { gameId, userId }, (ack: any) => {
       if (!ack?.ok) {
@@ -180,7 +184,7 @@ export default function VsDealer() {
             if (socketRef.current && gameId) {
               socketRef.current.emit("game:leave", { gameId, userId })
             }
-            router.push("/Qmode")
+            router.push("/play/quick")
           }}
           style={{ padding: "10px 20px", background: "#ff6b6b", border: "none", color: "white", cursor: "pointer", borderRadius: "5px" }}
           disabled={isLoading}

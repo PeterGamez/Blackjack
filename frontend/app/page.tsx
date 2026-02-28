@@ -170,7 +170,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => router.push("/ModeSelecter")}
+          onClick={() => router.push("/play")}
           onMouseEnter={() => setHovered("play")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("play")}

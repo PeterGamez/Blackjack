@@ -74,7 +74,6 @@ export default function ProfilePage() {
         ← Back
       </button>
       <h2>Profile</h2>
-      <p><strong>ID:</strong> {user.id}</p>
       <p><strong>Username:</strong> {user.username}</p>
       <p><strong>Email:</strong> {user.email}</p>
       <p><strong>Role:</strong> {user.role}</p>

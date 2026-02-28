@@ -3,45 +3,41 @@
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
-export default function RankMode() {
+export default function RankPlayer() {
   const router = useRouter()
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
     if (!token) router.replace("/auth")
-  }, [])
+  }, [router])
 
   return (
     <div
       style={{
-        position: "relative",
+        height: "100vh",
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
-        gap: 16,
+        background: "#f4f4f4",
+        flexDirection: "column",
+        gap: "20px",
       }}
     >
+      <h1 style={{ fontSize: "32px", color: "#333" }}>Coming soon</h1>
+      <p style={{ color: "#666" }}>Player vs Player rank mode is under development.</p>
       <button
         onClick={() => router.push("/play")}
         style={{
-          position: "absolute",
-          top: "20px",
-          left: "20px",
-          padding: "8px 16px",
-          background: "#ccc",
+          padding: "10px 20px",
+          background: "#4da6ff",
+          color: "white",
           border: "none",
+          borderRadius: "5px",
           cursor: "pointer",
-          borderRadius: "4px",
-          color: "black",
         }}
       >
-        ← Back
+        Back to modes
       </button>
-      <h1 style={{ fontSize: "48px", margin: 0 }}>🚧</h1>
-      <h2 style={{ fontSize: "32px", margin: 0, letterSpacing: "2px" }}>Coming Soon</h2>
-      <p style={{ color: "#aaa", margin: 0 }}>Rank Mode is under construction. Stay tuned!</p>
     </div>
   )
 }

@@ -122,7 +122,7 @@ export default function Dealer() {
     setIsLoading(true)
     socketRef.current.emit(
       "game:start",
-      { userId, gameType: "vsDealer", bet: betAmount },
+      { userId, gameType: "quick_ai", bet: betAmount },
       (ack: any) => {
         setIsLoading(false)
         if (!ack?.ok) {

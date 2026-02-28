@@ -39,7 +39,7 @@ const calcValue = (hand: Card[]): number => {
 interface GameState {
     gameId: number;
     userId: number;
-    gameType: "vsDealer" | "vsPlayer";
+    gameType: "quick_ai" | "quick_player" | "rank_player";
     status: "betting" | "playing" | "dealer-turn" | "game-over";
     playerBet: number;
     playerHand: string;
@@ -92,7 +92,7 @@ export default class GameSocket {
         return {
             gameId: parseInt(data.gameId),
             userId: parseInt(data.userId),
-            gameType: data.gameType as "vsDealer" | "vsPlayer",
+            gameType: data.gameType as "quick_ai" | "quick_player" | "rank_player",
             status: data.status as "betting" | "playing" | "dealer-turn" | "game-over",
             playerBet: parseInt(data.playerBet),
             playerHand: data.playerHand,
@@ -143,7 +143,7 @@ export default class GameSocket {
 
     public static register(socket: Socket): void {
         /* game:start — creates game, deals cards, deducts bet */
-        socket.on("game:start", async (payload: { userId: number; gameType: "vsDealer" | "vsPlayer"; bet: number }, ack) => {
+        socket.on("game:start", async (payload: { userId: number; gameType: "quick_ai" | "quick_player" | "rank_player"; bet: number }, ack) => {
             const { userId, gameType, bet } = payload;
             if (!userId || !bet || bet <= 0) {
                 ack?.({ ok: false, message: "userId and bet are required" });

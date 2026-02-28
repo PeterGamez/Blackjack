@@ -1,6 +1,40 @@
 import { Server as IOServer, Socket } from "socket.io";
 import RedisService from "../services/RedisService";
 import Server from "../utils/Server";
+import UserModel from "../models/UserModel";
+
+interface Card {
+    suit: string;
+    rank: string;
+    value: number;
+}
+
+const SUITS = ["♠", "♥", "♦", "♣"];
+const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+
+const createDeck = (): Card[] => {
+    const deck: Card[] = [];
+    for (let i = 0; i < 6; i++) {
+        for (const suit of SUITS) {
+            for (const rank of RANKS) {
+                const value = rank === "A" ? 11 : ["J", "Q", "K"].includes(rank) ? 10 : parseInt(rank);
+                deck.push({ suit, rank, value });
+            }
+        }
+    }
+    return deck.sort(() => Math.random() - 0.5);
+};
+
+const calcValue = (hand: Card[]): number => {
+    let value = 0;
+    let aces = 0;
+    for (const card of hand) {
+        value += card.value;
+        if (card.rank === "A") aces++;
+    }
+    while (value > 21 && aces > 0) { value -= 10; aces--; }
+    return value;
+};
 
 interface GameState {
     gameId: number;
@@ -108,102 +142,186 @@ export default class GameSocket {
     }
 
     public static register(socket: Socket): void {
-        socket.on("game:start", async (payload: { gameId: number; userId: number; gameType: "vsDealer" | "vsPlayer"; bet: number }, ack) => {
-            const { gameId, userId, gameType, bet } = payload;
-            if (!gameId || !userId) {
-                ack?.({ ok: false, message: "gameId and userId are required" });
+        /* game:start — creates game, deals cards, deducts bet */
+        socket.on("game:start", async (payload: { userId: number; gameType: "vsDealer" | "vsPlayer"; bet: number }, ack) => {
+            const { userId, gameType, bet } = payload;
+            if (!userId || !bet || bet <= 0) {
+                ack?.({ ok: false, message: "userId and bet are required" });
                 return;
             }
+            try {
+                const user = await UserModel.selectUser(userId);
+                if (!user || user.coins < bet) {
+                    ack?.({ ok: false, message: "Insufficient coins" });
+                    return;
+                }
 
-            await this.join(socket, gameId);
-            await this.setUserCurrentGame(userId, gameId);
+                const rawId = await RedisService.Redis.incr("socket:game:id");
+                const gameId = typeof rawId === "number" ? rawId : parseInt(rawId as string);
 
-            const gameState: GameState = {
-                gameId,
-                userId,
-                gameType,
-                status: "playing",
-                playerBet: bet,
-                playerHand: "[]",
-                dealerHand: "[]",
-                playerValue: 0,
-                dealerValue: 0,
-                result: "pending",
-                reward: 0,
-                deck: "[]",
-                createdAt: Date.now(),
-            };
+                const deck = createDeck();
+                const playerHand: Card[] = [deck[0], deck[2]];
+                const dealerHand: Card[] = [deck[1], deck[3]];
+                const remainingDeck = deck.slice(4);
+                const playerValue = calcValue(playerHand);
 
-            await this.saveGameState(gameId, gameState);
-            this.emitToGame(gameId, "game:started", gameState);
-            ack?.({ ok: true });
-        });
+                const gameState: GameState = {
+                    gameId,
+                    userId,
+                    gameType,
+                    status: "playing",
+                    playerBet: bet,
+                    playerHand: JSON.stringify(playerHand),
+                    dealerHand: JSON.stringify(dealerHand),
+                    playerValue,
+                    dealerValue: calcValue([dealerHand[0]]),
+                    result: "pending",
+                    reward: 0,
+                    deck: JSON.stringify(remainingDeck),
+                    createdAt: Date.now(),
+                };
 
-        socket.on("game:hit", async (payload: { gameId: number; userId: number; playerHand: string; deck: string; playerValue: number }, ack) => {
-            const { gameId, userId, playerHand, deck, playerValue } = payload;
-            if (!gameId || !userId) {
-                ack?.({ ok: false, message: "gameId and userId are required" });
-                return;
-            }
-
-            const gameState = await this.getGameState(gameId);
-            if (!gameState || gameState.userId !== userId) {
-                ack?.({ ok: false, message: "Game not found or unauthorized" });
-                return;
-            }
-
-            gameState.playerHand = playerHand;
-            gameState.playerValue = playerValue;
-            gameState.deck = deck;
-
-            await this.saveGameState(gameId, gameState);
-            this.emitToGame(gameId, "game:player-hit", { playerHand, playerValue });
-
-            if (playerValue > 21) {
-                gameState.result = "lose";
-                gameState.status = "game-over";
                 await this.saveGameState(gameId, gameState);
-                this.emitToGame(gameId, "game:bust", { playerValue });
-            }
+                await this.setUserCurrentGame(userId, gameId);
+                await UserModel.updateUser(userId, "coins", user.coins - bet);
+                await this.join(socket, gameId);
 
-            ack?.({ ok: true });
+                ack?.({
+                    ok: true,
+                    gameId,
+                    playerHand,
+                    dealerHand: [dealerHand[0]], // hide second dealer card
+                    playerValue,
+                    bet,
+                    coins: user.coins - bet,
+                });
+            } catch (err) {
+                this.server.error("GameSocket", `game:start error: ${err}`);
+                ack?.({ ok: false, message: "Server error" });
+            }
         });
 
-        socket.on("game:stand", async (payload: { gameId: number; userId: number; deck: string; playerHand: string; dealerHand: string; playerValue: number; dealerValue: number; result: "win" | "lose" | "push"; reward: number }, ack) => {
-            const { gameId, userId, playerHand, dealerHand, playerValue, dealerValue, result, reward, deck } = payload;
+        /* game:hit — draws one card for the player */
+        socket.on("game:hit", async (payload: { gameId: number; userId: number }, ack) => {
+            const { gameId, userId } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
                 return;
             }
+            try {
+                const gameState = await this.getGameState(gameId);
+                if (!gameState || gameState.userId !== userId) {
+                    ack?.({ ok: false, message: "Game not found or unauthorized" });
+                    return;
+                }
 
-            const gameState = await this.getGameState(gameId);
-            if (!gameState || gameState.userId !== userId) {
-                ack?.({ ok: false, message: "Game not found or unauthorized" });
-                return;
+                const playerHand: Card[] = JSON.parse(gameState.playerHand);
+                const deck: Card[] = JSON.parse(gameState.deck);
+                if (deck.length === 0) {
+                    ack?.({ ok: false, message: "Deck is empty" });
+                    return;
+                }
+
+                playerHand.push(deck.shift()!);
+                const playerValue = calcValue(playerHand);
+
+                gameState.playerHand = JSON.stringify(playerHand);
+                gameState.playerValue = playerValue;
+                gameState.deck = JSON.stringify(deck);
+
+                if (playerValue > 21) {
+                    gameState.result = "lose";
+                    gameState.status = "game-over";
+                    gameState.reward = 0;
+                    await this.saveGameState(gameId, gameState);
+                    this.emitToGame(gameId, "game:bust", { playerHand, playerValue });
+                    ack?.({ ok: true, playerHand, playerValue, bust: true });
+                    return;
+                }
+
+                await this.saveGameState(gameId, gameState);
+                this.emitToGame(gameId, "game:player-hit", { playerHand, playerValue });
+                ack?.({ ok: true, playerHand, playerValue, bust: false });
+            } catch (err) {
+                this.server.error("GameSocket", `game:hit error: ${err}`);
+                ack?.({ ok: false, message: "Server error" });
             }
-
-            gameState.playerHand = playerHand;
-            gameState.dealerHand = dealerHand;
-            gameState.playerValue = playerValue;
-            gameState.dealerValue = dealerValue;
-            gameState.result = result;
-            gameState.reward = reward;
-            gameState.status = "game-over";
-            gameState.deck = deck;
-
-            await this.saveGameState(gameId, gameState);
-            this.emitToGame(gameId, "game:finished", gameState);
-
-            ack?.({ ok: true });
         });
 
+        /* game:stand — dealer plays, computes result, rewards coins */
+        socket.on("game:stand", async (payload: { gameId: number; userId: number }, ack) => {
+            const { gameId, userId } = payload;
+            if (!gameId || !userId) {
+                ack?.({ ok: false, message: "gameId and userId are required" });
+                return;
+            }
+            try {
+                const gameState = await this.getGameState(gameId);
+                if (!gameState || gameState.userId !== userId) {
+                    ack?.({ ok: false, message: "Game not found or unauthorized" });
+                    return;
+                }
+
+                const playerHand: Card[] = JSON.parse(gameState.playerHand);
+                const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
+                const deck: Card[] = JSON.parse(gameState.deck);
+
+                // Dealer draws until >= 17
+                while (calcValue(dealerHand) < 17 && deck.length > 0) {
+                    dealerHand.push(deck.shift()!);
+                }
+
+                const playerValue = calcValue(playerHand);
+                const dealerValue = calcValue(dealerHand);
+
+                let result: "win" | "lose" | "push";
+                let reward = 0;
+
+                if (dealerValue > 21 || playerValue > dealerValue) {
+                    result = "win";
+                    reward = gameState.playerBet * 2;
+                } else if (dealerValue > playerValue) {
+                    result = "lose";
+                    reward = 0;
+                } else {
+                    result = "push";
+                    reward = gameState.playerBet;
+                }
+
+                gameState.playerHand = JSON.stringify(playerHand);
+                gameState.dealerHand = JSON.stringify(dealerHand);
+                gameState.playerValue = playerValue;
+                gameState.dealerValue = dealerValue;
+                gameState.result = result;
+                gameState.reward = reward;
+                gameState.status = "game-over";
+                gameState.deck = JSON.stringify(deck);
+
+                await this.saveGameState(gameId, gameState);
+
+                const user = await UserModel.selectUser(userId);
+                let newCoins = user?.coins ?? 0;
+                if (reward > 0 && user) {
+                    newCoins = user.coins + reward;
+                    await UserModel.updateUser(userId, "coins", newCoins);
+                }
+
+                const finishedPayload = { gameId, playerHand, dealerHand, playerValue, dealerValue, result, reward, coins: newCoins };
+                this.emitToGame(gameId, "game:finished", finishedPayload);
+                ack?.({ ok: true, ...finishedPayload });
+            } catch (err) {
+                this.server.error("GameSocket", `game:stand error: ${err}`);
+                ack?.({ ok: false, message: "Server error" });
+            }
+        });
+
+        /* game:leave */
         socket.on("game:leave", async (payload: { gameId: number; userId: number }, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
                 return;
             }
-
             await this.leave(socket, gameId);
             ack?.({ ok: true });
         });

@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import config from "../../config"
 
-export default function VerifyPage() {
+function VerifyContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [message, setMessage] = useState<string | null>(null)
@@ -30,9 +30,7 @@ export default function VerifyPage() {
         if (!res.ok) {
           setError(data.error || "Verification failed")
         } else {
-          // use backend message if available otherwise fallback
           setMessage(data.message || "Email successfully verified! You may now log in.")
-          // redirect to login after a moment
           setTimeout(() => {
             router.push("/auth")
           }, 2000)
@@ -50,6 +48,43 @@ export default function VerifyPage() {
   return (
     <div
       style={{
+        width: "400px",
+        padding: "30px",
+        border: "1px solid #ddd",
+        background: "white",
+        textAlign: "center",
+      }}
+    >
+      {loading ? (
+        <p>Verifying your email...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <p style={{ color: "green" }}>{message}</p>
+      )}
+      {!loading && (
+        <button
+          onClick={() => router.push("/auth")}
+          style={{
+            marginTop: "16px",
+            padding: "10px 20px",
+            background: "#4da6ff",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Go to Login
+        </button>
+      )}
+    </div>
+  )
+}
+
+export default function VerifyPage() {
+  return (
+    <div
+      style={{
         height: "100vh",
         display: "flex",
         justifyContent: "center",
@@ -57,38 +92,9 @@ export default function VerifyPage() {
         background: "#f4f4f4",
       }}
     >
-      <div
-        style={{
-          width: "400px",
-          padding: "30px",
-          border: "1px solid #ddd",
-          background: "white",
-          textAlign: "center",
-        }}
-      >
-        {loading ? (
-          <p>Verifying your email...</p>
-        ) : error ? (
-          <p style={{ color: "red" }}>{error}</p>
-        ) : (
-          <p style={{ color: "green" }}>{message}</p>
-        )}
-        {!loading && (
-          <button
-            onClick={() => router.push("/auth")}
-            style={{
-              marginTop: "16px",
-              padding: "10px 20px",
-              background: "#4da6ff",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Go to Login
-          </button>
-        )}
-      </div>
+      <Suspense fallback={<p>Loading...</p>}>
+        <VerifyContent />
+      </Suspense>
     </div>
   )
 }

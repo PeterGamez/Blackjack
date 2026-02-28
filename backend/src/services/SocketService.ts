@@ -1,7 +1,7 @@
 import { createServer, Server as HttpServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 import Server from "../utils/Server";
-import RoomService from "../socket/RoomSocket";
+import GameSocket from "../socket/GameSocket";
 
 export default class SocketService {
     public static io: IOServer;
@@ -19,7 +19,7 @@ export default class SocketService {
             },
         });
 
-        RoomService.init(this.io, server);
+        GameSocket.init(this.io, server);
 
         this.registerEvents();
 
@@ -31,7 +31,7 @@ export default class SocketService {
     private static registerEvents(): void {
         this.io.on("connection", (socket: Socket) => {
             this.server.log("Socket.IO", `Client connected: ${socket.id}`);
-            RoomService.register(socket);
+            GameSocket.register(socket);
         });
     }
 

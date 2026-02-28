@@ -17,7 +17,7 @@
 | คำ | ความหมาย |
 |----|-----------|
 | Coin | เงินที่หาได้ในเกม |
-| Cash | เงินพรีเมียม (เติมเงิน) |
+| Token | เงินพรีเมียม (เติมเงิน) |
 | Viewer | ผู้ชมที่ดูเกมและเดิมพันผลลัพธ์ได้ |
 | Player | ผู้เล่น |
 | Dealer | เจ้ามือ |
@@ -91,9 +91,9 @@
 
 | ID | Requirement |
 |----|-------------|
-| FR-3-07 | ผู้เล่นต้องใช้ Cash เพื่อเข้าเล่น |
-| FR-3-08 | ระบบต้องหัก Cash ก่อนเริ่มเกม |
-| FR-3-09 | ผู้ชนะต้องได้รับ Cash เป็นรางวัล |
+| FR-3-07 | ผู้เล่นต้องใช้ Token เพื่อเข้าเล่น |
+| FR-3-08 | ระบบต้องหัก Token ก่อนเริ่มเกม |
+| FR-3-09 | ผู้ชนะต้องได้รับ Token เป็นรางวัล |
 | FR-3-10 | ระบบต้องอัปเดตอันดับหลังจบเกม |
 
 ---
@@ -139,7 +139,7 @@
 | ID | Requirement |
 |----|-------------|
 | FR-6-01 | ผู้เล่นต้องมี Coin balance |
-| FR-6-02 | ผู้เล่นต้องมี Cash balance |
+| FR-6-02 | ผู้เล่นต้องมี Token balance |
 | FR-6-03 | ระบบต้องหักเงินเมื่อเดิมพัน |
 | FR-6-04 | ระบบต้องเพิ่มเงินเมื่อชนะ |
 | FR-6-05 | ระบบต้องแสดงยอดเงินล่าสุดแบบ realtime |
@@ -164,7 +164,7 @@
 | ID | Requirement |
 |----|-------------|
 | FR-8-01 | ระบบต้องแสดงอันดับผู้เล่น |
-| FR-8-02 | ระบบต้องจัดอันดับตาม Rank score หรือ Cash |
+| FR-8-02 | ระบบต้องจัดอันดับตาม Rank score หรือ Token |
 | FR-8-03 | ระบบต้องอัปเดตอันดับแบบ realtime |
 
 ---
@@ -179,7 +179,7 @@
 |----|-------------|
 | FR-9-01 | ระบบต้องมีร้านค้า Skin |
 | FR-9-02 | ระบบต้องแสดงรายการ Skin พร้อมราคา |
-| FR-9-03 | ผู้เล่นต้องซื้อ Skin ด้วย Coin หรือ Cash ได้ |
+| FR-9-03 | ผู้เล่นต้องซื้อ Skin ด้วย Coin หรือ Token ได้ |
 | FR-9-04 | ระบบต้องหักเงินหลังซื้อสำเร็จ |
 | FR-9-05 | ระบบต้องเพิ่ม Skin ลง Inventory ผู้เล่น |
 
@@ -226,7 +226,7 @@
 | UI-08 | Table Selection Page | หน้าสำหรับเลือกโต๊ะที่ต้องการเข้าเดิมพัน |
 | UI-09 | Spectator Page | หน้าสำหรับดูเกมที่กำลังเล่นและเดิมพันแบบ Viewer |
 | UI-10 | Result Overlay | หน้าต่างแสดงผลแพ้ชนะหลังจบรอบ |
-| UI-11 | Payment Page | หน้าสำหรับเติม Cash หรือทำธุรกรรม |
+| UI-11 | Payment Page | หน้าสำหรับเติม Token หรือทำธุรกรรม |
 | UI-12 | Skin Shop Page | หน้าร้านค้าสำหรับซื้อ Skin |
 | UI-13 | Inventory Page | หน้าคลัง Item และ Skin ของผู้เล่น |
 
@@ -248,7 +248,7 @@
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
 | API-USER-02 | `GET` | `/user/stats` | None | Bearer | ดึงสถิติการเล่นของผู้ใช้ เช่น จำนวนเกม ชนะ/แพ้ Rank score |
 | API-USER-03 | `PATCH` | `/user/profile` | `{avatar?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
-| API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Cash ของผู้ใช้ |
+| API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Token ของผู้ใช้ |
 | API-USER-05 | `GET` | `/user/history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ พร้อมผลแพ้ชนะและเงินที่ได้รับ |
 
 #### 4.2.3 Lobby & Mode API
@@ -256,7 +256,7 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-LOBBY-01 | `GET` | `/lobby/modes` | None | Bearer | ดึงรายการโหมดเกมที่รองรับ เช่น QuickPlay และ Rank Mode พร้อมรายละเอียด |
-| API-LOBBY-02 | `GET` | `/lobby/leaderboard` | None | Bearer | ดึงอันดับผู้เล่นสูงสุดจากคะแนน Rank หรือ Cash |
+| API-LOBBY-02 | `GET` | `/lobby/leaderboard` | None | Bearer | ดึงอันดับผู้เล่นสูงสุดจากคะแนน Rank หรือ Token |
 
 #### 4.2.4 Matchmaking API
 
@@ -270,14 +270,14 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Cash เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
+| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Token เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
 
 #### 4.2.6 Skin System API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-SKIN-01 | `GET` | `/skin/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดที่มีในร้านค้า พร้อมราคาและประเภท |
-| API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Cash และเพิ่มเข้า Inventory |
+| API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Token และเพิ่มเข้า Inventory |
 
 ### 4.3 Socket.IO Events
 

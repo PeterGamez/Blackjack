@@ -1,65 +1,186 @@
-import Image from "next/image";
+"use client"
+
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import config from "./config"
 
 export default function Home() {
+  const router = useRouter()
+  const [hovered, setHovered] = useState<string | null>(null)
+  const [username, setUsername] = useState<string>("")
+  const [coins, setCoins] = useState<number>(0)
+  const [tokens, setTokens] = useState<number>(0)
+
+  // load profile from backend
+  const loadProfile = async () => {
+    try {
+      const token = localStorage.getItem("accessToken")
+      if (!token) return
+      const res = await fetch(`${config.apiUrl}/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setUsername(data.username || "")
+      if (typeof data.coins === "number") {
+        setCoins(data.coins)
+      }
+      if (typeof data.tokens === "number") {
+        setTokens(data.tokens)
+      }
+    } catch (err) {
+      console.error("failed to load profile", err)
+    }
+  }
+
+  // load cache from localStorage on mount
+  useEffect(() => {
+    const cachedUsername = localStorage.getItem("cached_username")
+    const cachedCoins = localStorage.getItem("cached_coins")
+    const cachedTokens = localStorage.getItem("cached_tokens")
+
+    if (cachedUsername) setUsername(cachedUsername)
+    if (cachedCoins) setCoins(Number(cachedCoins))
+    if (cachedTokens) setTokens(Number(cachedTokens))
+
+    loadProfile()
+  }, [])
+
+  // save to cache whenever username, coins, or tokens change
+  useEffect(() => {
+    if (username) localStorage.setItem("cached_username", username)
+    if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
+    if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
+  }, [username, coins, tokens])
+
+  const buttonStyle = (name: string) => ({
+    width: "350px",
+    padding: "15px 120px",
+    fontSize: "20px",
+    fontWeight: "bold",
+    background: "#4da6ff",
+    color: "black",
+    border: "3px solid #2b7cd3",
+    transform: "skewX(-45deg)",
+    cursor: "pointer",
+    transition: "0.2s",
+    whiteSpace: "nowrap",
+    boxShadow:
+      hovered === name
+        ? "0 0 25px #4da6ff, 0 0 50px #4da6ff"
+        : "0 0 10px #4da6ff",
+    scale: hovered === name ? "1.05" : "1",
+    marginLeft: "-5px"
+  })
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        background: "#d9d3c7"
+      }}
+    >
+
+      {/* TOP BAR */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "20px 40px"
+        }}
+      >
+        <div
+          style={{
+            border: "2px solid #3b82f6",
+            padding: "10px 20px",
+            cursor: "pointer"
+          }}
+          onClick={() => router.push(username ? "/profile" : "/auth")}
+        >
+          {username || "Login"}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div style={{ display: "flex", gap: "20px" }}>
+          <div style={{ border: "2px solid orange", padding: "10px 20px" }}>
+            🪙 {coins}
+          </div>
+          <div style={{ border: "2px solid #3b82f6", padding: "10px 20px" }}>
+            🎫 {tokens}
+          </div>
         </div>
-      </main>
+      </div>
+
+      {/* LEFT BOARD */}
+      <div style={{ paddingLeft: "40px" }}>
+        <div style={{
+          width: "250px",
+          height: "300px",
+          border: "2px solid #3b82f6",
+          padding: "20px"
+        }}>
+          บอร์ดกิจกรรม
+        </div>
+      </div>
+
+      {/* BOTTOM MENU */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end", // ดันไปขวา
+          paddingRight: "5%",        // เว้นขอบขวา
+          paddingBottom: "30px"
+        }}
+      >
+        <button
+          onClick={() => router.push("/Skin")}
+          onMouseEnter={() => setHovered("skin")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("skin")}
+        >
+          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+            Skin
+          </span>
+        </button>
+
+        <button
+          onClick={() => router.push("/Gambling")}
+          onMouseEnter={() => setHovered("gambling")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("gambling")}
+        >
+          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+            Gambling
+          </span>
+        </button>
+
+        <button
+          onClick={() => router.push("/CreateTable")}
+          onMouseEnter={() => setHovered("create")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("create")}
+        >
+          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+            Create Table
+          </span>
+        </button>
+
+        <button
+          onClick={() => router.push("/play")}
+          onMouseEnter={() => setHovered("play")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("play")}
+        >
+          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+            Play
+          </span>
+        </button>
+      </div>
+
     </div>
-  );
+  )
 }

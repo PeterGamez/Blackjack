@@ -40,7 +40,7 @@ export default function ProfilePage() {
       <div style={{ textAlign: "center", marginTop: "100px" }}>
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => router.push("/")}
           style={{
             marginBottom: "20px",
             padding: "6px 12px",

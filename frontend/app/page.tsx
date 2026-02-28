@@ -100,9 +100,9 @@ export default function Home() {
             padding: "10px 20px",
             cursor: "pointer"
           }}
-          onClick={() => router.push("/profile")}
+          onClick={() => router.push(username ? "/profile" : "/auth")}
         >
-          {username || "username"}
+          {username || "Login"}
         </div>
 
         <div style={{ display: "flex", gap: "20px" }}>

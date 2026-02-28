@@ -32,7 +32,7 @@ export default function ProfilePage() {
     localStorage.removeItem("cached_username")
     localStorage.removeItem("cached_coins")
     localStorage.removeItem("cached_cash")
-    router.push("/login")
+    router.push("/auth")
   }
 
   if (!user) {

@@ -31,9 +31,7 @@ export default (app: Hono, server: Server) => {
 
             const hashedPassword = await server.Password.hash(password);
 
-            await UserModel.createUser(username, email, hashedPassword);
-
-            /* const userId = await UserModel.createUser(username, email, hashedPassword);
+            const userId = await UserModel.createUser(username, email, hashedPassword);
 
             try {
                 await server.EmailVerification.sendVerificationEmail(userId, email);
@@ -41,7 +39,7 @@ export default (app: Hono, server: Server) => {
                 server.error("EMAIL", `Failed to send verification email: ${emailError}`);
                 await UserModel.deleteUser(userId);
                 return c.json({ error: "Registration failed: Unable to send verification email" }, 500);
-            }*/
+            }
 
             server.log("AUTH", `User registered: ${email}`);
 

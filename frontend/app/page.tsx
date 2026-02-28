@@ -137,7 +137,7 @@ export default function Home() {
         }}
       >
         <button
-          onClick={() => router.push("/Skin")}
+          onClick={() => router.push("/skin")}
           onMouseEnter={() => setHovered("skin")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("skin")}
@@ -148,7 +148,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => router.push("/Gambling")}
+          onClick={() => router.push("/gambling")}
           onMouseEnter={() => setHovered("gambling")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("gambling")}
@@ -159,7 +159,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => router.push("/CreateTable")}
+          onClick={() => router.push("/createtable")}
           onMouseEnter={() => setHovered("create")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("create")}

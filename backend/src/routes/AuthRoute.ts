@@ -5,7 +5,12 @@ import UserModel from "../models/UserModel";
 export default (app: Hono, server: Server) => {
     app.post("/register", async (c) => {
         try {
-            const body = (await c.req.json()) as { username: string; email: string; password: string };
+            let body: { username: string; email: string; password: string };
+            try {
+                body = (await c.req.json()) as { username: string; email: string; password: string };
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
 
             const username = body.username?.trim()?.toLowerCase();
             const email = body.email?.trim()?.toLowerCase();
@@ -13,6 +18,11 @@ export default (app: Hono, server: Server) => {
 
             if (!username || !email || !password) {
                 return c.json({ error: "Missing required fields" }, 400);
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return c.json({ error: "Invalid email address" }, 400);
             }
 
             const existingUser = await UserModel.selectUserByUsernameOrEmail(username);
@@ -47,7 +57,12 @@ export default (app: Hono, server: Server) => {
 
     app.post("/verify", async (c) => {
         try {
-            const body = (await c.req.json()) as { token: string };
+            let body: { token: string };
+            try {
+                body = (await c.req.json()) as { token: string };
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
             const { token } = body;
 
             if (!token) {
@@ -82,7 +97,12 @@ export default (app: Hono, server: Server) => {
 
     app.post("/login", async (c) => {
         try {
-            const body = (await c.req.json()) as { username: string; password: string };
+            let body: { username: string; password: string };
+            try {
+                body = (await c.req.json()) as { username: string; password: string };
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
 
             const username = body.username?.trim()?.toLowerCase();
             const password = body.password?.trim();
@@ -132,7 +152,12 @@ export default (app: Hono, server: Server) => {
 
     app.post("/refresh", async (c) => {
         try {
-            const body = (await c.req.json()) as { refreshToken: string };
+            let body: { refreshToken: string };
+            try {
+                body = (await c.req.json()) as { refreshToken: string };
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
             const { refreshToken } = body;
 
             if (!refreshToken) {

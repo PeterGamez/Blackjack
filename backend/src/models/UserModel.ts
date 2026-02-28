@@ -64,4 +64,14 @@ export default class UserModel {
             connection.release();
         }
     }
+
+    public static async deleteUser(id: number): Promise<void> {
+        const sql = `DELETE FROM ${this.table} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [id]);
+        } finally {
+            connection.release();
+        }
+    }
 }

@@ -15,7 +15,6 @@ export default (app: Hono, server: Server) => {
             const username = body.username?.trim()?.toLowerCase();
             const email = body.email?.trim()?.toLowerCase();
             const password = body.password?.trim();
-
             if (!username || !email || !password) {
                 return c.json({ error: "Missing required fields" }, 400);
             }
@@ -32,13 +31,17 @@ export default (app: Hono, server: Server) => {
 
             const hashedPassword = await server.Password.hash(password);
 
-            const userId = await UserModel.createUser(username, email, hashedPassword);
+            await UserModel.createUser(username, email, hashedPassword);
+
+            /* const userId = await UserModel.createUser(username, email, hashedPassword);
 
             try {
                 await server.EmailVerification.sendVerificationEmail(userId, email);
             } catch (emailError) {
                 server.error("EMAIL", `Failed to send verification email: ${emailError}`);
-            }
+                await UserModel.deleteUser(userId);
+                return c.json({ error: "Registration failed: Unable to send verification email" }, 500);
+            }*/
 
             server.log("AUTH", `User registered: ${email}`);
 
@@ -106,19 +109,16 @@ export default (app: Hono, server: Server) => {
 
             const username = body.username?.trim()?.toLowerCase();
             const password = body.password?.trim();
-
             if (!username || !password) {
                 return c.json({ error: "Missing username/email or password" }, 400);
             }
 
             const user = await UserModel.selectUserByUsernameOrEmail(username);
-
             if (!user) {
                 return c.json({ error: "Username/email or password is incorrect" }, 401);
             }
 
             const isValidPassword = await server.Password.compare(password, user.password);
-
             if (!isValidPassword) {
                 return c.json({ error: "Username/email or password is incorrect" }, 401);
             }

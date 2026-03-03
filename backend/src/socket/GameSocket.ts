@@ -1,6 +1,7 @@
 import { Server as IOServer, Socket } from "socket.io";
 import RedisService from "../services/RedisService";
 import UserModel from "../models/UserModel";
+import GameHistoryModel from "../models/GameHistoryModel";
 import type Server from "../utils/Server";
 import type { Card, GameType, GameCurrency, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
 
@@ -218,6 +219,15 @@ export default class GameSocket {
             await UserModel.updateUser(gameState.userId, currency, balance);
         }
 
+        await GameHistoryModel.createGameHistory(
+            gameState.userId,
+            1,
+            result,
+            gameState.gameType,
+            gameState.playerBet,
+            reward
+        );
+
         return { playerHand, dealerHand, playerValue, dealerValue, result, reward, currency, balance };
     }
 
@@ -294,6 +304,17 @@ export default class GameSocket {
                 await UserModel.updateUser(userId, currency, newBalance);
                 await this.join(socket, gameId);
 
+                if (status === "game-over") {
+                    await GameHistoryModel.createGameHistory(
+                        userId,
+                        1,
+                        result,
+                        gameType,
+                        bet,
+                        reward
+                    );
+                }
+
                 ack?.({
                     ok: true,
                     gameId,
@@ -351,6 +372,14 @@ export default class GameSocket {
                     gameState.status = "game-over";
                     gameState.reward = 0;
                     await this.saveGameState(gameId, gameState);
+                    await GameHistoryModel.createGameHistory(
+                        gameState.userId,
+                        1,
+                        "lose",
+                        gameState.gameType,
+                        gameState.playerBet,
+                        0
+                    );
                     this.emitToGame(gameId, "game:bust", { playerHand, playerValue });
                     ack?.({ ok: true, playerHand, playerValue, bust: true });
                     return;

@@ -1,6 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import config from "../config";
-import { JWTPayload } from "../interfaces/JWTPayload";
+import { JWTPayload } from "../interfaces/Auth";
 import { UserInterface } from "../interfaces/Database";
 
 export default class JWT {

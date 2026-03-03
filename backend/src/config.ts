@@ -16,10 +16,6 @@ export default {
         refreshTokenTtl: "24h",
     },
 
-    verifyEmail: {
-        expiresIn: "24", // hours
-    },
-
     email: {
         host: process.env.EMAIL_HOST || "smtp.example.com",
         port: parseInt(process.env.EMAIL_PORT || "587"),
@@ -29,6 +25,9 @@ export default {
             pass: process.env.EMAIL_PASS || "",
         },
         from: process.env.EMAIL_FROM || "",
+
+        verifyExpiresIn: 24, // hours
+        resetPasswordExpiresIn: 15, // minutes
     },
 
     mysql: {

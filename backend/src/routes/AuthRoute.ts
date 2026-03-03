@@ -34,7 +34,7 @@ export default (app: Hono, server: Server) => {
             const userId = await UserModel.createUser(username, email, hashedPassword);
 
             try {
-                await server.EmailVerification.sendVerificationEmail(userId, email);
+                await server.Email.sendVerificationEmail(userId, email);
             } catch (emailError) {
                 server.error("EMAIL", `Failed to send verification email: ${emailError}`);
                 await UserModel.deleteUser(userId);
@@ -70,7 +70,7 @@ export default (app: Hono, server: Server) => {
                 return c.json({ error: "Missing verification token" }, 400);
             }
 
-            const payload = await server.EmailVerification.verify(token);
+            const payload = await server.Email.verifyEmail(token);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 400);
             }
@@ -189,6 +189,80 @@ export default (app: Hono, server: Server) => {
             server.error("AUTH", "Token refresh error: ");
             console.error(error);
             return c.json({ error: "Invalid or expired refresh token" }, 401);
+        }
+    });
+
+    app.post("/reset-password", async (c) => {
+        try {
+            let body: { email: string };
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+            const { email } = body;
+
+            if (!email) {
+                return c.json({ error: "Missing email" }, 400);
+            }
+
+            const user = await UserModel.selectUserByUsernameOrEmail(email);
+            if (!user) {
+                return c.json({ error: "Email not found" }, 404);
+            }
+
+            try {
+                await server.Email.sendPasswordResetEmail(user.id, email);
+            } catch (emailError) {
+                server.error("EMAIL", `Failed to send password reset email: ${emailError}`);
+                return c.json({ error: "Failed to send password reset email" }, 500);
+            }
+
+            server.log("AUTH", `Password reset requested for: ${email}`);
+
+            return c.json({ message: "Password reset email sent" });
+        } catch (error) {
+            server.error("AUTH", "Password reset error: ");
+            console.error(error);
+            return c.json({ error: "Password reset failed" }, 500);
+        }
+    });
+
+    app.post("/reset-password/verify", async (c) => {
+        try {
+            let body: { token: string; newPassword: string };
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+            const { token, newPassword } = body;
+
+            if (!token || !newPassword) {
+                return c.json({ error: "Missing token or new password" }, 400);
+            }
+
+            const payload = await server.Email.verifyPasswordReset(token);
+            if (!payload) {
+                return c.json({ error: "Invalid or expired token" }, 400);
+            }
+            const { email } = payload;
+
+            if (!email) {
+                return c.json({ error: "Invalid token" }, 400);
+            }
+
+            const hashedPassword = await server.Password.hash(newPassword);
+
+            await UserModel.updateUser(payload.userId, "password", hashedPassword);
+
+            server.log("AUTH", `Password reset for: ${email}`);
+
+            return c.json({ message: "Password reset successful" });
+        } catch (error) {
+            server.error("AUTH", "Password reset verification error: ");
+            console.error(error);
+            return c.json({ error: "Invalid or expired token" }, 400);
         }
     });
 

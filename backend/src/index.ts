@@ -5,7 +5,7 @@ import { serve } from "@hono/node-server";
 import databaseHandler from "./handlers/databaseHandler";
 import Server from "./utils/Server";
 import route from "./route";
-import { JWTPayload } from "./interfaces/JWTPayload";
+import { JWTPayload } from "./interfaces/Auth";
 
 const server = new Server();
 const app = new Hono().basePath(server.config.api.path);

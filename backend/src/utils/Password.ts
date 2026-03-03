@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 12;
 
-export class Password {
+export default class Password {
     public async hash(password: string): Promise<string> {
         return await bcrypt.hash(password, SALT_ROUNDS);
     }

@@ -3,7 +3,6 @@
  */
 const config = {
     arrowParens: "always",
-    bracketSameLine: true,
     endOfLine: "lf",
     embeddedLanguageFormatting: "auto",
     htmlWhitespaceSensitivity: "ignore",
@@ -17,7 +16,7 @@ const config = {
     singleQuote: false,
     vueIndentScriptAndStyle: false,
 
-    bracketSameLine: false,
+    bracketSameLine: true,
     bracketSpacing: true,
 
     rangeStart: 0,

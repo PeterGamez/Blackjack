@@ -1,9 +1,9 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import config from "../config";
-import { JWTPayload } from "../interfaces/JWTPayload";
+import { JWTPayload } from "../interfaces/Auth";
 import { UserInterface } from "../interfaces/Database";
 
-export class JWT {
+export default class JWT {
     public generateAccessToken(user: UserInterface): string {
         const payload: JWTPayload = {
             userId: user.id,

@@ -1,4 +1,4 @@
-# Twenty-One Degrees - Blackjack
+# Twenty-One Degrees
 
 ## Software Requirements Specification (SRS)
 
@@ -50,7 +50,8 @@
 |----|-------------|
 | FR-1-01 | ผู้ใช้ต้องกรอก username / email / password |
 | FR-1-02 | ระบบต้องตรวจสอบ username และ email ซ้ำ |
-| FR-1-03 | ระบบต้องเข้ารหัส password ก่อนบันทึก และยืนยันอีเมล |
+| FR-1-03 | ระบบต้องเข้ารหัส password ก่อนบันทึก และส่งอีเมลยืนยัน |
+| FR-1-04 | ระบบรีเซ็ตรหัสผ่านได้ผ่านอีเมล |
 
 ---
 
@@ -240,6 +241,8 @@
 | API-AUTH-02 | `POST` | `/auth/verify` | `${token}` | None | ยืนยันอีเมลด้วย parameter token |
 | API-AUTH-03 | `POST` | `/auth/login` | `{username, password}` | None | เข้าสู่ระบบ คืน access token และ refresh token |
 | API-AUTH-04 | `POST` | `/auth/refresh` | `{refreshToken}` | None | รีเฟรช access token ด้วย refresh token |
+| API-AUTH-05 | `POST` | `/auth/reset-password` | `{email}` | None | ขอรีเซ็ตรหัสผ่าน ส่งลิงก์ไปยังอีเมล |
+| API-AUTH-06 | `POST` | `/auth/reset-password/verify` | `{token, newPassword}` | None | ยืนยัน token และตั้งรหัสผ่านใหม่ |
 
 #### 4.2.2 User Profile API
 
@@ -299,7 +302,6 @@
 | `room:player-joined` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นเข้าร่วม |
 | `room:player-left` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นออก |
 | `room:data` | `{ tableId, from, data }` | ข้อมูลที่ผู้เล่นส่งมา (relay) |
-| `room:error` | `message: string` | แจ้ง error |
 
 #### 4.3.2 Gameplay Socket Events (Socket.IO)
 
@@ -316,7 +318,6 @@
 |-------|---------|----------|
 | `room:state` | `{ tableId, members[] }` | สถานะห้อง |
 | `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลลัพธ์ |
-| `room:error` | `message: string` | แจ้ง error |
 
 #### 4.3.3 Spectator Socket Events (Socket.IO)
 

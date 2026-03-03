@@ -3,9 +3,9 @@ import config from "../config";
 import Redis from "ioredis";
 import UserModel from "../models/UserModel";
 import RedisService from "../services/RedisService";
-import { EmailVerification } from "./EmailVerification";
-import { JWT } from "./JWT";
-import { Password } from "./Password";
+import Email from "./Email";
+import JWT from "./JWT";
+import Password from "./Password";
 import SocketService from "../services/SocketService";
 import UserSkinModel from "../models/UserSkinModels";
 import CodeHistoryModel from "../models/CodeHistoryModel";
@@ -17,7 +17,7 @@ export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
-    public EmailVerification = new EmailVerification(this);
+    public Email = new Email(this);
     public JWT = new JWT();
     public Password = new Password();
 

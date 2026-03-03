@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 19, 2026 at 03:37 PM
+-- Generation Time: Mar 03, 2026 at 09:44 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
 -- PHP Version: 8.2.29
 
@@ -32,12 +32,11 @@ CREATE TABLE `code` (
   `code` varchar(255) NOT NULL,
   `amount` int(11) NOT NULL DEFAULT 0,
   `type` varchar(255) NOT NULL,
-  `usageCount` int(11) NOT NULL DEFAULT 0,
+  `maxUses` int(11) NOT NULL DEFAULT 0,
   `isActive` tinyint(1) NOT NULL DEFAULT 0,
   `expiredDate` datetime NOT NULL DEFAULT current_timestamp(),
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -51,8 +50,7 @@ CREATE TABLE `codeHistory` (
   `codeId` int(11) NOT NULL DEFAULT 0,
   `userId` int(11) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -70,8 +68,7 @@ CREATE TABLE `gameHistory` (
   `bet` int(11) NOT NULL DEFAULT 0,
   `reward` int(11) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -87,8 +84,7 @@ CREATE TABLE `payment` (
   `amount` int(11) NOT NULL DEFAULT 0,
   `currencyType` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -100,14 +96,14 @@ CREATE TABLE `payment` (
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(255) NOT NULL DEFAULT 'user',
   `tokens` int(11) NOT NULL DEFAULT 0,
-  `coins` int(11) NOT NULL DEFAULT 0,
-  `isVerified` int(11) NOT NULL DEFAULT 0,
+  `coins` int(11) NOT NULL DEFAULT 1000,
+  `isVerified` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -121,8 +117,7 @@ CREATE TABLE `userSkin` (
   `userId` int(11) NOT NULL DEFAULT 0,
   `skinId` int(11) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedBy` int(11) NOT NULL DEFAULT 1
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -204,35 +199,6 @@ ALTER TABLE `user`
 --
 ALTER TABLE `userSkin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `codeHistory`
---
-ALTER TABLE `codeHistory`
-  ADD CONSTRAINT `codeHistory_ibfk_1` FOREIGN KEY (`codeId`) REFERENCES `code` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `codeHistory_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `gameHistory`
---
-ALTER TABLE `gameHistory`
-  ADD CONSTRAINT `gameHistory_ibfk_1` FOREIGN KEY (`userId1`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `payment`
---
-ALTER TABLE `payment`
-  ADD CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `userSkin`
---
-ALTER TABLE `userSkin`
-  ADD CONSTRAINT `userSkin_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -9,7 +9,12 @@ export default function Qmode() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
-    if (!token) router.replace("/auth")
+    if (!token) {
+      router.replace("/auth")
+    } else {
+      // this index is no longer used; always bounce back to main 'play' screen
+      router.replace("/play")
+    }
   }, [])
 
   const buttonStyle = (name: string) => ({
@@ -22,7 +27,7 @@ export default function Qmode() {
     fontWeight: "bold",
     background: "#4da6ff",
     color: "black",
-    border: "3px solid #2b7cd3",
+    border: "5px solid #2b7cd3",
     cursor: "pointer",
     transition: "0.2s",
     whiteSpace: "nowrap",

@@ -224,7 +224,7 @@ export default function Dealer() {
             if (socketRef.current && gameId) {
               socketRef.current.emit("game:leave", { gameId, userId })
             }
-            router.push("/play/quick")
+            router.push("/play")
           }}
           style={{ padding: "10px 20px", background: "#ff6b6b", border: "none", color: "white", cursor: "pointer", borderRadius: "5px" }}
           disabled={isLoading}

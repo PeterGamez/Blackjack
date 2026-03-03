@@ -26,7 +26,7 @@ export default function Player() {
       <h1 style={{ fontSize: "32px", color: "#333" }}>Coming soon</h1>
       <p style={{ color: "#666" }}>Player vs Player mode is under development.</p>
       <button
-        onClick={() => router.push("/play/quick")}
+        onClick={() => router.push("/play")}
         style={{
           padding: "10px 20px",
           background: "#4da6ff",

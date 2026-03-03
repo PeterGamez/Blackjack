@@ -2,82 +2,150 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
+import config from "../config"
+import styles from "./play.module.css"
 
 export default function Home() {
   const router = useRouter()
   const [hovered, setHovered] = useState<string | null>(null)
+  const [username, setUsername] = useState<string>("")
+  const [coins, setCoins] = useState<number>(0)
+  const [tokens, setTokens] = useState<number>(0)
 
+  // load profile from backend
+  const loadProfile = async () => {
+    try {
+      const token = localStorage.getItem("accessToken")
+      if (!token) return
+      const res = await fetch(`${config.apiUrl}/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setUsername(data.username || "")
+      if (typeof data.coins === "number") {
+        setCoins(data.coins)
+      }
+      if (typeof data.tokens === "number") {
+        setTokens(data.tokens)
+      }
+    } catch (err) {
+      console.error("failed to load profile", err)
+    }
+  }
+
+  // load cache from localStorage on mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
-    if (!token) router.replace("/auth")
-  }, [])
+    if (!token) {
+      router.replace("/auth")
+      return
+    }
 
-  const buttonStyle = (name: string) => ({
-    width: "350px",
-    padding: "200px 200px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "20px",
-    fontWeight: "bold",
-    background: "#4da6ff",
-    color: "black",
-    border: "3px solid #2b7cd3",
-    /* removed skew transform to make button normal */
-    cursor: "pointer",
-    transition: "0.2s",
-    whiteSpace: "nowrap",
-    boxShadow:
-      hovered === name
-        ? "0 0 25px #4da6ff, 0 0 50px #4da6ff"
-        : "0 0 10px #4da6ff",
-    scale: hovered === name ? "1.05" : "1"
-  })
+    const cachedUsername = localStorage.getItem("cached_username")
+    const cachedCoins = localStorage.getItem("cached_coins")
+    const cachedTokens = localStorage.getItem("cached_tokens")
+
+    if (cachedUsername) setUsername(cachedUsername)
+    if (cachedCoins) setCoins(Number(cachedCoins))
+    if (cachedTokens) setTokens(Number(cachedTokens))
+
+    loadProfile()
+  }, [router])
+
+  // save to cache whenever username, coins, or tokens change
+  useEffect(() => {
+    if (username) localStorage.setItem("cached_username", username)
+    if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
+    if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
+  }, [username, coins, tokens])
+
+  const getButtonClass = (name: string): string => {
+    return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`
+  }
 
   return (
-    <div
-      style={{
-  position: "relative",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "100vh",
-  gap: "50px",
-}}
-    >
-      <button
-        onClick={() => router.push("/")}
-        style={{ position: "absolute", top: "20px", left: "20px", padding: "8px 16px", background: "#ccc", border: "none", cursor: "pointer", borderRadius: "4px" }}
-      >
-        ← Back
-      </button>
+    <div className={styles.container}>
+      {/* Top Bar with User Info */}
+      <div className={styles.topBar}>
+        {/* Profile Section */}
+        <div className={styles.profileSection}>
+          <div className={styles.profileAvatar}></div>
+          <span className={styles.username}>{username}</span>
+        </div>
 
-      <div style={{ position: "absolute", top: "80px", textAlign: "center" }}>
-        <h2 style={{ margin: 0, fontSize: "28px", letterSpacing: "2px" }}>🃏 Select Mode</h2>
-        <p style={{ margin: "8px 0 0", color: "#aaa" }}>Choose how you want to play</p>
+        {/* Right: Coins and Tokens */}
+        <div className={styles.resourcesSection}>
+          {/* Coins */}
+          <div className={styles.resourceBox}>
+            <span className={styles.coinIcon}>🪙</span>
+            <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
+          </div>
+
+          {/* Tokens */}
+          <div className={styles.resourceBox}>
+            <div className={styles.tokenIcon}>
+              <span className={styles.tokenLetter}>T</span>
+            </div>
+            <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
+            <button className={styles.plusButton}>+</button>
+          </div>
+        </div>
       </div>
 
+      {/* Back Button */}
       <button
-        onClick={() => router.push("/play/quick")}
-        onMouseEnter={() => setHovered("skin")}
-        onMouseLeave={() => setHovered(null)}
-        style={buttonStyle("skin")}
+        onClick={() => router.push("/")}
+        className={styles.backButton}
       >
-        <span style={{ display: "inline-block" }}>
-          QuickPlay
-        </span>
+        ← Lobby
       </button>
-      
-      <button
-        onClick={() => router.push("/play/rank")}
-        onMouseEnter={() => setHovered("Gambling")}
-        onMouseLeave={() => setHovered(null)}
-        style={buttonStyle("Gambling")}
-      >
-        <span style={{ display: "inline-block" }}>
-          Rank
-        </span>
-      </button>
+
+      {/* Mode Title */}
+      <div className={styles.modeTitle}>
+        <h2>Mode</h2>
+      </div>
+
+      {/* Mode Selector Row */}
+      <div className={styles.modeSelector}>
+        {/* Quick Play - Player VS Dealer */}
+        <button
+          onClick={() => router.push("/play/quick/dealer")}
+          onMouseEnter={() => setHovered("quickDealer")}
+          onMouseLeave={() => setHovered(null)}
+          className={getButtonClass("quickDealer")}
+        >
+          <div className={styles.buttonTitle}>Quick Play</div>
+          <div className={styles.buttonSubtitle}>Player</div>
+          <div className={styles.buttonSubtitle}>VS</div>
+          <div className={styles.buttonSubtitle}>Dealer</div>
+        </button>
+
+        {/* Quick Play - Player VS Player */}
+        <button
+          onClick={() => router.push("/play/quick/player")}
+          onMouseEnter={() => setHovered("quickPlayer")}
+          onMouseLeave={() => setHovered(null)}
+          className={getButtonClass("quickPlayer")}
+        >
+          <div className={styles.buttonTitle}>Quick Play</div>
+          <div className={styles.buttonSubtitle}>Player</div>
+          <div className={styles.buttonSubtitle}>VS</div>
+          <div className={styles.buttonSubtitle}>Player</div>
+        </button>
+
+        {/* Rank */}
+        <button
+          onClick={() => router.push("/play/rank")}
+          onMouseEnter={() => setHovered("rank")}
+          onMouseLeave={() => setHovered(null)}
+          className={getButtonClass("rank")}
+        >
+          <div className={styles.buttonTitle}>Rank</div>
+        </button>
+      </div>
     </div>
   )
 }

@@ -1,18 +1,13 @@
 import { Server as IOServer, Socket } from "socket.io";
 import RedisService from "../services/RedisService";
-import Server from "../utils/Server";
 import UserModel from "../models/UserModel";
-
-interface Card {
-    suit: string;
-    rank: string;
-    value: number;
-}
+import type Server from "../utils/Server";
+import type { Card, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
 
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
-const createDeck = (): Card[] => {
+function createDeck(): Card[] {
     const deck: Card[] = [];
     for (let i = 0; i < 6; i++) {
         for (const suit of SUITS) {
@@ -23,9 +18,9 @@ const createDeck = (): Card[] => {
         }
     }
     return deck.sort(() => Math.random() - 0.5);
-};
+}
 
-const calcValue = (hand: Card[]): number => {
+function calcValue(hand: Card[]): number {
     let value = 0;
     let aces = 0;
     for (const card of hand) {
@@ -37,22 +32,6 @@ const calcValue = (hand: Card[]): number => {
         aces--;
     }
     return value;
-};
-
-interface GameState {
-    gameId: number;
-    userId: number;
-    gameType: "quick_ai" | "quick_player" | "rank_player";
-    status: "betting" | "playing" | "dealer-turn" | "game-over";
-    playerBet: number;
-    playerHand: string;
-    dealerHand: string;
-    playerValue: number;
-    dealerValue: number;
-    result: "win" | "lose" | "push" | "pending";
-    reward: number;
-    deck: string;
-    createdAt: number;
 }
 
 export default class GameSocket {
@@ -61,6 +40,8 @@ export default class GameSocket {
 
     private static readonly GAME_PREFIX = "socket:game:";
     private static readonly USER_GAME_PREFIX = "socket:user_game:";
+    private static readonly SOCKET_CONN_PREFIX = "socket:conn:";
+    private static readonly SOCKET_USER_SOCKET_PREFIX = "socket:user_socket:";
 
     public static init(io: IOServer, server: Server): void {
         this.io = io;
@@ -79,6 +60,42 @@ export default class GameSocket {
         return `${this.USER_GAME_PREFIX}${userId}`;
     }
 
+    public static socketConnKey(socketId: string): string {
+        return `${this.SOCKET_CONN_PREFIX}${socketId}`;
+    }
+
+    public static userSocketKey(userId: number): string {
+        return `${this.SOCKET_USER_SOCKET_PREFIX}${userId}`;
+    }
+
+    public static async setSocketUser(socketId: string, userId: number): Promise<void> {
+        const oldSocketId = await RedisService.get<string>(this.userSocketKey(userId));
+        if (oldSocketId && oldSocketId !== socketId) {
+            await RedisService.del(this.socketConnKey(oldSocketId));
+        }
+        await RedisService.set(this.socketConnKey(socketId), userId.toString());
+        await RedisService.expire(this.socketConnKey(socketId), 86400);
+        await RedisService.set(this.userSocketKey(userId), socketId);
+        await RedisService.expire(this.userSocketKey(userId), 86400);
+    }
+
+    public static async getSocketUser(socketId: string): Promise<number | null> {
+        const userId = await RedisService.get<string>(this.socketConnKey(socketId));
+        return userId ? parseInt(userId) : null;
+    }
+
+    public static async getUserSocket(userId: number): Promise<string | null> {
+        return await RedisService.get<string>(this.userSocketKey(userId));
+    }
+
+    public static async removeSocketUser(socketId: string): Promise<void> {
+        const userId = await this.getSocketUser(socketId);
+        if (userId !== null) {
+            await RedisService.del(this.userSocketKey(userId));
+        }
+        await RedisService.del(this.socketConnKey(socketId));
+    }
+
     public static async saveGameState(gameId: number, state: GameState): Promise<void> {
         const gameKey = this.gameKey(gameId);
         await RedisService.del(gameKey);
@@ -95,7 +112,7 @@ export default class GameSocket {
         return {
             gameId: parseInt(data.gameId),
             userId: parseInt(data.userId),
-            gameType: data.gameType as "quick_ai" | "quick_player" | "rank_player",
+            gameType: data.gameType as "quick_ai",
             status: data.status as "betting" | "playing" | "dealer-turn" | "game-over",
             playerBet: parseInt(data.playerBet),
             playerHand: data.playerHand,
@@ -144,11 +161,68 @@ export default class GameSocket {
         this.server.log("GameSocket", `${socket.id} left game ${gameId}`);
     }
 
+    private static async resolveDealer(gameState: GameState): Promise<{
+        playerHand: Card[];
+        dealerHand: Card[];
+        playerValue: number;
+        dealerValue: number;
+        result: "win" | "lose" | "push";
+        reward: number;
+        coins: number;
+    }> {
+        const playerHand: Card[] = JSON.parse(gameState.playerHand);
+        const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
+        const deck: Card[] = JSON.parse(gameState.deck);
+
+        while (calcValue(dealerHand) < 17 && deck.length > 0) {
+            dealerHand.push(deck.shift()!);
+        }
+
+        const playerValue = calcValue(playerHand);
+        const dealerValue = calcValue(dealerHand);
+
+        let result: "win" | "lose" | "push";
+        let reward = 0;
+
+        if (dealerValue > 21 || playerValue > dealerValue) {
+            result = "win";
+            reward = gameState.playerBet * 2;
+        } else if (dealerValue > playerValue) {
+            result = "lose";
+            reward = 0;
+        } else {
+            result = "push";
+            reward = gameState.playerBet;
+        }
+
+        gameState.dealerHand = JSON.stringify(dealerHand);
+        gameState.dealerValue = dealerValue;
+        gameState.result = result;
+        gameState.reward = reward;
+        gameState.status = "game-over";
+        gameState.deck = JSON.stringify(deck);
+
+        await this.saveGameState(gameState.gameId, gameState);
+
+        const user = await UserModel.selectUser(gameState.userId);
+        let coins = user?.coins ?? 0;
+        if (reward > 0 && user) {
+            coins = user.coins + reward;
+            await UserModel.updateUser(gameState.userId, "coins", coins);
+        }
+
+        return { playerHand, dealerHand, playerValue, dealerValue, result, reward, coins };
+    }
+
     public static register(socket: Socket): void {
-        socket.on("game:start", async (payload: { userId: number; gameType: "quick_ai" | "quick_player" | "rank_player"; bet: number }, ack) => {
+        socket.on("game:start", async (payload: GameStartPayload, ack) => {
             const { userId, gameType, bet } = payload;
             if (!userId || !bet || bet <= 0) {
                 ack?.({ ok: false, message: "userId and bet are required" });
+                return;
+            }
+            if (gameType !== "quick_ai") {
+                ack?.({ ok: false, message: "Game mode not available" });
                 return;
             }
             try {
@@ -166,36 +240,64 @@ export default class GameSocket {
                 const dealerHand: Card[] = [deck[1], deck[3]];
                 const remainingDeck = deck.slice(4);
                 const playerValue = calcValue(playerHand);
+                const dealerValue = calcValue(dealerHand);
+                const isBlackjack = playerValue === 21;
+                const isDealerBlackjack = dealerValue === 21;
+
+                let status: GameState["status"] = "playing";
+                let result: GameState["result"] = "pending";
+                let reward = 0;
+
+                if (isBlackjack || isDealerBlackjack) {
+                    status = "game-over";
+                    if (isBlackjack && isDealerBlackjack) {
+                        result = "push";
+                        reward = bet;
+                    } else if (isBlackjack) {
+                        result = "win";
+                        reward = Math.floor(bet * 2.5); // Blackjack pays 3:2
+                    } else {
+                        result = "lose";
+                        reward = 0;
+                    }
+                }
 
                 const gameState: GameState = {
                     gameId,
                     userId,
                     gameType,
-                    status: "playing",
+                    status,
                     playerBet: bet,
                     playerHand: JSON.stringify(playerHand),
                     dealerHand: JSON.stringify(dealerHand),
                     playerValue,
                     dealerValue: calcValue([dealerHand[0]]),
-                    result: "pending",
-                    reward: 0,
+                    result,
+                    reward,
                     deck: JSON.stringify(remainingDeck),
                     createdAt: Date.now(),
                 };
 
+                const newCoins = user.coins - bet + reward;
                 await this.saveGameState(gameId, gameState);
                 await this.setUserCurrentGame(userId, gameId);
-                await UserModel.updateUser(userId, "coins", user.coins - bet);
+                await this.setSocketUser(socket.id, userId);
+                await UserModel.updateUser(userId, "coins", newCoins);
                 await this.join(socket, gameId);
 
                 ack?.({
                     ok: true,
                     gameId,
                     playerHand,
-                    dealerHand: [dealerHand[0]],
+                    dealerHand: status === "game-over" ? dealerHand : [dealerHand[0]],
                     playerValue,
+                    dealerValue: status === "game-over" ? dealerValue : calcValue([dealerHand[0]]),
                     bet,
-                    coins: user.coins - bet,
+                    coins: newCoins,
+                    blackjack: isBlackjack,
+                    dealerBlackjack: isDealerBlackjack,
+                    result: status === "game-over" ? result : undefined,
+                    reward: status === "game-over" ? reward : undefined,
                 });
             } catch (err) {
                 this.server.error("GameSocket", `game:start error: ${err}`);
@@ -203,7 +305,7 @@ export default class GameSocket {
             }
         });
 
-        socket.on("game:hit", async (payload: { gameId: number; userId: number }, ack) => {
+        socket.on("game:hit", async (payload: GameActionPayload, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
@@ -213,6 +315,10 @@ export default class GameSocket {
                 const gameState = await this.getGameState(gameId);
                 if (!gameState || gameState.userId !== userId) {
                     ack?.({ ok: false, message: "Game not found or unauthorized" });
+                    return;
+                }
+                if (gameState.status === "game-over") {
+                    ack?.({ ok: false, message: "Game is already over" });
                     return;
                 }
 
@@ -240,6 +346,14 @@ export default class GameSocket {
                     return;
                 }
 
+                if (playerValue === 21) {
+                    const resolved = await this.resolveDealer(gameState);
+                    const finishedPayload = { gameId, ...resolved };
+                    this.emitToGame(gameId, "game:finished", finishedPayload);
+                    ack?.({ ok: true, ...finishedPayload, bust: false });
+                    return;
+                }
+
                 await this.saveGameState(gameId, gameState);
                 this.emitToGame(gameId, "game:player-hit", { playerHand, playerValue });
                 ack?.({ ok: true, playerHand, playerValue, bust: false });
@@ -249,7 +363,7 @@ export default class GameSocket {
             }
         });
 
-        socket.on("game:stand", async (payload: { gameId: number; userId: number }, ack) => {
+        socket.on("game:stand", async (payload: GameActionPayload, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
@@ -261,51 +375,13 @@ export default class GameSocket {
                     ack?.({ ok: false, message: "Game not found or unauthorized" });
                     return;
                 }
-
-                const playerHand: Card[] = JSON.parse(gameState.playerHand);
-                const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
-                const deck: Card[] = JSON.parse(gameState.deck);
-
-                while (calcValue(dealerHand) < 17 && deck.length > 0) {
-                    dealerHand.push(deck.shift()!);
+                if (gameState.status === "game-over") {
+                    ack?.({ ok: false, message: "Game is already over" });
+                    return;
                 }
 
-                const playerValue = calcValue(playerHand);
-                const dealerValue = calcValue(dealerHand);
-
-                let result: "win" | "lose" | "push";
-                let reward = 0;
-
-                if (dealerValue > 21 || playerValue > dealerValue) {
-                    result = "win";
-                    reward = gameState.playerBet * 2;
-                } else if (dealerValue > playerValue) {
-                    result = "lose";
-                    reward = 0;
-                } else {
-                    result = "push";
-                    reward = gameState.playerBet;
-                }
-
-                gameState.playerHand = JSON.stringify(playerHand);
-                gameState.dealerHand = JSON.stringify(dealerHand);
-                gameState.playerValue = playerValue;
-                gameState.dealerValue = dealerValue;
-                gameState.result = result;
-                gameState.reward = reward;
-                gameState.status = "game-over";
-                gameState.deck = JSON.stringify(deck);
-
-                await this.saveGameState(gameId, gameState);
-
-                const user = await UserModel.selectUser(userId);
-                let newCoins = user?.coins ?? 0;
-                if (reward > 0 && user) {
-                    newCoins = user.coins + reward;
-                    await UserModel.updateUser(userId, "coins", newCoins);
-                }
-
-                const finishedPayload = { gameId, playerHand, dealerHand, playerValue, dealerValue, result, reward, coins: newCoins };
+                const resolved = await this.resolveDealer(gameState);
+                const finishedPayload = { gameId, ...resolved };
                 this.emitToGame(gameId, "game:finished", finishedPayload);
                 ack?.({ ok: true, ...finishedPayload });
             } catch (err) {
@@ -314,7 +390,7 @@ export default class GameSocket {
             }
         });
 
-        socket.on("game:leave", async (payload: { gameId: number; userId: number }, ack) => {
+        socket.on("game:leave", async (payload: GameActionPayload, ack) => {
             const { gameId, userId } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
@@ -326,6 +402,7 @@ export default class GameSocket {
 
         socket.on("disconnect", async () => {
             this.server.log("GameSocket", `Client disconnected: ${socket.id}`);
+            await this.removeSocketUser(socket.id);
         });
     }
 }

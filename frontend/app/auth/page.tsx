@@ -78,7 +78,8 @@ export default function AuthPage() {
     setLoginLoading(false)
   }
 
-  const handleRegister = async () => {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
     setRegMessage("")
     if (regPassword !== regConfirm) {
       setRegMessage("Passwords do not match")
@@ -359,7 +360,7 @@ export default function AuthPage() {
               </button>
             </form>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               {/* 2-column grid */}
               <div
                 style={{
@@ -376,6 +377,7 @@ export default function AuthPage() {
                       placeholder="username/email"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
+                      required
                       style={inputStyle}
                     />
                   </div>
@@ -395,6 +397,7 @@ export default function AuthPage() {
                       placeholder="password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
+                      required
                       style={{ ...inputStyle, paddingRight: "64px" }}
                     />
                     <button
@@ -424,6 +427,7 @@ export default function AuthPage() {
                       placeholder="Email"
                       value={regEmail}
                       onChange={(e) => setRegEmail(e.target.value)}
+                      required
                       style={inputStyle}
                     />
                   </div>
@@ -438,6 +442,7 @@ export default function AuthPage() {
                       placeholder="password"
                       value={regConfirm}
                       onChange={(e) => setRegConfirm(e.target.value)}
+                      required
                       style={{ ...inputStyle, paddingRight: "64px" }}
                     />
                     <button
@@ -474,7 +479,7 @@ export default function AuthPage() {
 
               <div style={{ display: "flex", justifyContent: "center", marginTop: "11px" }}>
                 <button
-                  onClick={handleRegister}
+                  type="submit"
                   disabled={regLoading}
                   onMouseEnter={() => setHoveredBtn("signup")}
                   onMouseLeave={() => setHoveredBtn(null)}
@@ -483,7 +488,7 @@ export default function AuthPage() {
                   {regLoading ? "Creating..." : "Create Account"}
                 </button>
               </div>
-            </div>
+            </form>
           )}
         </div>
         <style jsx>{`

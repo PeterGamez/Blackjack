@@ -5,7 +5,7 @@ export interface UserInterface extends InterfaceBase {
     email: string;
     password: string;
     role: "user" | "admin";
-    cash: number;
+    tokens: number;
     coins: number;
     isVerified: boolean;
 }

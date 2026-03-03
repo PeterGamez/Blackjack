@@ -1,11 +1,10 @@
 import { createServer, Server as HttpServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 import Server from "../utils/Server";
-import RoomService from "../socket/RoomSocket";
-import { RoomClientEvents, RoomServerEvents } from "../interfaces/Socket";
+import GameSocket from "../socket/GameSocket";
 
 export default class SocketService {
-    public static io: IOServer<RoomClientEvents, RoomServerEvents>;
+    public static io: IOServer;
     private static httpServer: HttpServer;
     private static server: Server;
 
@@ -13,14 +12,14 @@ export default class SocketService {
         this.server = server;
         this.httpServer = createServer();
 
-        this.io = new IOServer<RoomClientEvents, RoomServerEvents>(this.httpServer, {
+        this.io = new IOServer(this.httpServer, {
             cors: {
                 origin: "*",
                 methods: ["GET", "POST"],
             },
         });
 
-        RoomService.init(this.io, server);
+        GameSocket.init(this.io, server);
 
         this.registerEvents();
 
@@ -32,12 +31,12 @@ export default class SocketService {
     private static registerEvents(): void {
         this.io.on("connection", (socket: Socket) => {
             this.server.log("Socket.IO", `Client connected: ${socket.id}`);
-            RoomService.register(socket);
+            GameSocket.register(socket);
         });
     }
 
-    public static emit<E extends keyof RoomServerEvents>(event: E, ...args: Parameters<RoomServerEvents[E]>): void {
-        (this.io as unknown as { emit: (...a: unknown[]) => void }).emit(event, ...args);
+    public static emit(event: string, ...args: unknown[]): void {
+        this.io.emit(event, ...args);
     }
 
     public static close(): void {

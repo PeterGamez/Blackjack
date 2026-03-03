@@ -44,6 +44,17 @@ export default class UserModel {
         }
     }
 
+    public static async selectUserExistsByUsernameOrEmail(username: string, email: string): Promise<boolean> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE username = ? OR email = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [username, email]);
+            return rows[0].count > 0;
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async verifyEmail(email: string): Promise<boolean> {
         const sql = `UPDATE ${this.table} SET isVerified = true WHERE email = ?`;
         const connection = await this.DB.getConnection();

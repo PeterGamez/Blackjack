@@ -24,7 +24,7 @@ export default (app: Hono, server: Server) => {
                 return c.json({ error: "Invalid email address" }, 400);
             }
 
-            const existingUser = await UserModel.selectUserByUsernameOrEmail(username);
+            const existingUser = await UserModel.selectUserExistsByUsernameOrEmail(username, email);
             if (existingUser) {
                 return c.json({ error: "Username or email already exists" }, 409);
             }
@@ -230,16 +230,16 @@ export default (app: Hono, server: Server) => {
 
     app.post("/reset-password/verify", async (c) => {
         try {
-            let body: { token: string; newPassword: string };
+            let body: { token: string; password: string };
             try {
                 body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
-            const { token, newPassword } = body;
+            const { token, password } = body;
 
-            if (!token || !newPassword) {
-                return c.json({ error: "Missing token or new password" }, 400);
+            if (!token || !password) {
+                return c.json({ error: "Missing token or password" }, 400);
             }
 
             const payload = await server.Email.verifyPasswordReset(token);
@@ -252,7 +252,7 @@ export default (app: Hono, server: Server) => {
                 return c.json({ error: "Invalid token" }, 400);
             }
 
-            const hashedPassword = await server.Password.hash(newPassword);
+            const hashedPassword = await server.Password.hash(password);
 
             await UserModel.updateUser(payload.userId, "password", hashedPassword);
 

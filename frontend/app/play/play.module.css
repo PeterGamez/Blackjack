@@ -1,24 +1,29 @@
 /* Main Container */
 .container {
   position: relative;
-  width: 100%;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   background: #1e2430;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
-  gap: 2rem;
+  overflow: hidden;
   font-family: 'Sora', sans-serif;
+}
+
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
 }
 
 /* ===== TOP BAR SECTION ===== */
 .topBar {
-  position: fixed;
-  top: clamp(0.75rem, 2vh, 1.25rem);
+  position: absolute;
+  top: 16px;
   left: 0;
   right: 0;
-  --side-offset: clamp(1rem, 3vw, 3rem);
+  --side-offset: 56px;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -28,7 +33,6 @@
   backdrop-filter: blur(10px);
   z-index: 100;
   gap: 2rem;
-  flex-wrap: wrap;
 }
 
 /* Profile Section */
@@ -157,13 +161,13 @@
 
 /* ===== BACK BUTTON ===== */
 .backButton {
-  position: fixed;
-  top: clamp(140px, 18vh, 220px);
-  left: clamp(1rem, 5vw, 150px);
+  position: absolute;
+  top: 190px;
+  left: 80px;
   background: transparent;
   border: none;
   color: #e6eaf2;
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  font-size: 1.2rem;
   cursor: pointer;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -182,18 +186,17 @@
 /* ===== MODE TITLE ===== */
 .modeTitle {
   position: absolute;
-  top: clamp(100px, 12vh, 200px);
+  top: 160px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   width: 100%;
   text-align: center;
-  margin-top: 3rem;
 }
 
 .modeTitle h2 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-size: 3rem;
   color: #e6eaf2;
   font-weight: 700;
   letter-spacing: 2px;
@@ -201,17 +204,16 @@
 
 /* ===== MODE SELECTOR ===== */
 .modeSelector {
+  position: absolute;
+  top: 270px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1rem, 3vw, 4rem);
+  gap: 2.75rem;
   justify-content: center;
   align-items: center;
-  margin-top: clamp(15rem, 15vh, 12rem);
+  width: 1800px;
   padding: 2rem;
-  width: 100%;
-  max-width: 1800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* ===== GAME BUTTON ===== */
@@ -220,17 +222,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.3rem, 1vw, 0.6rem);
+  gap: 0.6rem;
 
   /* Sizing */
-  flex: 0 0 clamp(280px, 25vw, 500px);
+  flex: 0 0 500px;
   aspect-ratio: 3 / 4;
-  min-height: clamp(350px, 60vh, 664px);
+  min-height: 664px;
 
   /* Container */
-  padding: clamp(1rem, 3vw, 2rem);
-  border: clamp(12px, 3vw, 20px) solid #ffffff;
-  border-radius: clamp(20px, 3vw, 30px);
+  padding: 2rem;
+  border: 20px solid #ffffff;
+  border-radius: 30px;
 
   /* Visual */
   background: linear-gradient(
@@ -268,205 +270,21 @@
 
 /* ===== TEXT ===== */
 .buttonTitle {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: 2.8rem;
   font-weight: 700;
   line-height: 1.2;
   color: #1f2a44;
   text-transform: uppercase;
-  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  margin-bottom: 3rem;
 }
 
 .buttonSubtitle {
-  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-size: 1.6rem;
   font-weight: 600;
   line-height: 1.2;
   color: #1f2a44;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-/* ===== RESPONSIVE BREAKPOINTS ===== */
-
-/* Large Tablets / Small Desktops */
-@media (max-width: 1200px) {
-  .modeSelector {
-    gap: clamp(0.75rem, 2.5vw, 2.5rem);
-  }
-  
-  .gameButton {
-    flex: 0 0 clamp(250px, 30vw, 400px);
-  }
-}
-
-/* Tablets */
-@media (max-width: 768px) {
-  .container {
-    padding: 7rem 1rem 2rem 1rem;
-  }
-  
-  .topBar {
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  
-  .profileSection {
-    flex: 0 0 100%;
-    justify-content: center;
-    margin-left: 0;
-  }
-  
-  .resourcesSection {
-    flex: 0 0 100%;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-right: 0;
-  }
-  
-  .resourceBox {
-    width: 200px;
-    min-width: 200px;
-    gap: 0.8rem;
-    padding: 0.5rem 1rem;
-  }
-  
-  .backButton {
-    position: fixed;
-    top: clamp(100px, 15vh, 140px);
-    left: 1rem;
-    padding: 0.5rem 0.75rem;
-  }
-  
-  .modeTitle {
-    top: clamp(70px, 10vh, 120px);
-  }
-  
-  .modeTitle h2 {
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
-  }
-  
-  .modeSelector {
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-top: clamp(5rem, 12vh, 8rem);
-  }
-  
-  .gameButton {
-    flex: 0 0 clamp(250px, 80vw, 400px);
-    min-height: clamp(300px, 80vw, 500px);
-  }
-}
-
-/* Mobile Devices */
-@media (max-width: 480px) {
-  .container {
-    padding: 7rem 0.75rem 1rem 0.75rem;
-    gap: 1rem;
-  }
-  
-  .topBar {
-    padding: 0.75rem;
-    position: fixed;
-    top: clamp(0.75rem, 2vh, 1.25rem);
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .profileSection {
-    flex: 0 0 100%;
-    margin-left: 0;
-  }
-  
-  .profileAvatar {
-    width: clamp(50px, 15vw, 70px);
-    height: clamp(50px, 15vw, 70px);
-  }
-  
-  .username {
-    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-    max-width: 200px;
-  }
-  
-  .resourcesSection {
-    flex: 0 0 100%;
-    gap: 1rem;
-    justify-content: space-around;
-    margin-right: 0;
-  }
-  
-  .resourceBox {
-    width: 170px;
-    min-width: 170px;
-    padding: 0.5rem 0.75rem;
-    gap: 0.6rem;
-    justify-content: flex-start;
-  }
-  
-  .backButton {
-    top: clamp(110px, 16vh, 140px);
-    left: 0.75rem;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-    border-width: 1.5px;
-  }
-  
-  .modeTitle {
-    top: clamp(65px, 9vh, 100px);
-  }
-  
-  .modeTitle h2 {
-    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
-  }
-  
-  .modeSelector {
-    margin-top: clamp(4rem, 10vh, 6rem);
-    padding: 1rem 0.5rem;
-  }
-  
-  .gameButton {
-    flex: 0 0 clamp(220px, 90vw, 350px);
-    min-height: clamp(260px, 90vw, 450px);
-    border-width: 12px;
-    padding: 1rem;
-    gap: 0.5rem;
-  }
-  
-  .buttonTitle {
-    font-size: clamp(1.4rem, 3.5vw, 2rem);
-  }
-  
-  .buttonSubtitle {
-    font-size: clamp(1rem, 2.5vw, 1.5rem);
-  }
-}
-
-/* Extra Small Devices */
-@media (max-width: 360px) {
-  .topBar {
-    padding: 0.5rem;
-  }
-  
-  .resourceBox {
-    width: 140px;
-    min-width: 140px;
-    gap: 0.5rem;
-    justify-content: flex-start;
-  }
-  
-  .resourceValue {
-    font-size: clamp(0.8rem, 2vw, 1rem);
-  }
-  
-  .modeSelector {
-    margin-top: 3rem;
-  }
-  
-  .gameButton {
-    flex: 0 0 clamp(200px, 100vw, 300px);
-    min-height: clamp(240px, 100vw, 400px);
-    border-width: 10px;
-  }
 }
 
 /* Print Styles */

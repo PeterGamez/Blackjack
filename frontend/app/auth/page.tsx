@@ -7,6 +7,7 @@ import config from "../config"
 export default function AuthPage() {
   const router = useRouter()
   const [tab, setTab] = useState<"login" | "register">("login")
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left")
 
   // Login state
   const [loginUsername, setLoginUsername] = useState("")
@@ -25,6 +26,13 @@ export default function AuthPage() {
   const [showRegPassword, setShowRegPassword] = useState(false)
   const [showRegConfirm, setShowRegConfirm] = useState(false)
   const [hoveredBtn, setHoveredBtn] = useState<string | null>(null)
+  const [isBackHovered, setIsBackHovered] = useState(false)
+
+  const switchTab = (nextTab: "login" | "register") => {
+    if (nextTab === tab) return
+    setSlideDirection(nextTab === "register" ? "left" : "right")
+    setTab(nextTab)
+  }
 
   const goldGradient = "linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%)"
   const btnStyle = (key: string, disabled: boolean): React.CSSProperties => ({
@@ -70,7 +78,8 @@ export default function AuthPage() {
     setLoginLoading(false)
   }
 
-  const handleRegister = async () => {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
     setRegMessage("")
     if (regPassword !== regConfirm) {
       setRegMessage("Passwords do not match")
@@ -86,10 +95,11 @@ export default function AuthPage() {
       const data = await res.json()
       if (!res.ok) {
         setRegMessage(data.error || "Register failed")
+        setRegLoading(false)
         return
       }
       setRegMessage("Register success! Check your email.")
-      setTimeout(() => setTab("login"), 1500)
+      setTimeout(() => switchTab("login"), 1500)
     } catch {
       setRegMessage("Server error")
     }
@@ -151,6 +161,7 @@ export default function AuthPage() {
   return (
     <div
       style={{
+        position: "relative",
         minHeight: "100vh",
         display: "flex",
         justifyContent: "center",
@@ -158,6 +169,33 @@ export default function AuthPage() {
         background: "#1a2234",
       }}
     >
+      <button
+        type="button"
+        onClick={() => router.push("/")}
+        onMouseEnter={() => setIsBackHovered(true)}
+        onMouseLeave={() => setIsBackHovered(false)}
+        style={{
+          position: "fixed",
+          top: "70px",
+          left: "70px",
+          background: isBackHovered ? "rgba(92, 107, 138, 0.6)" : "transparent",
+          border: "none",
+          color: "#e6eaf2",
+          fontSize: "clamp(0.9rem, 2vw, 1.2rem)",
+          cursor: "pointer",
+          padding: "0.5rem 1rem",
+          borderRadius: "8px",
+          fontWeight: 400,
+          letterSpacing: "1px",
+          textTransform: "uppercase",
+          zIndex: 50,
+          transform: isBackHovered ? "translateX(-5px)" : "translateX(0)",
+          transition: "all 0.3s ease",
+        }}
+      >
+        ← Lobby
+      </button>
+
       <div
         style={{
           width: tab === "register" ? "900px" : "578px",
@@ -165,6 +203,7 @@ export default function AuthPage() {
           flexDirection: "column",
           alignItems: "center",
           padding: "0 28px",
+          transition: "width 0.3s ease",
         }}
       >
         {/* Avatar */}
@@ -181,13 +220,28 @@ export default function AuthPage() {
         {/* Tabs */}
         <div
           style={{
-            display: "flex",
-            gap: "55px",
+            position: "relative",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            width: "290px",
             marginBottom: "50px",
+            alignItems: "end",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "50%",
+              height: "2px",
+              background: "#d4a84b",
+              transform: tab === "register" ? "translateX(100%)" : "translateX(0)",
+              transition: "transform 0.28s ease",
+            }}
+          />
           <button
-            onClick={() => setTab("login")}
+            onClick={() => switchTab("login")}
             style={{
               background: "none",
               border: "none",
@@ -195,15 +249,15 @@ export default function AuthPage() {
               fontSize: "25px",
               fontWeight: tab === "login" ? "600" : "400",
               color: tab === "login" ? "#d4a84b" : "#93a3bb",
-              borderBottom: tab === "login" ? "2px solid #d4a84b" : "2px solid transparent",
+              borderBottom: "2px solid transparent",
               paddingBottom: "9px",
-              transition: "0.2s",
+              transition: "color 0.28s ease",
             }}
           >
             Sign in
           </button>
           <button
-            onClick={() => setTab("register")}
+            onClick={() => switchTab("register")}
             style={{
               background: "none",
               border: "none",
@@ -211,9 +265,9 @@ export default function AuthPage() {
               fontSize: "25px",
               fontWeight: tab === "register" ? "600" : "400",
               color: tab === "register" ? "#d4a84b" : "#93a3bb",
-              borderBottom: tab === "register" ? "2px solid #d4a84b" : "2px solid transparent",
+              borderBottom: "2px solid transparent",
               paddingBottom: "9px",
-              transition: "0.2s",
+              transition: "color 0.28s ease",
             }}
           >
             Sign up
@@ -221,7 +275,13 @@ export default function AuthPage() {
         </div>
 
         {/* Forms */}
-        <div style={{ width: "100%" }}>
+        <div
+          key={tab}
+          style={{
+            width: "100%",
+            animation: `${slideDirection === "left" ? "slideInFromRight" : "slideInFromLeft"} 0.28s ease`,
+          }}
+        >
           {tab === "login" ? (
             <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               <div>
@@ -300,7 +360,7 @@ export default function AuthPage() {
               </button>
             </form>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               {/* 2-column grid */}
               <div
                 style={{
@@ -317,6 +377,7 @@ export default function AuthPage() {
                       placeholder="username/email"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
+                      required
                       style={inputStyle}
                     />
                   </div>
@@ -336,6 +397,7 @@ export default function AuthPage() {
                       placeholder="password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
+                      required
                       style={{ ...inputStyle, paddingRight: "64px" }}
                     />
                     <button
@@ -365,6 +427,7 @@ export default function AuthPage() {
                       placeholder="Email"
                       value={regEmail}
                       onChange={(e) => setRegEmail(e.target.value)}
+                      required
                       style={inputStyle}
                     />
                   </div>
@@ -379,6 +442,7 @@ export default function AuthPage() {
                       placeholder="password"
                       value={regConfirm}
                       onChange={(e) => setRegConfirm(e.target.value)}
+                      required
                       style={{ ...inputStyle, paddingRight: "64px" }}
                     />
                     <button
@@ -415,7 +479,7 @@ export default function AuthPage() {
 
               <div style={{ display: "flex", justifyContent: "center", marginTop: "11px" }}>
                 <button
-                  onClick={handleRegister}
+                  type="submit"
                   disabled={regLoading}
                   onMouseEnter={() => setHoveredBtn("signup")}
                   onMouseLeave={() => setHoveredBtn(null)}
@@ -424,9 +488,32 @@ export default function AuthPage() {
                   {regLoading ? "Creating..." : "Create Account"}
                 </button>
               </div>
-            </div>
+            </form>
           )}
         </div>
+        <style jsx>{`
+          @keyframes slideInFromRight {
+            from {
+              opacity: 0;
+              transform: translateX(44px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes slideInFromLeft {
+            from {
+              opacity: 0;
+              transform: translateX(-44px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+        `}</style>
       </div>
     </div>
   )

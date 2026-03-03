@@ -2,7 +2,7 @@ import { Server as IOServer, Socket } from "socket.io";
 import RedisService from "../services/RedisService";
 import UserModel from "../models/UserModel";
 import type Server from "../utils/Server";
-import type { Card, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
+import type { Card, GameType, GameCurrency, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
 
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
@@ -112,7 +112,8 @@ export default class GameSocket {
         return {
             gameId: parseInt(data.gameId),
             userId: parseInt(data.userId),
-            gameType: data.gameType as "quick_ai",
+            gameType: data.gameType as GameType,
+            currency: data.currency as GameCurrency,
             status: data.status as "betting" | "playing" | "dealer-turn" | "game-over",
             playerBet: parseInt(data.playerBet),
             playerHand: data.playerHand,
@@ -161,6 +162,10 @@ export default class GameSocket {
         this.server.log("GameSocket", `${socket.id} left game ${gameId}`);
     }
 
+    private static getCurrency(gameType: GameType): GameCurrency {
+        return gameType === "rank_player" ? "tokens" : "coins";
+    }
+
     private static async resolveDealer(gameState: GameState): Promise<{
         playerHand: Card[];
         dealerHand: Card[];
@@ -168,7 +173,8 @@ export default class GameSocket {
         dealerValue: number;
         result: "win" | "lose" | "push";
         reward: number;
-        coins: number;
+        currency: GameCurrency;
+        balance: number;
     }> {
         const playerHand: Card[] = JSON.parse(gameState.playerHand);
         const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
@@ -204,14 +210,15 @@ export default class GameSocket {
 
         await this.saveGameState(gameState.gameId, gameState);
 
+        const { currency } = gameState;
         const user = await UserModel.selectUser(gameState.userId);
-        let coins = user?.coins ?? 0;
+        let balance = user?.[currency] ?? 0;
         if (reward > 0 && user) {
-            coins = user.coins + reward;
-            await UserModel.updateUser(gameState.userId, "coins", coins);
+            balance = user[currency] + reward;
+            await UserModel.updateUser(gameState.userId, currency, balance);
         }
 
-        return { playerHand, dealerHand, playerValue, dealerValue, result, reward, coins };
+        return { playerHand, dealerHand, playerValue, dealerValue, result, reward, currency, balance };
     }
 
     public static register(socket: Socket): void {
@@ -225,10 +232,11 @@ export default class GameSocket {
                 ack?.({ ok: false, message: "Game mode not available" });
                 return;
             }
+            const currency = this.getCurrency(gameType);
             try {
                 const user = await UserModel.selectUser(userId);
-                if (!user || user.coins < bet) {
-                    ack?.({ ok: false, message: "Insufficient coins" });
+                if (!user || user[currency] < bet) {
+                    ack?.({ ok: false, message: `Insufficient ${currency}` });
                     return;
                 }
 
@@ -266,6 +274,7 @@ export default class GameSocket {
                     gameId,
                     userId,
                     gameType,
+                    currency,
                     status,
                     playerBet: bet,
                     playerHand: JSON.stringify(playerHand),
@@ -278,11 +287,11 @@ export default class GameSocket {
                     createdAt: Date.now(),
                 };
 
-                const newCoins = user.coins - bet + reward;
+                const newBalance = user[currency] - bet + reward;
                 await this.saveGameState(gameId, gameState);
                 await this.setUserCurrentGame(userId, gameId);
                 await this.setSocketUser(socket.id, userId);
-                await UserModel.updateUser(userId, "coins", newCoins);
+                await UserModel.updateUser(userId, currency, newBalance);
                 await this.join(socket, gameId);
 
                 ack?.({
@@ -293,7 +302,8 @@ export default class GameSocket {
                     playerValue,
                     dealerValue: status === "game-over" ? dealerValue : calcValue([dealerHand[0]]),
                     bet,
-                    coins: newCoins,
+                    currency,
+                    balance: newBalance,
                     blackjack: isBlackjack,
                     dealerBlackjack: isDealerBlackjack,
                     result: status === "game-over" ? result : undefined,

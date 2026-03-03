@@ -8,6 +8,12 @@ export interface PlayerPayload {
     socketId: string;
 }
 
+export interface RoomDataPayload {
+    tableId: string;
+    from: string;
+    data: unknown;
+}
+
 export interface RoomMessagePayload {
     tableId: string;
     data: unknown;

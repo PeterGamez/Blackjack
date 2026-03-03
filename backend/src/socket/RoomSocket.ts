@@ -1,15 +1,15 @@
 import { Server as IOServer, Socket } from "socket.io";
-import type { RoomMessagePayload, RoomServerEvents } from "../interfaces/Socket";
+import type { RoomClientEvents, RoomMessagePayload, RoomServerEvents } from "../interfaces/Socket";
 import RedisService from "../services/RedisService";
 import Server from "../utils/Server";
 
 export default class RoomSocket {
-    private static io: IOServer;
+    private static io: IOServer<RoomClientEvents, RoomServerEvents>;
     private static server: Server;
 
     private static readonly ROOM_PREFIX = "socket:room:";
 
-    public static init(io: IOServer, server: Server): void {
+    public static init(io: IOServer<RoomClientEvents, RoomServerEvents>, server: Server): void {
         this.io = io;
         this.server = server;
     }

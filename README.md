@@ -273,7 +273,7 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Token เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
+| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{slip}` | Bearer | เติม Token เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
 
 #### 4.2.6 Skin System API
 

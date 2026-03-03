@@ -3,6 +3,7 @@ import { createMiddleware } from "hono/factory";
 import Server from "./utils/Server";
 import AuthRoute from "./routes/AuthRoute";
 import UserRoute from "./routes/UserRoute";
+import PaymentRoute from "./routes/PaymentRoute";
 
 const authMiddleware = (server: Server) => {
     return createMiddleware(async (c, next) => {
@@ -39,6 +40,8 @@ export default async (app: Hono, server: Server) => {
     app.use("/*", authMiddleware(server));
 
     app.route("/user", UserRoute(new Hono(), server));
+
+    app.route("/payment", PaymentRoute(new Hono(), server));
 
     app.notFound((c) => {
         return c.json({ error: "Not Found" }, 404);

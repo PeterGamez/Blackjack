@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import config from "../../../config"
 import { io, Socket } from "socket.io-client"
+import { getCardImagePath, getCardBackImage } from "../../../utils/cardUtils"
 
 interface Card {
   suit: string
@@ -12,6 +13,44 @@ interface Card {
 }
 
 type GameStatus = "betting" | "playing" | "game-over"
+
+const styles = `
+  @keyframes cardSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-100px) rotateY(90deg);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) rotateY(0deg);
+    }
+  }
+
+  @keyframes cardFlip {
+    0% {
+      transform: rotateY(0deg) scale(1);
+    }
+    50% {
+      transform: rotateY(90deg) scale(1.1);
+    }
+    100% {
+      transform: rotateY(0deg) scale(1);
+    }
+  }
+
+  .card {
+    animation: cardSlideIn 0.5s ease-out;
+    perspective: 1000px;
+  }
+
+  .card-flip {
+    animation: cardFlip 0.6s ease-in-out;
+  }
+
+  .card-back {
+    animation: cardSlideIn 0.5s ease-out;
+  }
+`
 
 export default function Dealer() {
   const router = useRouter()
@@ -177,6 +216,7 @@ export default function Dealer() {
 
   return (
     <div style={{ background: "#2d5016", minHeight: "100vh", color: "white", padding: "20px" }}>
+      <style>{styles}</style>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <button
@@ -184,7 +224,7 @@ export default function Dealer() {
             if (socketRef.current && gameId) {
               socketRef.current.emit("game:leave", { gameId, userId })
             }
-            router.push("/play/quick")
+            router.push("/play")
           }}
           style={{ padding: "10px 20px", background: "#ff6b6b", border: "none", color: "white", cursor: "pointer", borderRadius: "5px" }}
           disabled={isLoading}
@@ -220,17 +260,58 @@ export default function Dealer() {
         {gameStatus !== "betting" && (
           <>
             {/* Dealer Hand */}
-            <div style={{ marginBottom: "40px" }}>
+            <div style={{ marginBottom: "80px" }}>
               <h3>Dealer{gameStatus === "game-over" ? ` - Value: ${dealerValue}` : ""}</h3>
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "flex-start" }}>
                 {dealerHand.map((card, i) => (
-                  <div key={i} style={{ width: "80px", height: "120px", background: "white", color: "black", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", fontWeight: "bold", borderRadius: "5px", border: "2px solid gold" }}>
-                    {card.rank}{card.suit}
+                  <div
+                    key={i}
+                    className={gameStatus === "game-over" ? "card card-flip" : "card"}
+                    style={{
+                      position: "relative",
+                      width: "100px",
+                      height: "150px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <img
+                      src={getCardImagePath(card)}
+                      alt={`${card.rank}${card.suit}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
+                        objectFit: "fill",
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%23fff' width='100' height='150'/%3E%3C/svg%3E"
+                      }}
+                    />
                   </div>
                 ))}
                 {gameStatus === "playing" && (
-                  <div style={{ width: "80px", height: "120px", background: "#1a4010", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px", border: "2px solid gold", fontSize: "30px" }}>
-                    🂠
+                  <div
+                    className="card-back"
+                    style={{
+                      width: "100px",
+                      height: "150px",
+                    }}
+                  >
+                    <img
+                      src={getCardBackImage(1)}
+                      alt="Card back"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
+                        objectFit: "fill",
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%231a4010' width='100' height='150'/%3E%3Ctext x='50' y='75' font-size='60' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%82%A0%3C/text%3E%3C/svg%3E"
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -239,10 +320,30 @@ export default function Dealer() {
             {/* Player Hand */}
             <div style={{ marginBottom: "40px" }}>
               <h3>Your Hand - Value: {playerValue}</h3>
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "flex-start" }}>
                 {playerHand.map((card, i) => (
-                  <div key={i} style={{ width: "80px", height: "120px", background: "white", color: "black", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", fontWeight: "bold", borderRadius: "5px", border: "2px solid gold" }}>
-                    {card.rank}{card.suit}
+                  <div
+                    key={i}
+                    className="card"
+                    style={{
+                      width: "100px",
+                      height: "150px",
+                    }}
+                  >
+                    <img
+                      src={getCardImagePath(card)}
+                      alt={`${card.rank}${card.suit}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
+                        objectFit: "fill",
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%23fff' width='100' height='150'/%3E%3C/svg%3E"
+                      }}
+                    />
                   </div>
                 ))}
               </div>

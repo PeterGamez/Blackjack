@@ -55,132 +55,244 @@ export default function Home() {
     if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
   }, [username, coins, tokens])
 
-  const buttonStyle = (name: string) => ({
-    width: "350px",
-    padding: "15px 120px",
-    fontSize: "20px",
+ const buttonStyle = (name: string) => {
+  let background = ""
+
+  switch (name) {
+
+    // 1️⃣ Shop
+    case "shop":
+      background =
+        "linear-gradient(90deg, #C99A3F 0%, #E6B85C 50%, #F2C879 100%)"
+      break
+
+    // 2️⃣ Inventory
+    case "inventory":
+      background = "#F2C879"
+      break
+
+    // 3️⃣ Gambling
+    case "gambling":
+      background =
+        "linear-gradient(90deg, #F2C879 0%, #E6B85C 50%, #C99A3F 100%)"
+      break
+
+    // 4️⃣ Create Table
+    case "create":
+      background = "#C99A3F"
+      break
+
+    // 5️⃣ Play
+    case "play":
+      background =
+        "linear-gradient(90deg,  #C99A3F 0%, #E6B85C 50%, #F2C879 100%)"
+      break
+
+    default:
+      background = "#E6B85C"
+  }
+
+  return {
+    width: "250px",
+    height: "64px",
+    fontSize: "24px",
     fontWeight: "bold",
-    background: "#4da6ff",
-    color: "black",
-    border: "3px solid #2b7cd3",
-    transform: "skewX(-45deg)",
-    cursor: "pointer",
-    transition: "0.2s",
-    whiteSpace: "nowrap",
-    boxShadow:
+    background,
+    color: "#1a1a1a",
+    border: "2px solid rgba(0,0,0,0.25)",
+    transform:
       hovered === name
-        ? "0 0 25px #4da6ff, 0 0 50px #4da6ff"
-        : "0 0 10px #4da6ff",
-    scale: hovered === name ? "1.05" : "1",
-    marginLeft: "-5px"
-  })
+        ? "skewX(-45deg) scale(1.05)"
+        : "skewX(-45deg)",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    whiteSpace: "nowrap",
+    marginLeft: "-6px",
+    boxShadow: hovered === name
+      ? "0 8px 20px rgba(0,0,0,0.25)"
+      : "0 2px 6px rgba(0,0,0,0.15)"
+  }
+}
+
+  const menuItems = [
+    { key: "shop", label: "Shop", path: "/skin" },
+    { key: "inventory", label: "Inventory", path: "/profile" },
+    { key: "gambling", label: "Gambling", path: "/gambling" },
+    { key: "create", label: "Create Table", path: "/createtable" },
+    { key: "play", label: "Play", path: "/play" }
+  ]
 
   return (
     <div
       style={{
-        height: "100vh",
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "#d9d3c7"
+        background: "#1E2430",
+        padding: "28px 60px 56px"
       }}
     >
-
-      {/* TOP BAR */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          padding: "20px 40px"
+          alignItems: "center",
+          padding: "12px 0",
+          gap: "32px"
         }}
       >
         <div
-          style={{
-            border: "2px solid #3b82f6",
-            padding: "10px 20px",
-            cursor: "pointer"
-          }}
           onClick={() => router.push(username ? "/profile" : "/auth")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            gap: 0,
+            background: "rgba(92, 107, 138, 0.6)",
+            border: "1px solid rgba(92, 107, 138, 0.8)",
+            borderRadius: "20px",
+            padding: "8px 24px 8px 0",
+            height: "64px",
+            flexShrink: 0
+          }}
         >
-          {username || "Login"}
+          <div
+            style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              background: "#ffffff",
+              border: "3px solid #5c6b8a",
+              zIndex: 2,
+              marginLeft: "-20px",
+              marginRight: "12px"
+            }}
+          />
+          <div
+            style={{
+              color: "#e6eaf2",
+              display: "flex",
+              alignItems: "center",
+              fontSize: "18px",
+              fontWeight: 400
+            }}
+          >
+            {username || "username"}
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "20px" }}>
-          <div style={{ border: "2px solid orange", padding: "10px 20px" }}>
-            🪙 {coins}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px", marginRight: "0" }}>
+          <div
+            style={{
+              height: "64px",
+              minWidth: "220px",
+              borderRadius: "20px",
+              background: "rgba(92, 107, 138, 0.6)",
+              border: "1px solid rgba(92, 107, 138, 0.8)",
+              color: "#e6eaf2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: "16px",
+              fontSize: "18px",
+              padding: "0 24px",
+              cursor: "pointer",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
+              e.currentTarget.style.transform = "translateY(-2px)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
+              e.currentTarget.style.transform = "translateY(0)"
+            }}
+          >
+            <span style={{ fontSize: "20px" }}>🪙</span>
+            {coins.toLocaleString()}
           </div>
-          <div style={{ border: "2px solid #3b82f6", padding: "10px 20px" }}>
-            🎫 {tokens}
+
+          <div
+            style={{
+              height: "64px",
+              minWidth: "220px",
+              borderRadius: "20px",
+              background: "rgba(92, 107, 138, 0.6)",
+              border: "1px solid rgba(92, 107, 138, 0.8)",
+              color: "#e6eaf2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: "16px",
+              fontSize: "18px",
+              padding: "0 24px",
+              cursor: "pointer",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
+              e.currentTarget.style.transform = "translateY(-2px)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
+              e.currentTarget.style.transform = "translateY(0)"
+            }}
+          >
+            <div
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "6px",
+                background: "#b28bff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "16px",
+                fontWeight: 700,
+                color: "#1a1a1a"
+              }}
+            >
+              T
+            </div>
+            {tokens.toLocaleString()}
+            <span style={{ fontSize: "28px", lineHeight: 1, marginLeft: "auto", fontWeight: 700 }}>+</span>
           </div>
         </div>
       </div>
 
-      {/* LEFT BOARD */}
-      <div style={{ paddingLeft: "40px" }}>
-        <div style={{
-          width: "250px",
-          height: "300px",
-          border: "2px solid #3b82f6",
-          padding: "20px"
-        }}>
-          บอร์ดกิจกรรม
-        </div>
+      <div style={{ paddingLeft: "6px" }}>
+        <div
+          style={{
+            width: "270px",
+            height: "420px",
+            borderRadius: "14px",
+            background: "#d9d9d9"
+          }}
+        />
       </div>
 
-      {/* BOTTOM MENU */}
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end", // ดันไปขวา
-          paddingRight: "5%",        // เว้นขอบขวา
-          paddingBottom: "30px"
+          justifyContent: "center",
+          paddingBottom: "2px"
         }}
       >
-        <button
-          onClick={() => router.push("/skin")}
-          onMouseEnter={() => setHovered("skin")}
-          onMouseLeave={() => setHovered(null)}
-          style={buttonStyle("skin")}
-        >
-          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
-            Skin
-          </span>
-        </button>
-
-        <button
-          onClick={() => router.push("/gambling")}
-          onMouseEnter={() => setHovered("gambling")}
-          onMouseLeave={() => setHovered(null)}
-          style={buttonStyle("gambling")}
-        >
-          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
-            Gambling
-          </span>
-        </button>
-
-        <button
-          onClick={() => router.push("/createtable")}
-          onMouseEnter={() => setHovered("create")}
-          onMouseLeave={() => setHovered(null)}
-          style={buttonStyle("create")}
-        >
-          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
-            Create Table
-          </span>
-        </button>
-
-        <button
-          onClick={() => router.push("/play")}
-          onMouseEnter={() => setHovered("play")}
-          onMouseLeave={() => setHovered(null)}
-          style={buttonStyle("play")}
-        >
-          <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
-            Play
-          </span>
-        </button>
+        {menuItems.map((item) => (
+          <button
+            key={item.key}
+            onClick={() => router.push(item.path)}
+            onMouseEnter={() => setHovered(item.key)}
+            onMouseLeave={() => setHovered(null)}
+            style={buttonStyle(item.key)}
+          >
+            <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+              {item.label}
+            </span>
+          </button>
+        ))}
       </div>
-
     </div>
   )
 }

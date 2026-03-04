@@ -84,6 +84,10 @@ export default function StorePage() {
         >
           ← Lobby
         </button>
+        {/* Mode Title */}
+        <div className={styles.modeTitle}>
+          <h2>Shop</h2>
+        </div>
 
       {/* ===== MAIN AREA ===== */}
       <div className={styles.main}>

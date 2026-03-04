@@ -1,0 +1,52 @@
+name: CI Check & Build
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+jobs:
+  backend:
+    if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
+    name: Backend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Backend
+        run: bun run build
+
+  frontend:
+    if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Frontend
+        run: bun run build

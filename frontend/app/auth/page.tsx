@@ -118,9 +118,10 @@ export default function AuthPage() {
     padding: "20px 22px",
     background: "#3d4f6e",
     border: "none",
-    borderRadius: "11px",
+    borderRadius: "20px",
     color: "#c8d0e0",
     fontSize: "21px",
+    fontFamily: "var(--font-inter), sans-serif",
     outline: "none",
     boxSizing: "border-box",
   }
@@ -167,6 +168,7 @@ export default function AuthPage() {
         justifyContent: "center",
         alignItems: "center",
         background: "#1a2234",
+        fontFamily: "Sora, sans-serif",
       }}
     >
       <button
@@ -247,7 +249,7 @@ export default function AuthPage() {
               border: "none",
               cursor: "pointer",
               fontSize: "25px",
-              fontWeight: tab === "login" ? "600" : "400",
+              fontWeight: "400",
               color: tab === "login" ? "#d4a84b" : "#93a3bb",
               borderBottom: "2px solid transparent",
               paddingBottom: "9px",
@@ -263,7 +265,7 @@ export default function AuthPage() {
               border: "none",
               cursor: "pointer",
               fontSize: "25px",
-              fontWeight: tab === "register" ? "600" : "400",
+              fontWeight: "400",
               color: tab === "register" ? "#d4a84b" : "#93a3bb",
               borderBottom: "2px solid transparent",
               paddingBottom: "9px",
@@ -285,7 +287,7 @@ export default function AuthPage() {
           {tab === "login" ? (
             <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               <div>
-                <label style={labelStyle}>Username</label>
+                <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
                 <div style={inputWrapStyle}>
                   <input
                     type="text"
@@ -299,7 +301,7 @@ export default function AuthPage() {
               </div>
 
               <div>
-                <label style={labelStyle}>Password</label>
+                <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Password</label>
                 <div style={inputWrapStyle}>
                   <input
                     type={showLoginPassword ? "text" : "password"}
@@ -337,9 +339,9 @@ export default function AuthPage() {
                 disabled={loginLoading}
                 onMouseEnter={() => setHoveredBtn("signin")}
                 onMouseLeave={() => setHoveredBtn(null)}
-                style={{ marginTop: "11px", padding: "20px", ...btnStyle("signin", loginLoading) }}
+                style={{ marginTop: "11px", alignSelf: "center", padding: "20px 72px", ...btnStyle("signin", loginLoading), fontWeight: "400", textTransform: "uppercase" }}
               >
-                {loginLoading ? "Signing in..." : "Sign In"}
+                {loginLoading ? "SIGNING IN..." : "SIGN IN"}
               </button>
 
               <button
@@ -371,7 +373,7 @@ export default function AuthPage() {
               >
                 {/* Username */}
                 <div>
-                  <label style={labelStyle}>Username</label>
+                  <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
                   <div style={inputWrapStyle}>
                     <input
                       placeholder="username/email"
@@ -385,7 +387,7 @@ export default function AuthPage() {
 
                 {/* Password */}
                 <div>
-                  <label style={{ ...labelStyle, display: "flex", alignItems: "baseline", gap: "10px" }}>
+                  <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px", display: "flex", alignItems: "baseline", gap: "10px" }}>
                     Password
                     <span style={{ fontSize: "13px", color: "#8899bb", fontWeight: "400" }}>
                       At Least 8 Characters: A–Z, a–z, 0–9, Symbols.

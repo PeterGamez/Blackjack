@@ -12,6 +12,12 @@ interface Card {
   value: number
 }
 
+interface ChipStack {
+  value: number
+  count: number
+  image: string
+}
+
 type GameStatus = "betting" | "playing" | "game-over"
 
 const styles = `
@@ -66,6 +72,31 @@ export default function Dealer() {
   const [gameId, setGameId] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(false)
   const [userId, setUserId] = useState<number>(0)
+
+  const getChipStacks = (amount: number): ChipStack[] => {
+    const chipValues = [1000, 500, 100, 25, 10, 5, 1]
+    const chipImages: Record<number, string> = {
+      1000: "/chips/chips1000.png",
+      500: "/chips/chip500.png",
+      100: "/chips/chip100.png",
+      25: "/chips/chip25.png",
+      10: "/chips/chip10.png",
+      5: "/chips/chip5.png",
+      1: "/chips/chip1.png",
+    }
+
+    let remaining = Math.max(0, Math.floor(amount))
+    const stacks: ChipStack[] = []
+
+    for (const value of chipValues) {
+      if (remaining < value) continue
+      const count = Math.floor(remaining / value)
+      remaining -= count * value
+      stacks.push({ value, count, image: chipImages[value] ?? "/chips/chip1.png" })
+    }
+
+    return stacks
+  }
 
   const calculateHandValue = (hand: Card[]) => {
     let value = 0
@@ -126,14 +157,20 @@ export default function Dealer() {
       dealerValue: number
       result: "win" | "lose" | "push"
       reward: number
-      coins: number
+      balance?: number
+      coins?: number
     }) => {
       setPlayerHand(data.playerHand)
       setDealerHand(data.dealerHand)
       const msg = data.result === "win" ? "You win!" : data.result === "push" ? "Push!" : "Dealer wins"
       setResult(msg)
-      setPlayerChips(data.coins)
-      localStorage.setItem("cached_coins", data.coins.toString())
+      const nextChips = typeof data.balance === "number"
+        ? data.balance
+        : typeof data.coins === "number"
+          ? data.coins
+          : playerChips
+      setPlayerChips(nextChips)
+      localStorage.setItem("cached_coins", nextChips.toString())
       setGameStatus("game-over")
       setIsLoading(false)
     })
@@ -172,8 +209,13 @@ export default function Dealer() {
         setPlayerHand(ack.playerHand)
         setDealerHand(ack.dealerHand)
         setBet(ack.bet)
-        setPlayerChips(ack.coins)
-        localStorage.setItem("cached_coins", ack.coins.toString())
+        const nextChips = typeof ack?.balance === "number"
+          ? ack.balance
+          : typeof ack?.coins === "number"
+            ? ack.coins
+            : playerChips
+        setPlayerChips(nextChips)
+        localStorage.setItem("cached_coins", nextChips.toString())
         setGameStatus("playing")
         setMessage("")
         setResult("")
@@ -213,6 +255,7 @@ export default function Dealer() {
 
   const playerValue = calculateHandValue(playerHand)
   const dealerValue = calculateHandValue(dealerHand)
+  const chipStacks = getChipStacks(bet)
 
   return (
     <div style={{ background: "#2d5016", minHeight: "100vh", color: "white", padding: "20px" }}>
@@ -259,6 +302,52 @@ export default function Dealer() {
 
         {gameStatus !== "betting" && (
           <>
+            {/* Bet Chips */}
+            <div style={{ marginBottom: "24px", textAlign: "center" }}>
+              <h3 style={{ marginBottom: "12px" }}>Bet: {bet}</h3>
+              <div style={{ display: "flex", justifyContent: "center", gap: "18px", flexWrap: "wrap", minHeight: "56px" }}>
+                {chipStacks.map((stack) => (
+                  <div key={stack.value} style={{ position: "relative", width: "52px", height: "56px" }}>
+                    {Array.from({ length: Math.min(stack.count, 6) }).map((_, index) => (
+                      <div
+                        key={`${stack.value}-${index}`}
+                        style={{
+                          position: "absolute",
+                          bottom: `${index * 6}px`,
+                          left: "0",
+                          width: "52px",
+                          height: "52px",
+                          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.35))",
+                        }}
+                      >
+                        <img
+                          src={stack.image}
+                          alt={`${stack.value} chip`}
+                          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                        />
+                      </div>
+                    ))}
+                    {stack.count > 6 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-14px",
+                          right: "-12px",
+                          background: "rgba(0,0,0,0.7)",
+                          borderRadius: "10px",
+                          padding: "2px 6px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        x{stack.count}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Dealer Hand */}
             <div style={{ marginBottom: "80px" }}>
               <h3>Dealer{gameStatus === "game-over" ? ` - Value: ${dealerValue}` : ""}</h3>

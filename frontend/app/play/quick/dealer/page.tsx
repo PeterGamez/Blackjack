@@ -20,42 +20,45 @@ interface ChipStack {
 
 type GameStatus = "betting" | "playing" | "game-over"
 
+const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000]
+const CHIP_IMAGES: Record<number, string> = {
+  1000: "/chips/chips1000.png",
+  500: "/chips/chip500.png",
+  100: "/chips/chip100.png",
+  25: "/chips/chip25.png",
+  10: "/chips/chip10.png",
+  5: "/chips/chip5.png",
+  1: "/chips/chip1.png",
+}
+
 const styles = `
   @keyframes cardSlideIn {
-    from {
-      opacity: 0;
-      transform: translateX(-100px) rotateY(90deg);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0) rotateY(0deg);
-    }
+    from { opacity: 0; transform: translateY(-40px) scale(0.85); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);    }
   }
-
   @keyframes cardFlip {
-    0% {
-      transform: rotateY(0deg) scale(1);
-    }
-    50% {
-      transform: rotateY(90deg) scale(1.1);
-    }
-    100% {
-      transform: rotateY(0deg) scale(1);
-    }
+    0%   { transform: rotateY(0deg)  scale(1);   }
+    50%  { transform: rotateY(90deg) scale(1.08); }
+    100% { transform: rotateY(0deg)  scale(1);   }
   }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1);   }
+  }
+  .card      { animation: cardSlideIn 0.45s ease-out; }
+  .card-flip { animation: cardFlip 0.6s ease-in-out; }
+  .card-back { animation: cardSlideIn 0.45s ease-out; }
+  .result-badge { animation: fadeIn 0.4s ease-out; }
 
-  .card {
-    animation: cardSlideIn 0.5s ease-out;
-    perspective: 1000px;
+  .chip-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s;
+    padding: 0;
   }
-
-  .card-flip {
-    animation: cardFlip 0.6s ease-in-out;
-  }
-
-  .card-back {
-    animation: cardSlideIn 0.5s ease-out;
-  }
+  .chip-btn:hover { transform: translateY(-6px) scale(1.12); }
+  .chip-btn:active { transform: scale(0.95); }
 `
 
 export default function Dealer() {
@@ -65,37 +68,46 @@ export default function Dealer() {
   const [playerHand, setPlayerHand] = useState<Card[]>([])
   const [dealerHand, setDealerHand] = useState<Card[]>([])
   const [bet, setBet] = useState<number>(0)
+  const [pendingBet, setPendingBet] = useState<number>(0)
   const [playerChips, setPlayerChips] = useState<number>(0)
   const [message, setMessage] = useState<string>("")
   const [result, setResult] = useState<string>("")
-  const [tempBet, setTempBet] = useState<string>("10")
   const [gameId, setGameId] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(false)
   const [userId, setUserId] = useState<number>(0)
+  const [username, setUsername] = useState<string>("username")
+  const [timer, setTimer] = useState<number>(10)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const getChipStacks = (amount: number): ChipStack[] => {
     const chipValues = [1000, 500, 100, 25, 10, 5, 1]
-    const chipImages: Record<number, string> = {
-      1000: "/chips/chips1000.png",
-      500: "/chips/chip500.png",
-      100: "/chips/chip100.png",
-      25: "/chips/chip25.png",
-      10: "/chips/chip10.png",
-      5: "/chips/chip5.png",
-      1: "/chips/chip1.png",
-    }
-
     let remaining = Math.max(0, Math.floor(amount))
     const stacks: ChipStack[] = []
-
     for (const value of chipValues) {
       if (remaining < value) continue
       const count = Math.floor(remaining / value)
       remaining -= count * value
-      stacks.push({ value, count, image: chipImages[value] ?? "/chips/chip1.png" })
+      stacks.push({ value, count, image: CHIP_IMAGES[value] ?? "/chips/chip1.png" })
     }
-
     return stacks
+  }
+
+  const startTimer = () => {
+    setTimer(10)
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const stopTimer = () => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
   }
 
   const calculateHandValue = (hand: Card[]) => {
@@ -116,7 +128,6 @@ export default function Dealer() {
     const cachedCoins = localStorage.getItem("cached_coins")
     if (cachedCoins) setPlayerChips(Number(cachedCoins))
 
-    // fetch userId
     ;(async () => {
       try {
         const res = await fetch(`${config.apiUrl}/user/me`, {
@@ -125,6 +136,7 @@ export default function Dealer() {
         if (res.ok) {
           const data = await res.json()
           setUserId(data.id)
+          setUsername(data.username || data.name || "username")
           setPlayerChips(data.coins ?? Number(cachedCoins ?? 0))
           localStorage.setItem("userId", data.id.toString())
         }
@@ -141,9 +153,11 @@ export default function Dealer() {
 
     socket.on("game:player-hit", (data: { playerHand: Card[]; playerValue: number }) => {
       setPlayerHand(data.playerHand)
+      startTimer()
     })
 
     socket.on("game:bust", (data: { playerHand: Card[]; playerValue: number }) => {
+      stopTimer()
       setPlayerHand(data.playerHand)
       setResult("BUST! Dealer wins")
       setGameStatus("game-over")
@@ -160,9 +174,10 @@ export default function Dealer() {
       balance?: number
       coins?: number
     }) => {
+      stopTimer()
       setPlayerHand(data.playerHand)
       setDealerHand(data.dealerHand)
-      const msg = data.result === "win" ? "You win!" : data.result === "push" ? "Push!" : "Dealer wins"
+      const msg = data.result === "win" ? "You win! 🎉" : data.result === "push" ? "Push!" : "Dealer wins"
       setResult(msg)
       const nextChips = typeof data.balance === "number"
         ? data.balance
@@ -178,7 +193,7 @@ export default function Dealer() {
     socket.on("disconnect", () => console.log("Socket disconnected"))
 
     socketRef.current = socket
-    return () => { socketRef.current?.disconnect() }
+    return () => { stopTimer(); socketRef.current?.disconnect() }
   }, [])
 
   const startGame = (betAmount: number) => {
@@ -186,14 +201,8 @@ export default function Dealer() {
       setMessage("Invalid bet amount")
       return
     }
-    if (!socketRef.current) {
-      setMessage("Not connected")
-      return
-    }
-    if (!userId) {
-      setMessage("User not loaded yet, please wait")
-      return
-    }
+    if (!socketRef.current) { setMessage("Not connected"); return }
+    if (!userId) { setMessage("User not loaded yet, please wait"); return }
 
     setIsLoading(true)
     socketRef.current.emit(
@@ -201,10 +210,7 @@ export default function Dealer() {
       { userId, gameType: "quick_ai", bet: betAmount },
       (ack: any) => {
         setIsLoading(false)
-        if (!ack?.ok) {
-          setMessage(ack?.message || "Failed to start game")
-          return
-        }
+        if (!ack?.ok) { setMessage(ack?.message || "Failed to start game"); return }
         setGameId(ack.gameId)
         setPlayerHand(ack.playerHand)
         setDealerHand(ack.dealerHand)
@@ -219,6 +225,7 @@ export default function Dealer() {
         setGameStatus("playing")
         setMessage("")
         setResult("")
+        startTimer()
       }
     )
   }
@@ -226,247 +233,349 @@ export default function Dealer() {
   const hit = () => {
     if (isLoading || !socketRef.current || !gameId || !userId) return
     setIsLoading(true)
-    socketRef.current.emit(
-      "game:hit",
-      { gameId, userId },
-      (ack: any) => {
-        setIsLoading(false)
-        if (!ack?.ok) { setMessage(ack?.message || "Failed to hit"); return }
-        setPlayerHand(ack.playerHand)
-        if (ack.bust) {
-          setResult("BUST! Dealer wins")
-          setGameStatus("game-over")
-        }
-      }
-    )
+    socketRef.current.emit("game:hit", { gameId, userId }, (ack: any) => {
+      setIsLoading(false)
+      if (!ack?.ok) { setMessage(ack?.message || "Failed to hit"); return }
+      setPlayerHand(ack.playerHand)
+      if (ack.bust) { stopTimer(); setResult("BUST! Dealer wins"); setGameStatus("game-over") }
+      else startTimer()
+    })
   }
 
   const stand = () => {
     if (isLoading || !socketRef.current || !gameId || !userId) return
     setIsLoading(true)
+    stopTimer()
     socketRef.current.emit("game:stand", { gameId, userId }, (ack: any) => {
-      if (!ack?.ok) {
-        setIsLoading(false)
-        setMessage(ack?.message || "Failed to stand")
-      }
-      // result handled by game:finished event
+      if (!ack?.ok) { setIsLoading(false); setMessage(ack?.message || "Failed to stand") }
     })
   }
+
+  const addChipToBet = (value: number) => {
+    if (pendingBet + value > playerChips) return
+    setPendingBet(prev => prev + value)
+    setMessage("")
+  }
+
+  const clearBet = () => setPendingBet(0)
 
   const playerValue = calculateHandValue(playerHand)
   const dealerValue = calculateHandValue(dealerHand)
   const chipStacks = getChipStacks(bet)
 
   return (
-    <div style={{ background: "#2d5016", minHeight: "100vh", color: "white", padding: "20px" }}>
+    <div style={{ background: "#111827", minHeight: "100vh", color: "white", fontFamily: "'Inter', 'Segoe UI', sans-serif", overflow: "hidden" }}>
       <style>{styles}</style>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-        <button
+
+      {/* ─── Header ─── */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 24px",
+      }}>
+        {/* Avatar + username */}
+        <div
           onClick={() => {
-            if (socketRef.current && gameId) {
-              socketRef.current.emit("game:leave", { gameId, userId })
-            }
+            if (socketRef.current && gameId) socketRef.current.emit("game:leave", { gameId, userId })
             router.push("/play")
           }}
-          style={{ padding: "10px 20px", background: "#ff6b6b", border: "none", color: "white", cursor: "pointer", borderRadius: "5px" }}
-          disabled={isLoading}
+          style={{ display: "flex", alignItems: "center", gap: "12px", background: "#1f2937", borderRadius: "50px", padding: "6px 18px 6px 6px", cursor: "pointer" }}
         >
-          Back
-        </button>
-        <div style={{ fontSize: "18px", fontWeight: "bold" }}>Chips: {playerChips}</div>
+          <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "white", flexShrink: 0 }} />
+          <span style={{ fontWeight: 600, fontSize: "15px" }}>{username}</span>
+        </div>
+
+        {/* Balances */}
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {/* Coins */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#1f2937", borderRadius: "50px", padding: "8px 20px" }}>
+            <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "bold", color: "#78350f" }}>C</div>
+            <span style={{ fontWeight: 700, fontSize: "15px" }}>{playerChips.toLocaleString()}</span>
+          </div>
+          {/* Tokens */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#374151", borderRadius: "50px", padding: "8px 16px" }}>
+            <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "bold", color: "white" }}>T</div>
+            <span style={{ fontWeight: 700, fontSize: "15px" }}>0</span>
+            <span style={{ fontSize: "18px", color: "#9ca3af", marginLeft: "2px", cursor: "pointer" }}>+</span>
+          </div>
+        </div>
       </div>
 
-      {/* Game Area */}
-      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-        {gameStatus === "betting" && (
-          <div style={{ textAlign: "center", background: "rgba(0,0,0,0.3)", padding: "40px", borderRadius: "10px", marginTop: "100px" }}>
-            <h2>Place Your Bet</h2>
-            <input
-              type="number"
-              value={tempBet}
-              onChange={(e) => setTempBet(e.target.value)}
-              style={{ padding: "10px", fontSize: "16px", width: "100px", marginRight: "10px", borderRadius: "5px", border: "none" }}
-              disabled={isLoading}
-            />
-            <button
-              onClick={() => startGame(parseInt(tempBet))}
-              style={{ padding: "10px 30px", fontSize: "16px", background: "#51cf66", border: "none", color: "white", cursor: "pointer", borderRadius: "5px", opacity: isLoading ? 0.5 : 1 }}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : "Deal"}
-            </button>
-            {message && <p style={{ color: "#ff6b6b" }}>{message}</p>}
-          </div>
-        )}
+      {/* ─── Main Game Area ─── */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "10px" }}>
 
-        {gameStatus !== "betting" && (
-          <>
-            {/* Bet Chips */}
-            <div style={{ marginBottom: "24px", textAlign: "center" }}>
-              <h3 style={{ marginBottom: "12px" }}>Bet: {bet}</h3>
-              <div style={{ display: "flex", justifyContent: "center", gap: "18px", flexWrap: "wrap", minHeight: "56px" }}>
-                {chipStacks.map((stack) => (
-                  <div key={stack.value} style={{ position: "relative", width: "52px", height: "56px" }}>
-                    {Array.from({ length: Math.min(stack.count, 6) }).map((_, index) => (
-                      <div
-                        key={`${stack.value}-${index}`}
+        {/* ── Semicircular Table ── */}
+        <div style={{ position: "relative", width: "820px", maxWidth: "98vw" }}>
+
+          {/* Table shape */}
+          <div style={{
+            width: "820px",
+            maxWidth: "98vw",
+            height: "460px",
+            background: "#c8922a",
+            borderRadius: "0 0 430px 430px / 0 0 460px 460px",
+            boxShadow: "0 0 0 10px #e8b84b, 0 8px 40px rgba(0,0,0,0.6)",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            {/* Inner felt shadow */}
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "inherit",
+              boxShadow: "inset 0 -30px 60px rgba(0,0,0,0.15)",
+              pointerEvents: "none",
+            }} />
+
+            {/* ── Chip Stack (right side) ── */}
+            {gameStatus !== "betting" && (
+              <div style={{
+                position: "absolute",
+                right: "60px",
+                top: "50px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0",
+              }}>
+                {/* stacked chips visual */}
+                <div style={{ position: "relative", width: "90px", height: "140px" }}>
+                  {chipStacks.map((stack, si) => (
+                    Array.from({ length: Math.min(stack.count, 4) }).map((_, ci) => (
+                      <img
+                        key={`${si}-${ci}`}
+                        src={stack.image}
+                        alt={`${stack.value}`}
                         style={{
                           position: "absolute",
-                          bottom: `${index * 6}px`,
-                          left: "0",
-                          width: "52px",
-                          height: "52px",
-                          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.35))",
+                          bottom: `${(si * 20) + ci * 5}px`,
+                          left: `${si % 2 === 0 ? 0 : 20}px`,
+                          width: "60px",
+                          height: "60px",
+                          objectFit: "contain",
+                          filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.4))",
                         }}
-                      >
-                        <img
-                          src={stack.image}
-                          alt={`${stack.value} chip`}
-                          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                        />
-                      </div>
-                    ))}
-                    {stack.count > 6 && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "-14px",
-                          right: "-12px",
-                          background: "rgba(0,0,0,0.7)",
-                          borderRadius: "10px",
-                          padding: "2px 6px",
-                          fontSize: "11px",
-                          fontWeight: 700,
-                        }}
-                      >
-                        x{stack.count}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      />
+                    ))
+                  ))}
+                </div>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(0,0,0,0.6)", marginTop: "4px" }}>Bet: {bet}</span>
               </div>
+            )}
+
+            {/* ── Dealer Hand ── */}
+            <div style={{
+              position: "absolute",
+              top: "30px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: "10px",
+              alignItems: "flex-start",
+              justifyContent: "center",
+            }}>
+              {gameStatus !== "betting" && dealerHand.map((card, i) => (
+                <div key={i} className={gameStatus === "game-over" ? "card card-flip" : "card"}
+                  style={{ width: "85px", height: "125px" }}>
+                  <img src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`}
+                    style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='85' height='125'%3E%3Crect fill='%23fff' width='85' height='125'/%3E%3C/svg%3E" }}
+                  />
+                </div>
+              ))}
+              {gameStatus === "playing" && (
+                <div className="card-back" style={{ width: "85px", height: "125px" }}>
+                  <img src={getCardBackImage(1)} alt="Card back"
+                    style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='85' height='125'%3E%3Crect fill='%231a40b0' width='85' height='125'/%3E%3C/svg%3E" }}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Dealer Hand */}
-            <div style={{ marginBottom: "80px" }}>
-              <h3>Dealer{gameStatus === "game-over" ? ` - Value: ${dealerValue}` : ""}</h3>
-              <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "flex-start" }}>
-                {dealerHand.map((card, i) => (
-                  <div
-                    key={i}
-                    className={gameStatus === "game-over" ? "card card-flip" : "card"}
-                    style={{
-                      position: "relative",
-                      width: "100px",
-                      height: "150px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <img
-                      src={getCardImagePath(card)}
-                      alt={`${card.rank}${card.suit}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
-                        objectFit: "fill",
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%23fff' width='100' height='150'/%3E%3C/svg%3E"
-                      }}
-                    />
-                  </div>
-                ))}
+            {/* ── Dealer score badge + timer ── */}
+            {gameStatus !== "betting" && (
+              <div style={{
+                position: "absolute",
+                top: "168px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "6px",
+              }}>
+                <div style={{
+                  width: "46px", height: "46px", borderRadius: "50%",
+                  background: "rgba(100,100,100,0.75)", backdropFilter: "blur(4px)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 800, fontSize: "17px", color: "white",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                }}>
+                  {gameStatus === "playing" ? dealerHand.reduce((acc,c) => acc + c.value,0) : dealerValue}
+                </div>
                 {gameStatus === "playing" && (
-                  <div
-                    className="card-back"
-                    style={{
-                      width: "100px",
-                      height: "150px",
-                    }}
-                  >
-                    <img
-                      src={getCardBackImage(1)}
-                      alt="Card back"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
-                        objectFit: "fill",
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%231a4010' width='100' height='150'/%3E%3Ctext x='50' y='75' font-size='60' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%82%A0%3C/text%3E%3C/svg%3E"
-                      }}
-                    />
-                  </div>
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(0,0,0,0.6)" }}>{timer} s</span>
                 )}
               </div>
-            </div>
+            )}
 
-            {/* Player Hand */}
-            <div style={{ marginBottom: "40px" }}>
-              <h3>Your Hand - Value: {playerValue}</h3>
-              <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "flex-start" }}>
-                {playerHand.map((card, i) => (
-                  <div
-                    key={i}
-                    className="card"
-                    style={{
-                      width: "100px",
-                      height: "150px",
-                    }}
-                  >
-                    <img
-                      src={getCardImagePath(card)}
-                      alt={`${card.rank}${card.suit}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.5)",
-                        objectFit: "fill",
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='150'%3E%3Crect fill='%23fff' width='100' height='150'/%3E%3C/svg%3E"
-                      }}
-                    />
-                  </div>
-                ))}
+            {/* ── Player score badge ── */}
+            {gameStatus !== "betting" && (
+              <div style={{
+                position: "absolute",
+                top: "240px",
+                left: "50%",
+                transform: "translateX(-50%)",
+              }}>
+                <div style={{
+                  width: "46px", height: "46px", borderRadius: "50%",
+                  background: "rgba(100,100,100,0.75)", backdropFilter: "blur(4px)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 800, fontSize: "17px", color: "white",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                }}>
+                  {playerValue}
+                </div>
               </div>
+            )}
+
+            {/* ── Player Hand ── */}
+            <div style={{
+              position: "absolute",
+              bottom: "50px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: "10px",
+              alignItems: "flex-start",
+              justifyContent: "center",
+            }}>
+              {gameStatus !== "betting" && playerHand.map((card, i) => (
+                <div key={i} className="card" style={{ width: "85px", height: "125px" }}>
+                  <img src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`}
+                    style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='85' height='125'%3E%3Crect fill='%23fff' width='85' height='125'/%3E%3C/svg%3E" }}
+                  />
+                </div>
+              ))}
             </div>
 
-            {/* Result */}
+            {/* ── Betting phase overlay on table ── */}
+            {gameStatus === "betting" && (
+              <div style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "16px",
+                borderRadius: "inherit",
+              }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: "22px", color: "rgba(0,0,0,0.55)", letterSpacing: "1px" }}>PLACE YOUR BET</p>
+                <div style={{
+                  background: "rgba(0,0,0,0.2)", borderRadius: "12px",
+                  padding: "10px 24px", fontWeight: 800, fontSize: "28px", color: "rgba(0,0,0,0.7)", minWidth: "120px", textAlign: "center",
+                }}>
+                  {pendingBet > 0 ? pendingBet.toLocaleString() : "—"}
+                </div>
+                {/* Chips row */}
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+                  {CHIP_VALUES.map(v => (
+                    <button key={v} className="chip-btn" onClick={() => addChipToBet(v)} title={`+${v}`}>
+                      <img src={CHIP_IMAGES[v]} alt={`${v}`} style={{ width: "52px", height: "52px", objectFit: "contain" }} />
+                    </button>
+                  ))}
+                </div>
+                {message && <p style={{ margin: 0, color: "#dc2626", fontSize: "13px", fontWeight: 600 }}>{message}</p>}
+              </div>
+            )}
+
+            {/* ── Result badge ── */}
             {result && (
-              <div style={{ textAlign: "center", background: result.includes("win") ? "rgba(81,207,102,0.3)" : result.includes("Push") ? "rgba(255,193,7,0.3)" : "rgba(255,107,107,0.3)", padding: "20px", borderRadius: "5px", marginBottom: "20px" }}>
-                <h3 style={{ margin: 0 }}>{result}</h3>
+              <div className="result-badge" style={{
+                position: "absolute",
+                top: "50%", left: "50%",
+                transform: "translate(-50%, -50%)",
+                background: result.includes("win") ? "rgba(16,185,129,0.92)" : result.includes("Push") ? "rgba(245,158,11,0.92)" : "rgba(239,68,68,0.92)",
+                borderRadius: "16px",
+                padding: "18px 40px",
+                fontWeight: 800, fontSize: "22px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                whiteSpace: "nowrap",
+              }}>
+                {result}
               </div>
             )}
+          </div>
+        </div>
 
-            {/* Action buttons */}
-            {gameStatus === "playing" && (
-              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-                <button onClick={hit} disabled={isLoading} style={{ padding: "12px 30px", fontSize: "16px", background: "#4dabf7", border: "none", color: "white", cursor: "pointer", borderRadius: "5px", opacity: isLoading ? 0.5 : 1 }}>Hit</button>
-                <button onClick={stand} disabled={isLoading} style={{ padding: "12px 30px", fontSize: "16px", background: "#ffa94d", border: "none", color: "white", cursor: "pointer", borderRadius: "5px", opacity: isLoading ? 0.5 : 1 }}>Stand</button>
-              </div>
-            )}
+        {/* ─── Controls below the table ─── */}
+        <div style={{ marginTop: "28px", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
 
-            {/* Play Again */}
-            {gameStatus === "game-over" && (
-              <div style={{ textAlign: "center" }}>
-                <button
-                  onClick={() => { setGameStatus("betting"); setPlayerHand([]); setDealerHand([]); setResult(""); setMessage("") }}
-                  disabled={playerChips <= 0}
-                  style={{ padding: "12px 30px", fontSize: "16px", background: "#51cf66", border: "none", color: "white", cursor: "pointer", borderRadius: "5px" }}
-                >
-                  {playerChips <= 0 ? "Out of chips!" : "Play Again"}
-                </button>
-              </div>
-            )}
-          </>
-        )}
+          {/* Betting controls */}
+          {gameStatus === "betting" && (
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <button
+                onClick={clearBet}
+                style={{ padding: "12px 24px", fontSize: "15px", fontWeight: 700, background: "#374151", border: "none", color: "#d1d5db", cursor: "pointer", borderRadius: "10px", transition: "opacity 0.2s" }}
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => startGame(pendingBet)}
+                disabled={isLoading || pendingBet <= 0}
+                style={{
+                  padding: "12px 44px", fontSize: "16px", fontWeight: 800,
+                  background: pendingBet > 0 ? "#10b981" : "#374151",
+                  border: "none", color: "white", cursor: pendingBet > 0 ? "pointer" : "not-allowed",
+                  borderRadius: "10px", opacity: isLoading ? 0.6 : 1,
+                  transition: "background 0.2s, transform 0.1s",
+                  boxShadow: pendingBet > 0 ? "0 0 20px rgba(16,185,129,0.4)" : "none",
+                }}
+              >
+                {isLoading ? "Dealing…" : "DEAL"}
+              </button>
+            </div>
+          )}
+
+          {/* Playing controls */}
+          {gameStatus === "playing" && (
+            <div style={{ display: "flex", gap: "14px" }}>
+              <button
+                onClick={hit}
+                disabled={isLoading}
+                style={{ padding: "14px 44px", fontSize: "17px", fontWeight: 800, background: "#3b82f6", border: "none", color: "white", cursor: "pointer", borderRadius: "12px", opacity: isLoading ? 0.5 : 1, boxShadow: "0 0 20px rgba(59,130,246,0.4)", transition: "transform 0.1s" }}
+              >
+                HIT
+              </button>
+              <button
+                onClick={stand}
+                disabled={isLoading}
+                style={{ padding: "14px 44px", fontSize: "17px", fontWeight: 800, background: "#f97316", border: "none", color: "white", cursor: "pointer", borderRadius: "12px", opacity: isLoading ? 0.5 : 1, boxShadow: "0 0 20px rgba(249,115,22,0.4)", transition: "transform 0.1s" }}
+              >
+                STAND
+              </button>
+            </div>
+          )}
+
+          {/* Play Again */}
+          {gameStatus === "game-over" && (
+            <button
+              onClick={() => { setGameStatus("betting"); setPlayerHand([]); setDealerHand([]); setResult(""); setMessage(""); setPendingBet(0) }}
+              disabled={playerChips <= 0}
+              style={{ padding: "14px 48px", fontSize: "17px", fontWeight: 800, background: "#10b981", border: "none", color: "white", cursor: "pointer", borderRadius: "12px", boxShadow: "0 0 24px rgba(16,185,129,0.45)" }}
+            >
+              {playerChips <= 0 ? "Out of chips!" : "Play Again"}
+            </button>
+          )}
+
+          {message && gameStatus !== "betting" && (
+            <p style={{ margin: 0, color: "#f87171", fontWeight: 600, fontSize: "14px" }}>{message}</p>
+          )}
+        </div>
       </div>
     </div>
   )

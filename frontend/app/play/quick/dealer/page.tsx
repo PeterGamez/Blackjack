@@ -222,10 +222,21 @@ export default function Dealer() {
             : playerChips
         setPlayerChips(nextChips)
         localStorage.setItem("cached_coins", nextChips.toString())
-        setGameStatus("playing")
         setMessage("")
-        setResult("")
-        startTimer()
+
+        // Blackjack on initial deal — game is already over
+        if (ack.result !== undefined) {
+          const msg = ack.result === "win"
+            ? (ack.blackjack ? "Blackjack! 🎉 You win!" : "You win! 🎉")
+            : ack.result === "push" ? "Push! Both Blackjack" : "Dealer Blackjack — Dealer wins"
+          setResult(msg)
+          setGameStatus("game-over")
+          stopTimer()
+        } else {
+          setResult("")
+          setGameStatus("playing")
+          startTimer()
+        }
       }
     )
   }
@@ -237,8 +248,23 @@ export default function Dealer() {
       setIsLoading(false)
       if (!ack?.ok) { setMessage(ack?.message || "Failed to hit"); return }
       setPlayerHand(ack.playerHand)
-      if (ack.bust) { stopTimer(); setResult("BUST! Dealer wins"); setGameStatus("game-over") }
-      else startTimer()
+      if (ack.bust) {
+        stopTimer()
+        setResult("BUST! Dealer wins")
+        setGameStatus("game-over")
+      } else if (ack.result !== undefined) {
+        // Player hit exactly 21 — dealer resolved automatically
+        stopTimer()
+        if (ack.dealerHand) setDealerHand(ack.dealerHand)
+        const msg = ack.result === "win" ? "You win! 🎉" : ack.result === "push" ? "Push!" : "Dealer wins"
+        setResult(msg)
+        const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips
+        setPlayerChips(nextChips)
+        localStorage.setItem("cached_coins", nextChips.toString())
+        setGameStatus("game-over")
+      } else {
+        startTimer()
+      }
     })
   }
 

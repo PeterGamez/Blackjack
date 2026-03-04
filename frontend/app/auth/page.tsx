@@ -200,7 +200,7 @@ export default function AuthPage() {
 
       <div
         style={{
-          width: tab === "register" ? "900px" : "578px",
+          width: tab === "register" ? "1156px" : "578px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

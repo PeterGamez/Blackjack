@@ -115,7 +115,7 @@ export default function Home() {
 }
 
   const menuItems = [
-    { key: "shop", label: "Shop", path: "/skin" },
+    { key: "shop", label: "Shop", path: "/shop" },
     { key: "inventory", label: "Inventory", path: "/profile" },
     { key: "gambling", label: "Gambling", path: "/gambling" },
     { key: "create", label: "Create Table", path: "/createtable" },

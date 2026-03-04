@@ -5,48 +5,58 @@ on:
     types: [labeled, synchronize]
 
 jobs:
-  backend:
+  detect-changes:
     if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
     name: Backend Build
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./backend
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-
       - name: Install Dependencies
-        run: bun install
-
+        run: bun install --frozen-lockfile
       - name: Build Backend
         run: bun run build
 
   frontend:
-    if: contains(github.event.pull_request.labels.*.name, 'ready to merge')
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
     name: Frontend Build
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./frontend
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-
       - name: Install Dependencies
-        run: bun install
-
+        run: bun install --frozen-lockfile
       - name: Build Frontend
         run: bun run build

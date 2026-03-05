@@ -31,4 +31,16 @@ export default class CodeHistoryModel {
             connection.release();
         }
     }
+
+    public static async checkUserUsedCode(codeId: number, userId: number): Promise<boolean> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND userId = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [codeId, userId]);
+            const result = rows as { count: number }[];
+            return result[0].count > 0;
+        } finally {
+            connection.release();
+        }
+    }
 }

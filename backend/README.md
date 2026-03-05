@@ -1,4 +1,4 @@
-# Twenty-One Degrees — Backend
+# Twenty-One Degrees - Backend
 
 Hono + TypeScript REST API and Socket.IO server for the Twenty-One Degrees project.
 

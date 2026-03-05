@@ -9,7 +9,7 @@ Next.js + TypeScript frontend for the Twenty-One Degrees project.
 | Framework | [Next.js](https://nextjs.org) |
 | Styling | [Tailwind CSS](https://tailwindcss.com) |
 | Real-time | [Socket.IO Client](https://socket.io) |
-| Runtime | [Node.js](https://nodejs.org) |
+| Runtime | [Bun](https://bun.sh) |
 
 ---
 

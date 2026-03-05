@@ -53,4 +53,24 @@ export default {
         password: process.env.REDIS_PASSWORD || "",
         db: parseInt(process.env.REDIS_DB || "0"),
     },
+
+    payment: {
+        slipok: {
+            apiKey: process.env.SLIPOK_API_KEY || "",
+            branchId: process.env.SLIPOK_BRANCH_ID || "",
+            apiUrl: "https://api.slipok.com/api/line/apiVerify",
+        },
+        truemoney: {
+            apiUrl: "https://gift.truemoney.com/campaign/vouchers/",
+        },
+    },
+
+    packages: [
+        { id: 1, price: 35, tokens: 350, name: "Starter Pack", description: "แพ็คเริ่มต้น", active: true },
+        { id: 2, price: 99, tokens: 1100, name: "Basic Pack", description: "แพ็คพื้นฐาน", active: true },
+        { id: 3, price: 179, tokens: 2100, name: "Silver Pack", description: "แพ็คซิลเวอร์", active: true },
+        { id: 4, price: 349, tokens: 4500, name: "Gold Pack", description: "แพ็คทอง", active: true },
+        { id: 5, price: 729, tokens: 10000, name: "Platinum Pack", description: "แพ็คแพลทินั่ม", active: true },
+        { id: 6, price: 1800, tokens: 28000, name: "Diamond Pack", description: "แพ็คเพชร", active: true },
+    ],
 };

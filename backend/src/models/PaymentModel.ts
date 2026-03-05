@@ -26,7 +26,19 @@ export default class PaymentModel {
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [receiptRef]);
-            return rows[0];
+            const result = rows as PaymentInterface[];
+            return result.length > 0 ? result[0] : null;
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async selectPaymentByUserId(userId: number): Promise<PaymentInterface[]> {
+        const sql = `SELECT * FROM ${this.table} WHERE userId = ? ORDER BY createdAt DESC`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [userId]);
+            return rows as PaymentInterface[];
         } finally {
             connection.release();
         }

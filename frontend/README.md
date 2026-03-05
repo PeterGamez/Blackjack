@@ -31,17 +31,17 @@ bun install
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Build the application for production |
-| `npm run start` | Start the production server |
-| `npm run lint` | Lint all source files with ESLint |
+| `bun run dev` | Start the development server |
+| `bun run build` | Build the application for production |
+| `bun run start` | Start the production server |
+| `bun run lint` | Lint all source files with ESLint |
 
 ---
 
 ## Running
 
 ```sh
-npm run dev
+bun run dev
 ```
 
 - Frontend → `http://localhost:3000`

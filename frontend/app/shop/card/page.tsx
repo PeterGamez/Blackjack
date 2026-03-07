@@ -1,9 +1,9 @@
 "use client"
 
-import styles from "./shop.module.css"
+import styles from "../test.module.css"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "../config"
+import config from "../../config"
 
 export default function StorePage() {
   const router = useRouter()
@@ -11,6 +11,11 @@ export default function StorePage() {
   const [coins, setCoins] = useState<number>(0)
   const [tokens, setTokens] = useState<number>(0)
   const products = [
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
   { name: 'Name', price: 'price' },
   { name: 'Name', price: 'price' },
   { name: 'Name', price: 'price' },
@@ -55,7 +60,6 @@ export default function StorePage() {
 
   return (
     <div className={styles.container}>
-      
       {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
@@ -101,15 +105,23 @@ export default function StorePage() {
         <div className={styles.sidebar}>
           <button onClick={() => router.push("/shop/recommend")}>Recommend</button>
           <button onClick={() => router.push("/shop/theme")}>Theme</button>
-          <button onClick={() => router.push("/shop/card")}>Card</button>
+          <button className={styles.active} onClick={() => router.push("/shop/card")}>Card</button>
           <button onClick={() => router.push("/shop/chips")}>Chips</button>
-       </div>
-
+        </div>
 
         {/* CONTENT */}
         <div className={styles.content}>
-        </div>
+          {products.map((p, index) => (
+          <div key={index} className={styles.product}>
+            <div className={styles.productPreview}></div>
+            <div className={styles.productInfo}>
+              <strong>{p.name}</strong>
+              <span>{p.price}</span>
+            </div>
+          </div>
+          ))}
         </div>
       </div>
+    </div>
   )
 }

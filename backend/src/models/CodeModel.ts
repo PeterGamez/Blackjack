@@ -21,7 +21,7 @@ export default class CodeModel {
         }
     }
 
-    public static async selectCodeByCode(code: string): Promise<CodeInterface | null> {
+    public static async selectCodeByCode(code: string): Promise<CodeInterface> {
         const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
         const connection = await this.DB.getConnection();
         try {

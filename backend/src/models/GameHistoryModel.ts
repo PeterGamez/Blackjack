@@ -21,7 +21,7 @@ export default class GameHistoryModel {
         }
     }
 
-    public static async selectGameHistoryByUserId(userId: number): Promise<GameHistoryInterface[]> {
+    public static async selectAllGameHistoryByUserId(userId: number): Promise<GameHistoryInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId1 = ? OR userId2 = ?`;
         const connection = await this.DB.getConnection();
         try {

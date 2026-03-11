@@ -62,7 +62,7 @@ export default class Email {
         });
     }
 
-    public async verifyEmail(token: string): Promise<{ userId: number; email: string } | null> {
+    public async verifyEmail(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX_VERIFY}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);
@@ -91,7 +91,7 @@ export default class Email {
         });
     }
 
-    public async verifyPasswordReset(token: string): Promise<{ userId: number; email: string } | null> {
+    public async verifyPasswordReset(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX_RESET}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);

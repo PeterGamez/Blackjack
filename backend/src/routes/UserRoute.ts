@@ -6,6 +6,7 @@ import { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
 import UserInventoryModel from "../models/UserInventoryModels";
 import PaymentModel from "../models/PaymentModel";
+import GameHistoryModel from "../models/GameHistoryModel";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";
@@ -28,7 +29,7 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            const userInventory = await UserInventoryModel.selectUserInventoryByUserId(user.id);
+            const userInventory = await UserInventoryModel.selectAllUserInventoryByUserId(user.id);
 
             const response: UserInterface & { inventory: number[] } = {
                 ...user,
@@ -74,6 +75,17 @@ export default class UserRoute implements RouteInterface {
             const paymentHistory = await PaymentModel.selectAllPaymentsByUserId(user.id);
 
             return c.json(paymentHistory);
+        });
+
+        this.app.get("/game-history", async (c) => {
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            const gameHistory = await GameHistoryModel.selectAllGameHistoryByUserId(user.id);
+
+            return c.json(gameHistory);
         });
     }
 

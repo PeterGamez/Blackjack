@@ -6,5 +6,7 @@ export interface ProductInterface extends InterfaceBase {
     image: string;
     tokens: number;
     coins: number;
+    type: "card" | "chip" | "theme";
+    isRecommend: boolean;
     isActive: boolean;
 }

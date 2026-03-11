@@ -22,7 +22,7 @@ export default class PaymentRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
 
         this.app.get("/packages", async (c) => {
-            const packages = await PackageModel.selectAllPackages();
+            const packages = await PackageModel.selectAllActivePackages();
             return c.json({ packages });
         });
 

@@ -21,7 +21,7 @@ export default class UserInventoryModel {
         }
     }
 
-    public static async selectUserInventoryByUserId(userId: number): Promise<UserInventoryInterface[]> {
+    public static async selectAllUserInventoryByUserId(userId: number): Promise<UserInventoryInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
         const connection = await this.DB.getConnection();
         try {

@@ -38,12 +38,12 @@ export default class GameStateService {
         await RedisService.expire(this.userSocketKey(userId), 24 * 60 * 60);
     }
 
-    public static async getSocketUser(socketId: string): Promise<number | null> {
+    public static async getSocketUser(socketId: string): Promise<number> {
         const userId = await RedisService.get<string>(this.socketConnKey(socketId));
         return userId ? parseInt(userId) : null;
     }
 
-    public static async getUserSocket(userId: number): Promise<string | null> {
+    public static async getUserSocket(userId: number): Promise<string> {
         return await RedisService.get<string>(this.userSocketKey(userId));
     }
 
@@ -62,7 +62,7 @@ export default class GameStateService {
         await RedisService.expire(gameKey, 86400);
     }
 
-    public static async getGameState(gameId: number): Promise<GameState | null> {
+    public static async getGameState(gameId: number): Promise<GameState> {
         const data = await RedisService.hgetall<Record<string, string>>(this.gameKey(gameId));
         if (!data || Object.keys(data).length === 0) return null;
         return {
@@ -92,7 +92,7 @@ export default class GameStateService {
         await RedisService.expire(this.userGameKey(userId), 86400);
     }
 
-    public static async getUserCurrentGame(userId: number): Promise<number | null> {
+    public static async getUserCurrentGame(userId: number): Promise<number> {
         const gameId = await RedisService.get<string>(this.userGameKey(userId));
         return gameId ? parseInt(gameId) : null;
     }

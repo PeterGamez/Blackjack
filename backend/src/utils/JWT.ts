@@ -31,6 +31,10 @@ export default class JWT {
     }
 
     public verifyToken(token: string): JWTPayload {
-        return jwt.verify(token, config.auth.jwtSecret) as JWTPayload;
+        try {
+            return jwt.verify(token, config.auth.jwtSecret) as JWTPayload;
+        } catch {
+            return null;
+        }
     }
 }

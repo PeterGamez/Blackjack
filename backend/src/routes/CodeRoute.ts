@@ -77,12 +77,15 @@ export default class CodeRoute implements RouteInterface {
                     return c.json({ error: "Code has expired" }, 400);
                 }
 
-                const isRedeem = await CodeHistoryModel.isRedeemCodeHistoryByCodeIdAndUserId(codeData.id, user.id);
+                const [isRedeem, redeemCount] = await Promise.all([
+                    CodeHistoryModel.isRedeemCodeHistoryByCodeIdAndUserId(codeData.id, user.id),
+                    CodeHistoryModel.selectCodeHistoryCountByCodeId(codeData.id),
+                ]);
+
                 if (isRedeem) {
                     return c.json({ error: "You have already redeemed this code" }, 400);
                 }
 
-                const redeemCount = await CodeHistoryModel.selectCodeHistoryCountByCodeId(codeData.id);
                 if (redeemCount >= codeData.maxUses) {
                     return c.json({ error: "Code has reached maximum uses" }, 400);
                 }

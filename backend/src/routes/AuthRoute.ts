@@ -59,6 +59,11 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
+                const usernameRegex = /^[a-zA-Z0-9_]+$/;
+                if (!usernameRegex.test(username)) {
+                    return c.json({ error: "Username can only contain letters, numbers, and underscores" }, 400);
+                }
+
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
                     return c.json({ error: "Invalid email address" }, 400);
@@ -303,5 +308,6 @@ export default class AuthRoute implements RouteInterface {
 
     public getApp(app: Hono) {
         app.route(this.basePath, this.app);
+        this.server.log("Route", `Registered route: ${this.basePath} [${this.app.routes.length} endpoints]`);
     }
 }

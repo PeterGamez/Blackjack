@@ -12,6 +12,9 @@ import CodeHistoryModel from "../models/CodeHistoryModel";
 import CodeModel from "../models/CodeModel";
 import GameHistoryModel from "../models/GameHistoryModel";
 import PaymentModel from "../models/PaymentModel";
+import { SlipOK } from "./SlipOK";
+import { Truemoney } from "./Truemoney";
+import PackageModel from "../models/PackageModel";
 
 export default class Server {
     public config = config;
@@ -20,11 +23,14 @@ export default class Server {
     public Email = new Email(this);
     public JWT = new JWT();
     public Password = new Password();
+    public SlipOK = new SlipOK(this);
+    public Truemoney = new Truemoney(this);
 
     public initModels() {
         CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);
         CodeModel.init(this.config.mysql.table.code, this.DB);
         GameHistoryModel.init(this.config.mysql.table.gameHistory, this.DB);
+        PackageModel.init(this.config.mysql.table.package, this.DB);
         PaymentModel.init(this.config.mysql.table.payment, this.DB);
         UserModel.init(this.config.mysql.table.user, this.DB);
         UserSkinModel.init(this.config.mysql.table.userSkin, this.DB);

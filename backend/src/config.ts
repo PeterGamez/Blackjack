@@ -26,8 +26,17 @@ export default {
         },
         from: process.env.EMAIL_FROM || "",
 
-        verifyExpiresIn: 24, // hours
-        resetPasswordExpiresIn: 15, // minutes
+        verifyExpiresIn: 30, // minutes
+        resetPasswordExpiresIn: 30, // minutes
+    },
+
+    slipok: {
+        branch: process.env.SLIPOK_BRANCH || "",
+        authorization: process.env.SLIPOK_AUTHORIZATION || "",
+    },
+
+    truemoney: {
+        phone: process.env.TRUEMONEY_PHONE || "",
     },
 
     mysql: {
@@ -41,6 +50,7 @@ export default {
             codeHistory: "codeHistory",
             code: "code",
             gameHistory: "gameHistory",
+            package: "package",
             payment: "payment",
             user: "user",
             userSkin: "userSkin",

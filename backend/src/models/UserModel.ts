@@ -76,6 +76,16 @@ export default class UserModel {
         }
     }
 
+    public static async addBalance(id: number, type: "tokens" | "coins", amount: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [amount, id]);
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async deleteUser(id: number): Promise<void> {
         const sql = `DELETE FROM ${this.table} WHERE id = ?`;
         const connection = await this.DB.getConnection();

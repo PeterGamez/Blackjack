@@ -1,14 +1,11 @@
 import { Hono } from "hono";
 import Server from "../utils/Server";
-import UserModel from "../models/UserModel";
-import UserSkinModel from "../models/UserSkinModels";
-import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
 import { createMiddleware } from "hono/factory";
 import { BlankEnv, BlankSchema } from "hono/types";
 
-export default class UserRoute implements RouteInterface {
-    private readonly basePath = "/user";
+export default class CodeRoute implements RouteInterface {
+    private readonly basePath = "/code";
     private app: Hono<BlankEnv, BlankSchema, typeof this.basePath>;
     private server: Server;
 
@@ -46,23 +43,22 @@ export default class UserRoute implements RouteInterface {
 
     private registerRoutes() {
         this.app.use("*", this.authMiddleware());
-        this.app.get("/me", async (c) => {
-            const payload = c.get("jwtPayload");
-            const userId = payload.userId;
+        this.app.post("/redeem", async (c) => {
+            try {
+                let body: { code: string };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid JSON body" }, 400);
+                }
 
-            const user = await UserModel.selectUser(userId);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
+                const code = body.code;
+                return c.json(code);
+            } catch (error) {
+                this.server.error("CodeRoute", `Error processing redeem request: `);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
             }
-
-            const userSkin = await UserSkinModel.selectUserSkinByUserId(userId);
-
-            const response: UserInterface & { skins: number[] } = {
-                ...user,
-                skins: userSkin.map((us) => us.skinId),
-            };
-
-            return c.json(response);
         });
     }
 

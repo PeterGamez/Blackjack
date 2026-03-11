@@ -4,6 +4,7 @@ import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
 import PackageModel from "../models/PackageModel";
 import UserModel from "../models/UserModel";
+import PaymentModel from "../models/PaymentModel";
 
 export default class PaymentRoute implements RouteInterface {
     private readonly basePath = "/payment";
@@ -19,6 +20,11 @@ export default class PaymentRoute implements RouteInterface {
 
     private registerRoutes() {
         this.app.use("*", this.server.Middleware.auth());
+
+        this.app.get("/packages", async (c) => {
+            const packages = await PackageModel.selectAllPackages();
+            return c.json({ packages });
+        });
 
         this.app.post("/bank", async (c) => {
             try {
@@ -64,6 +70,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
+                await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Bank slip verified successfully" });
@@ -127,6 +134,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 
+                await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Voucher redeemed successfully" });

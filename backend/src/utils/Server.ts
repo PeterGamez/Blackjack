@@ -8,6 +8,7 @@ import PackageModel from "../models/PackageModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
 import UserSkinModel from "../models/UserSkinModels";
+import GameService from "../services/GameService";
 import RedisService from "../services/RedisService";
 import SocketService from "../services/SocketService";
 import { Blackjack } from "./Blackjack";
@@ -44,6 +45,7 @@ export default class Server {
     }
 
     public initServices() {
+        GameService.init(this);
         RedisService.init(this.Redis);
         SocketService.init(this);
     }

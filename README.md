@@ -250,6 +250,8 @@
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
 | API-USER-02 | `PATCH` | `/user/me` | `{password?}` | Bearer | อัปเดตรหัสผ่านผู้ใช้ |
+| API-USER-03 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
+| API-USER-04 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
 
 #### 4.2.3 Code API
 
@@ -261,14 +263,15 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-PAYMENT-01 | `POST` | `/payment/bank` | `{image, packageId}` | Bearer | เติมเงิน เช็คสลิป |
-| API-PAYMENT-02 | `POST` | `/payment/truemoney` | | `{url, packageId}` | Bearer | เติมเงินผ่าน ซองของขวัญ |
+| API-PAYMENT-01 | `GET` | `/payment/packages` | None | Bearer | ดึงรายการแพ็กเกจเติมเงินทั้งหมด |
+| API-PAYMENT-02 | `POST` | `/payment/bank` | `{image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
+| API-PAYMENT-03 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
 
 #### 4.2.5 Shop API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-SHOP-01 | `GET` | `/shop/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดในร้านค้า |
+| API-SHOP-01 | `GET` | `/shop/list` | None | Bearer | ดึงรายการสินค้าทั้งหมดในร้านค้า |
 
 ### 4.3 Socket.IO Events
 

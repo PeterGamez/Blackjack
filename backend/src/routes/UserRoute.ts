@@ -4,6 +4,7 @@ import UserSkinModel from "../models/UserSkinModels";
 import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
+import UserModel from "../models/UserModel";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";
@@ -34,6 +35,33 @@ export default class UserRoute implements RouteInterface {
             };
 
             return c.json(response);
+        });
+
+        this.app.patch("/me", async (c) => {
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            let body: { password?: string };
+            try {
+                body = await c.req.parseBody();
+            } catch {
+                return c.json({ error: "Invalid request body" }, 400);
+            }
+
+            const { password } = body;
+
+            if (!password) {
+                return c.json({ error: "Missing fields to update" }, 400);
+            }
+
+            if (password) {
+                const hashedPassword = await this.server.Password.hash(password);
+                await UserModel.updateUser(user.id, "password", hashedPassword);
+            }
+
+            return c.json({ ok: true });
         });
     }
 

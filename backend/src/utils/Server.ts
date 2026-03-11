@@ -1,34 +1,37 @@
+import Redis from "ioredis";
 import { Pool } from "mysql2/promise";
 import config from "../config";
-import Redis from "ioredis";
-import UserModel from "../models/UserModel";
-import RedisService from "../services/RedisService";
-import Email from "./Email";
-import JWT from "./JWT";
-import Password from "./Password";
-import SocketService from "../services/SocketService";
-import UserSkinModel from "../models/UserSkinModels";
 import CodeHistoryModel from "../models/CodeHistoryModel";
 import CodeModel from "../models/CodeModel";
 import GameHistoryModel from "../models/GameHistoryModel";
+import PackageModel from "../models/PackageModel";
 import PaymentModel from "../models/PaymentModel";
+import UserModel from "../models/UserModel";
+import UserSkinModel from "../models/UserSkinModels";
+import RedisService from "../services/RedisService";
+import SocketService from "../services/SocketService";
+import { Blackjack } from "./Blackjack";
+import Email from "./Email";
+import JWT from "./JWT";
+import { Middleware } from "./Middleware";
+import Password from "./Password";
 import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
-import PackageModel from "../models/PackageModel";
-import { Blackjack } from "./Blackjack";
-import { Middleware } from "./Middleware";
 
 export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
+
     public Email = new Email(this);
     public JWT = new JWT();
+    public Middleware = new Middleware(this);
     public Password = new Password();
+
     public SlipOK = new SlipOK(this);
     public Truemoney = new Truemoney(this);
+
     public Blackjack = new Blackjack();
-    public Middleware = new Middleware(this);
 
     public initModels() {
         CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);

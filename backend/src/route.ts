@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import Server from "./utils/Server";
 import AuthRoute from "./routes/AuthRoute";
-import UserRoute from "./routes/UserRoute";
 import CodeRoute from "./routes/CodeRoute";
 import PaymentRoute from "./routes/PaymentRoute";
 import ShopRoute from "./routes/ShopRoute";
+import UserRoute from "./routes/UserRoute";
 
 export default async (app: Hono, server: Server) => {
     app.get("/", (c) => {
@@ -12,10 +12,10 @@ export default async (app: Hono, server: Server) => {
     });
 
     new AuthRoute(server).getApp(app);
-    new UserRoute(server).getApp(app);
     new CodeRoute(server).getApp(app);
     new PaymentRoute(server).getApp(app);
     new ShopRoute(server).getApp(app);
+    new UserRoute(server).getApp(app);
 
     app.notFound((c) => {
         return c.json({ error: "Not Found" }, 404);

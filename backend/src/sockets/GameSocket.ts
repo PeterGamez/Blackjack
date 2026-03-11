@@ -1,6 +1,7 @@
 import { Server as IOServer, Socket } from "socket.io";
 import RedisService from "../services/RedisService";
 import UserModel from "../models/UserModel";
+import GameHistoryModel from "../models/GameHistoryModel";
 import type Server from "../utils/Server";
 import type { Card, GameType, GameCurrency, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
 import { AckType } from "../interfaces/Type";
@@ -85,13 +86,13 @@ export default class GameSocket {
             userId: parseInt(data.userId),
             gameType: data.gameType as GameType,
             currency: data.currency as GameCurrency,
-            status: data.status as "betting" | "playing" | "dealer-turn" | "game-over",
+            status: data.status as GameState["status"],
             playerBet: parseInt(data.playerBet),
             playerHand: data.playerHand,
             dealerHand: data.dealerHand,
             playerValue: parseInt(data.playerValue),
             dealerValue: parseInt(data.dealerValue),
-            result: data.result as "win" | "lose" | "push" | "pending",
+            result: data.result as GameState["result"],
             reward: parseInt(data.reward),
             deck: data.deck,
             createdAt: parseInt(data.createdAt),
@@ -221,6 +222,14 @@ export default class GameSocket {
                 await this.setUserCurrentGame(userId, gameId);
                 await this.setSocketUser(socket.id, userId);
                 await UserModel.decreaseBalance(userId, currency, bet);
+
+                if (reward > 0) {
+                    await UserModel.increaseBalance(userId, currency, reward);
+                }
+                if (status === "game-over") {
+                    await GameHistoryModel.createGameHistory(userId, 0, result, gameType, bet, reward);
+                }
+                
                 await this.join(socket, gameId);
 
                 ack?.({
@@ -250,6 +259,7 @@ export default class GameSocket {
                 ack?.({ ok: false, message: "gameId and userId are required" });
                 return;
             }
+
             try {
                 const gameState = await this.getGameState(gameId);
                 if (!gameState || gameState.userId !== userId) {
@@ -280,6 +290,7 @@ export default class GameSocket {
                     gameState.status = "game-over";
                     gameState.reward = 0;
                     await this.saveGameState(gameId, gameState);
+                    await GameHistoryModel.createGameHistory(gameState.userId, 0, "lose", gameState.gameType, gameState.playerBet, 0);
                     this.emitToGame(gameId, "game:bust", { playerHand, playerValue });
                     ack?.({ ok: true, playerHand, playerValue, bust: true });
                     return;
@@ -287,6 +298,7 @@ export default class GameSocket {
 
                 if (playerValue === 21) {
                     const resolved = await this.resolveDealer(gameState);
+                    await GameHistoryModel.createGameHistory(gameState.userId, 0, resolved.result, gameState.gameType, gameState.playerBet, resolved.reward);
                     const finishedPayload = { gameId, ...resolved };
                     this.emitToGame(gameId, "game:finished", finishedPayload);
                     ack?.({ ok: true, ...finishedPayload, bust: false });
@@ -295,6 +307,7 @@ export default class GameSocket {
 
                 await this.saveGameState(gameId, gameState);
                 this.emitToGame(gameId, "game:player-hit", { playerHand, playerValue });
+
                 ack?.({ ok: true, playerHand, playerValue, bust: false });
             } catch (err) {
                 this.server.error("GameSocket", `game:hit error: ${err}`);
@@ -308,6 +321,7 @@ export default class GameSocket {
                 ack?.({ ok: false, message: "gameId and userId are required" });
                 return;
             }
+
             try {
                 const gameState = await this.getGameState(gameId);
                 if (!gameState || gameState.userId !== userId) {
@@ -320,8 +334,10 @@ export default class GameSocket {
                 }
 
                 const resolved = await this.resolveDealer(gameState);
+                await GameHistoryModel.createGameHistory(gameState.userId, 0, resolved.result, gameState.gameType, gameState.playerBet, resolved.reward);
                 const finishedPayload = { gameId, ...resolved };
                 this.emitToGame(gameId, "game:finished", finishedPayload);
+
                 ack?.({ ok: true, ...finishedPayload });
             } catch (err) {
                 this.server.error("GameSocket", `game:stand error: ${err}`);

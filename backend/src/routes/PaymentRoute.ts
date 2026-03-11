@@ -93,7 +93,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
-                await UserModel.addBalance(userId, "tokens", pack.tokens);
+                await UserModel.increaseBalance(userId, "tokens", pack.tokens);
 
                 return c.json({ message: "Bank slip verified successfully" });
             } catch (error) {
@@ -159,7 +159,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 
-                await UserModel.addBalance(userId, "tokens", pack.tokens);
+                await UserModel.increaseBalance(userId, "tokens", pack.tokens);
 
                 return c.json({ message: "Voucher redeemed successfully" });
             } catch (error) {

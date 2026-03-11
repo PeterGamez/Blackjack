@@ -1,6 +1,6 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
 import { UserInterface } from "../interfaces/Database";
-import { UserType } from "../interfaces/Type";
+import { CurrencyType, UserType } from "../interfaces/Type";
 
 export default class UserModel {
     private static table: string;
@@ -76,11 +76,21 @@ export default class UserModel {
         }
     }
 
-    public static async addBalance(id: number, type: "tokens" | "coins", amount: number): Promise<void> {
+    public static async increaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [amount, id]);
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async decreaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} - ? WHERE id = ? AND ${type} >= ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [amount, id, amount]);
         } finally {
             connection.release();
         }

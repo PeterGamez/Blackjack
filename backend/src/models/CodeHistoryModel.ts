@@ -1,6 +1,4 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
-import { CodeHistoryInterface } from "../interfaces/Database";
-import CodeModel from "./CodeModel";
 
 export default class CodeHistoryModel {
     private static table: string;
@@ -22,12 +20,23 @@ export default class CodeHistoryModel {
         }
     }
 
-    public static async selectCodeHistoryByCodeAndUserId(code: string, userId: number): Promise<CodeHistoryInterface> {
-        const sql = `SELECT ch.* FROM ${this.table} ch JOIN ${CodeModel.getTable()} c ON ch.codeId = c.id WHERE c.code = ? AND ch.userId = ?`;
+    public static async selectCodeHistoryCountByCodeId(codeId: number): Promise<number> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [code, userId]);
-            return rows[0];
+            const [rows] = await connection.execute(sql, [codeId]);
+            return rows[0].count;
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async isRedeemCodeHistoryByCodeIdAndUserId(codeId: number, userId: number): Promise<boolean> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND userId = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [codeId, userId]);
+            return rows[0].count > 0;
         } finally {
             connection.release();
         }

@@ -10,10 +10,6 @@ export default class CodeModel {
         this.DB = DB;
     }
 
-    public static getTable(): string {
-        return this.table;
-    }
-
     public static async createCode(code: string, amount: number, type: CodeInterface["type"]): Promise<number> {
         const sql = `INSERT INTO ${this.table} (code, amount, type) VALUES (?, ?, ?)`;
         const connection = await this.DB.getConnection();

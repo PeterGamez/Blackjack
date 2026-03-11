@@ -5,6 +5,7 @@ import { createMiddleware } from "hono/factory";
 import { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
 import CodeHistoryModel from "../models/CodeHistoryModel";
+import CodeModel from "../models/CodeModel";
 
 export default class CodeRoute implements RouteInterface {
     private readonly basePath = "/code";
@@ -68,9 +69,30 @@ export default class CodeRoute implements RouteInterface {
                     return c.json({ error: "Missing code" }, 400);
                 }
 
-                await CodeHistoryModel.selectCodeHistoryByCodeAndUserId(code, userId);
+                const codeData = await CodeModel.selectCodeByCode(code);
+                if (!codeData) {
+                    return c.json({ error: "Code not found" }, 404);
+                }
+                if (!codeData.isActive) {
+                    return c.json({ error: "Code is not active" }, 400);
+                }
+                if (codeData.expiredDate < new Date()) {
+                    return c.json({ error: "Code has expired" }, 400);
+                }
 
-                return c.json(code);
+                const isRedeem = await CodeHistoryModel.isRedeemCodeHistoryByCodeIdAndUserId(codeData.id, userId);
+                if (isRedeem) {
+                    return c.json({ error: "You have already redeemed this code" }, 400);
+                }
+
+                const redeemCount = await CodeHistoryModel.selectCodeHistoryCountByCodeId(codeData.id);
+                if (redeemCount >= codeData.maxUses) {
+                    return c.json({ error: "Code has reached maximum uses" }, 400);
+                }
+
+                await Promise.all([CodeHistoryModel.createCodeHistory(codeData.id, userId), UserModel.increaseBalance(userId, codeData.type, codeData.amount)]);
+
+                return c.json({ message: "Code redeemed successfully", amount: codeData.amount, type: codeData.type });
             } catch (error) {
                 this.server.error("CodeRoute", `Error processing redeem request: `);
                 console.error(error);

@@ -1,5 +1,6 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
 import { CodeHistoryInterface } from "../interfaces/Database";
+import CodeModel from "./CodeModel";
 
 export default class CodeHistoryModel {
     private static table: string;
@@ -21,12 +22,12 @@ export default class CodeHistoryModel {
         }
     }
 
-    public static async selectCodeHistoryByUserId(userId: number): Promise<CodeHistoryInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
+    public static async selectCodeHistoryByCodeAndUserId(code: string, userId: number): Promise<CodeHistoryInterface> {
+        const sql = `SELECT ch.* FROM ${this.table} ch JOIN ${CodeModel.getTable()} c ON ch.codeId = c.id WHERE c.code = ? AND ch.userId = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [userId]);
-            return rows as CodeHistoryInterface[];
+            const [rows] = await connection.execute(sql, [code, userId]);
+            return rows[0];
         } finally {
             connection.release();
         }

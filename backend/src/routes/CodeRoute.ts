@@ -3,6 +3,8 @@ import Server from "../utils/Server";
 import { RouteInterface } from "../interfaces/Route";
 import { createMiddleware } from "hono/factory";
 import { BlankEnv, BlankSchema } from "hono/types";
+import UserModel from "../models/UserModel";
+import CodeHistoryModel from "../models/CodeHistoryModel";
 
 export default class CodeRoute implements RouteInterface {
     private readonly basePath = "/code";
@@ -45,6 +47,14 @@ export default class CodeRoute implements RouteInterface {
         this.app.use("*", this.authMiddleware());
         this.app.post("/redeem", async (c) => {
             try {
+                const payload = c.get("jwtPayload");
+                const userId = payload.userId;
+
+                const user = await UserModel.selectUser(userId);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
                 let body: { code: string };
                 try {
                     body = await c.req.json();
@@ -53,6 +63,13 @@ export default class CodeRoute implements RouteInterface {
                 }
 
                 const code = body.code;
+
+                if (!code) {
+                    return c.json({ error: "Missing code" }, 400);
+                }
+
+                await CodeHistoryModel.selectCodeHistoryByCodeAndUserId(code, userId);
+
                 return c.json(code);
             } catch (error) {
                 this.server.error("CodeRoute", `Error processing redeem request: `);

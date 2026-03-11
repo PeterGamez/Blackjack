@@ -3,7 +3,6 @@ import RedisService from "../services/RedisService";
 import UserModel from "../models/UserModel";
 import type Server from "../utils/Server";
 import type { Card, GameType, GameCurrency, GameState, GameStartPayload, GameActionPayload } from "../interfaces/Game";
-import Blackjack from "../utils/Blackjack";
 import { AckType } from "../interfaces/Type";
 
 export default class GameSocket {
@@ -148,7 +147,7 @@ export default class GameSocket {
         currency: GameCurrency;
         balance: number;
     }> {
-        return Blackjack.resolveDealer(gameState, this.saveGameState.bind(this));
+        return this.server.Blackjack.resolveDealer(gameState, this.saveGameState.bind(this));
     }
 
     public static register(socket: Socket): void {
@@ -173,12 +172,12 @@ export default class GameSocket {
                 const rawId = await RedisService.Redis.incr("socket:game:id");
                 const gameId = typeof rawId === "number" ? rawId : parseInt(rawId as string);
 
-                const deck = Blackjack.createDeck();
+                const deck = this.server.Blackjack.createDeck();
                 const playerHand: Card[] = [deck[0], deck[2]];
                 const dealerHand: Card[] = [deck[1], deck[3]];
                 const remainingDeck = deck.slice(4);
-                const playerValue = Blackjack.calcValue(playerHand);
-                const dealerValue = Blackjack.calcValue(dealerHand);
+                const playerValue = this.server.Blackjack.calcValue(playerHand);
+                const dealerValue = this.server.Blackjack.calcValue(dealerHand);
                 const isBlackjack = playerValue === 21;
                 const isDealerBlackjack = dealerValue === 21;
 
@@ -210,7 +209,7 @@ export default class GameSocket {
                     playerHand: JSON.stringify(playerHand),
                     dealerHand: JSON.stringify(dealerHand),
                     playerValue,
-                    dealerValue: Blackjack.calcValue([dealerHand[0]]),
+                    dealerValue: this.server.Blackjack.calcValue([dealerHand[0]]),
                     result,
                     reward,
                     deck: JSON.stringify(remainingDeck),
@@ -230,7 +229,7 @@ export default class GameSocket {
                     playerHand,
                     dealerHand: status === "game-over" ? dealerHand : [dealerHand[0]],
                     playerValue,
-                    dealerValue: status === "game-over" ? dealerValue : Blackjack.calcValue([dealerHand[0]]),
+                    dealerValue: status === "game-over" ? dealerValue : this.server.Blackjack.calcValue([dealerHand[0]]),
                     bet,
                     currency,
                     balance: newBalance,
@@ -270,7 +269,7 @@ export default class GameSocket {
                 }
 
                 playerHand.push(deck.shift()!);
-                const playerValue = Blackjack.calcValue(playerHand);
+                const playerValue = this.server.Blackjack.calcValue(playerHand);
 
                 gameState.playerHand = JSON.stringify(playerHand);
                 gameState.playerValue = playerValue;

@@ -1,11 +1,11 @@
 import UserModel from "../models/UserModel";
 import type { Card, GameState, GameCurrency } from "../interfaces/Game";
 
-export default class Blackjack {
-    public static readonly SUITS = ["♠", "♥", "♦", "♣"];
-    public static readonly RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+export class Blackjack {
+    public readonly SUITS = ["♠", "♥", "♦", "♣"];
+    public readonly RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
-    public static createDeck(): Card[] {
+    public createDeck(): Card[] {
         const deck: Card[] = [];
         for (let i = 0; i < 6; i++) {
             for (const suit of this.SUITS) {
@@ -18,7 +18,7 @@ export default class Blackjack {
         return deck.sort(() => Math.random() - 0.5);
     }
 
-    public static calcValue(hand: Card[]): number {
+    public calcValue(hand: Card[]): number {
         let value = 0;
         let aces = 0;
         for (const card of hand) {
@@ -32,7 +32,7 @@ export default class Blackjack {
         return value;
     }
 
-    public static async resolveDealer(
+    public async resolveDealer(
         gameState: GameState,
         saveGameState: (gameId: number, state: GameState) => Promise<void>
     ): Promise<{

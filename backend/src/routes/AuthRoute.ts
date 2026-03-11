@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import Server from "../utils/Server";
 import UserModel from "../models/UserModel";
 import { RouteInterface } from "../interfaces/Route";
-import { createMiddleware } from "hono/factory";
 import { BlankEnv, BlankSchema } from "hono/types";
 
 export default class AuthRoute implements RouteInterface {
@@ -20,30 +19,6 @@ export default class AuthRoute implements RouteInterface {
         this.registerRoutes();
     }
 
-    private authMiddleware() {
-        return createMiddleware(async (c, next) => {
-            const authHeader = c.req.header("Authorization");
-
-            if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                return c.json({ error: "Unauthorized" }, 401);
-            }
-
-            const token = authHeader.split(" ")[1];
-
-            try {
-                const payload = this.server.JWT.verifyToken(token);
-                if (!payload) {
-                    return c.json({ error: "Invalid or expired token" }, 401);
-                }
-
-                c.set("jwtPayload", payload);
-
-                await next();
-            } catch {
-                return c.json({ error: "Invalid or expired token" }, 401);
-            }
-        });
-    }
 
     private registerRoutes() {
         this.app.post("/register", async (c) => {
@@ -188,7 +163,6 @@ export default class AuthRoute implements RouteInterface {
             }
         });
 
-        this.app.use("/refresh", this.authMiddleware());
         this.app.post("/refresh", async (c) => {
             try {
                 let body: { refreshToken: string };
@@ -248,15 +222,13 @@ export default class AuthRoute implements RouteInterface {
                 }
 
                 const user = await UserModel.selectUserByUsernameOrEmail(email);
-                if (!user) {
-                    return c.json({ error: "Email not found" }, 404);
-                }
-
-                try {
-                    await this.server.Email.sendPasswordResetEmail(user.id, email);
-                } catch (emailError) {
-                    this.server.error("EMAIL", `Failed to send password reset email: ${emailError}`);
-                    return c.json({ error: "Failed to send password reset email" }, 500);
+                if (user) {
+                    try {
+                        await this.server.Email.sendPasswordResetEmail(user.id, email);
+                    } catch (emailError) {
+                        this.server.error("EMAIL", `Failed to send password reset email: ${emailError}`);
+                        return c.json({ error: "Failed to send password reset email" }, 500);
+                    }
                 }
 
                 this.server.log("AUTH", `Password reset requested for: ${email}`);

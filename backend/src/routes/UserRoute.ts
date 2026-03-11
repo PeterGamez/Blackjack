@@ -4,8 +4,6 @@ import UserSkinModel from "../models/UserSkinModels";
 import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
-import UserModel from "../models/UserModel";
-import { authMiddleware } from "../utils/authMiddleware";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";
@@ -19,15 +17,16 @@ export default class UserRoute implements RouteInterface {
         this.registerRoutes();
     }
 
-
     private registerRoutes() {
-        this.app.use("*", authMiddleware(this.server));
+        this.app.use("*", this.server.Middleware.auth());
+
         this.app.get("/me", async (c) => {
-            const userId = c.get("jwtPayload").userId;
-            const [user, userSkin] = await Promise.all([
-                UserModel.selectUser(userId),
-                UserSkinModel.selectUserSkinByUserId(userId),
-            ]);
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            const userSkin = await UserSkinModel.selectUserSkinByUserId(user.id);
 
             const response: UserInterface & { skins: number[] } = {
                 ...user,

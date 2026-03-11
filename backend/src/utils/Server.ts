@@ -16,7 +16,7 @@ import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
 import PackageModel from "../models/PackageModel";
 import { Blackjack } from "./Blackjack";
-import { Authentication } from "./Authentication";
+import { Middleware } from "./Middleware";
 
 export default class Server {
     public config = config;
@@ -28,7 +28,7 @@ export default class Server {
     public SlipOK = new SlipOK(this);
     public Truemoney = new Truemoney(this);
     public Blackjack = new Blackjack();
-    public Authentication = new Authentication();
+    public Middleware = new Middleware(this);
 
     public initModels() {
         CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);

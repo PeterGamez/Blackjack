@@ -5,7 +5,6 @@ import { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
 import CodeHistoryModel from "../models/CodeHistoryModel";
 import CodeModel from "../models/CodeModel";
-import { authMiddleware } from "../utils/authMiddleware";
 
 export default class CodeRoute implements RouteInterface {
     private readonly basePath = "/code";
@@ -19,15 +18,12 @@ export default class CodeRoute implements RouteInterface {
         this.registerRoutes();
     }
 
-
     private registerRoutes() {
-        this.app.use("*", authMiddleware(this.server));
+        this.app.use("*", this.server.Middleware.auth());
+
         this.app.post("/redeem", async (c) => {
             try {
-                const [user, body] = await Promise.all([
-                    this.server.Authentication.auth(c),
-                    c.req.json<{ code: string }>().catch(() => null),
-                ]);
+                const [user, body] = await Promise.all([this.server.Middleware.getUser(c), c.req.json<{ code: string }>().catch(() => null)]);
 
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);

@@ -4,7 +4,6 @@ import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
 import PackageModel from "../models/PackageModel";
 import UserModel from "../models/UserModel";
-import { authMiddleware } from "../utils/authMiddleware";
 
 export default class PaymentRoute implements RouteInterface {
     private readonly basePath = "/payment";
@@ -18,16 +17,12 @@ export default class PaymentRoute implements RouteInterface {
         this.registerRoutes();
     }
 
-
     private registerRoutes() {
-        this.app.use("*", authMiddleware(this.server));
+        this.app.use("*", this.server.Middleware.auth());
 
         this.app.post("/bank", async (c) => {
             try {
-                const payload = c.get("jwtPayload");
-                const userId = payload.userId;
-
-                const user = await UserModel.selectUser(userId);
+                const user = await this.server.Middleware.getUser(c);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
@@ -69,7 +64,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
-                await UserModel.increaseBalance(userId, "tokens", pack.tokens);
+                await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Bank slip verified successfully" });
             } catch (error) {
@@ -81,7 +76,7 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.post("/truemoney", async (c) => {
             try {
-                const user = await this.server.Authentication.auth(c);
+                const user = await this.server.Middleware.getUser(c);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }

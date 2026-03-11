@@ -19,7 +19,6 @@ export default class AuthRoute implements RouteInterface {
         this.registerRoutes();
     }
 
-
     private registerRoutes() {
         this.app.post("/register", async (c) => {
             try {
@@ -45,10 +44,7 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Invalid email address" }, 400);
                 }
 
-                const [existingUser, hashedPassword] = await Promise.all([
-                    UserModel.selectUserExistsByUsernameOrEmail(username, email),
-                    this.server.Password.hash(password),
-                ]);
+                const [existingUser, hashedPassword] = await Promise.all([UserModel.selectUserExistsByUsernameOrEmail(username, email), this.server.Password.hash(password)]);
                 if (existingUser) {
                     return c.json({ error: "Username or email already exists" }, 409);
                 }

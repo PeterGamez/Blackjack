@@ -48,10 +48,7 @@ export default class CodeRoute implements RouteInterface {
         this.app.use("*", this.authMiddleware());
         this.app.post("/redeem", async (c) => {
             try {
-                const payload = c.get("jwtPayload");
-                const userId = payload.userId;
-
-                const user = await UserModel.selectUser(userId);
+                const user = await this.server.Authentication.auth(c);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
@@ -80,7 +77,7 @@ export default class CodeRoute implements RouteInterface {
                     return c.json({ error: "Code has expired" }, 400);
                 }
 
-                const isRedeem = await CodeHistoryModel.isRedeemCodeHistoryByCodeIdAndUserId(codeData.id, userId);
+                const isRedeem = await CodeHistoryModel.isRedeemCodeHistoryByCodeIdAndUserId(codeData.id, user.id);
                 if (isRedeem) {
                     return c.json({ error: "You have already redeemed this code" }, 400);
                 }
@@ -90,7 +87,7 @@ export default class CodeRoute implements RouteInterface {
                     return c.json({ error: "Code has reached maximum uses" }, 400);
                 }
 
-                await Promise.all([CodeHistoryModel.createCodeHistory(codeData.id, userId), UserModel.increaseBalance(userId, codeData.type, codeData.amount)]);
+                await Promise.all([CodeHistoryModel.createCodeHistory(codeData.id, user.id), UserModel.increaseBalance(user.id, codeData.type, codeData.amount)]);
 
                 return c.json({ message: "Code redeemed successfully", amount: codeData.amount, type: codeData.type });
             } catch (error) {

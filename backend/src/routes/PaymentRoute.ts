@@ -105,10 +105,7 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.post("/truemoney", async (c) => {
             try {
-                const payload = c.get("jwtPayload");
-                const userId = payload.userId;
-
-                const user = await UserModel.selectUser(userId);
+                const user = await this.server.Authentication.auth(c);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
@@ -159,7 +156,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 
-                await UserModel.increaseBalance(userId, "tokens", pack.tokens);
+                await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Voucher redeemed successfully" });
             } catch (error) {

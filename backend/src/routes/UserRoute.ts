@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import Server from "../utils/Server";
-import UserModel from "../models/UserModel";
 import UserSkinModel from "../models/UserSkinModels";
 import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
@@ -47,15 +46,12 @@ export default class UserRoute implements RouteInterface {
     private registerRoutes() {
         this.app.use("*", this.authMiddleware());
         this.app.get("/me", async (c) => {
-            const payload = c.get("jwtPayload");
-            const userId = payload.userId;
-
-            const user = await UserModel.selectUser(userId);
+            const user = await this.server.Authentication.auth(c);
             if (!user) {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            const userSkin = await UserSkinModel.selectUserSkinByUserId(userId);
+            const userSkin = await UserSkinModel.selectUserSkinByUserId(user.id);
 
             const response: UserInterface & { skins: number[] } = {
                 ...user,

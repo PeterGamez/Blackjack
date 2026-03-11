@@ -7,7 +7,6 @@ import GameHistoryModel from "../models/GameHistoryModel";
 import PackageModel from "../models/PackageModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
-import UserSkinModel from "../models/UserSkinModels";
 import GameService from "../services/GameService";
 import RedisService from "../services/RedisService";
 import SocketService from "../services/SocketService";
@@ -18,6 +17,8 @@ import { Middleware } from "./Middleware";
 import Password from "./Password";
 import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
+import UserInventoryModel from "../models/UserInventoryModels";
+import ProductModel from "../models/ProductModel";
 
 export default class Server {
     public config = config;
@@ -40,8 +41,9 @@ export default class Server {
         GameHistoryModel.init(this.config.mysql.table.gameHistory, this.DB);
         PackageModel.init(this.config.mysql.table.package, this.DB);
         PaymentModel.init(this.config.mysql.table.payment, this.DB);
+        ProductModel.init(this.config.mysql.table.product, this.DB);
         UserModel.init(this.config.mysql.table.user, this.DB);
-        UserSkinModel.init(this.config.mysql.table.userSkin, this.DB);
+        UserInventoryModel.init(this.config.mysql.table.userInventory, this.DB);
     }
 
     public initServices() {

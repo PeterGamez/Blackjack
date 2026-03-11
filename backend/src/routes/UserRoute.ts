@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import Server from "../utils/Server";
-import UserSkinModel from "../models/UserSkinModels";
 import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
+import UserInventoryModel from "../models/UserInventoryModels";
+import PaymentModel from "../models/PaymentModel";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";
@@ -27,11 +28,11 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            const userSkin = await UserSkinModel.selectUserSkinByUserId(user.id);
+            const userInventory = await UserInventoryModel.selectUserInventoryByUserId(user.id);
 
-            const response: UserInterface & { skins: number[] } = {
+            const response: UserInterface & { inventory: number[] } = {
                 ...user,
-                skins: userSkin.map((us) => us.skinId),
+                inventory: userInventory.map((item) => item.productId),
             };
 
             return c.json(response);
@@ -62,6 +63,17 @@ export default class UserRoute implements RouteInterface {
             }
 
             return c.json({ ok: true });
+        });
+
+        this.app.get("/payment-history", async (c) => {
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            const paymentHistory = await PaymentModel.selectAllPaymentsByUserId(user.id);
+
+            return c.json(paymentHistory);
         });
     }
 

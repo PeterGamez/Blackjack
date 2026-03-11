@@ -52,8 +52,9 @@ export default {
             gameHistory: "gameHistory",
             package: "package",
             payment: "payment",
+            product: "product",
             user: "user",
-            userSkin: "userSkin",
+            userInventory: "userInventory",
         },
     },
 

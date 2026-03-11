@@ -1,7 +1,7 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
-import { UserSkinInterface } from "../interfaces/Database";
+import { UserInventoryInterface } from "../interfaces/Database";
 
-export default class UserSkinModel {
+export default class UserInventoryModel {
     private static table: string;
     private static DB: Pool;
 
@@ -10,23 +10,23 @@ export default class UserSkinModel {
         this.DB = DB;
     }
 
-    public static async createUserSkin(userId: number, skinId: number): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (userId, skinId) VALUES (?, ?)`;
+    public static async createUserInventory(userId: number, productId: number): Promise<number> {
+        const sql = `INSERT INTO ${this.table} (userId, productId) VALUES (?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [userId, skinId]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [userId, productId]);
             return result.insertId;
         } finally {
             connection.release();
         }
     }
 
-    public static async selectUserSkinByUserId(userId: number): Promise<UserSkinInterface[]> {
+    public static async selectUserInventoryByUserId(userId: number): Promise<UserInventoryInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [userId]);
-            return rows as UserSkinInterface[];
+            return rows as UserInventoryInterface[];
         } finally {
             connection.release();
         }

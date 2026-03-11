@@ -21,12 +21,12 @@ export default class PaymentModel {
         }
     }
 
-    public static async selectPaymentByReceipt(receiptRef: string): Promise<PaymentInterface | null> {
-        const sql = `SELECT * FROM ${this.table} WHERE receiptRef = ?`;
+    public static async selectAllPaymentsByUserId(userId: number): Promise<PaymentInterface[]> {
+        const sql = `SELECT * FROM ${this.table} WHERE userId = ? ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [receiptRef]);
-            return rows[0];
+            const [rows] = await connection.execute(sql, [userId]);
+            return rows as PaymentInterface[];
         } finally {
             connection.release();
         }

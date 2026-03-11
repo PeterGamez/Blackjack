@@ -10,6 +10,9 @@ export default class AuthRoute implements RouteInterface {
     private app: Hono<BlankEnv, BlankSchema, typeof this.basePath>;
     private server: Server;
 
+    private static readonly USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
+    private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     constructor(server: Server) {
         this.app = new Hono();
         this.server = server;
@@ -59,22 +62,21 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
-                const usernameRegex = /^[a-zA-Z0-9_]+$/;
-                if (!usernameRegex.test(username)) {
+                if (!AuthRoute.USERNAME_REGEX.test(username)) {
                     return c.json({ error: "Username can only contain letters, numbers, and underscores" }, 400);
                 }
 
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
+                if (!AuthRoute.EMAIL_REGEX.test(email)) {
                     return c.json({ error: "Invalid email address" }, 400);
                 }
 
-                const existingUser = await UserModel.selectUserExistsByUsernameOrEmail(username, email);
+                const [existingUser, hashedPassword] = await Promise.all([
+                    UserModel.selectUserExistsByUsernameOrEmail(username, email),
+                    this.server.Password.hash(password),
+                ]);
                 if (existingUser) {
                     return c.json({ error: "Username or email already exists" }, 409);
                 }
-
-                const hashedPassword = await this.server.Password.hash(password);
 
                 const userId = await UserModel.createUser(username, email, hashedPassword);
 

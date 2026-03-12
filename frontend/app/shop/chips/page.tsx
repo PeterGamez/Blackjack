@@ -104,7 +104,7 @@ export default function StorePage() {
         
         {/* SIDEBAR */}
         <div className={styles.sidebar}>
-          <button onClick={() => router.push("/shop/recommend")}>Recommend</button>
+          <button onClick={() => router.push("/shop")}>Recommend</button>
           <button onClick={() => router.push("/shop/theme")}>Theme</button>
           <button onClick={() => router.push("/shop/card")}>Card</button>
           <button className={styles.active} onClick={() => router.push("/shop/chips")}>Chips</button>

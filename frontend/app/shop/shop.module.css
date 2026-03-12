@@ -169,9 +169,9 @@
 
 .backButton {
   position: absolute;
-  top: 210px;
+  top: 230px;
   left: 50px;
-  background: #E6B85C;
+  background: transparent;
   border: none;
   color: #1f2a44;
   font-size: 0.95rem;
@@ -193,16 +193,16 @@
 /* ===== MODE TITLE ===== */
 .Title {
   position: absolute;
-  top: 138px;
+  top: 160px;
   left: 50%;
   transform: translateX(-50%);
   color: #1F2A44;
   z-index: 50;
   text-align: center;
-  font-weight: 700;
+  font-weight: 1000;
   font-size: 38px;
   margin: 0;
-  margin-top : 70;
+  margin-top : 64;
 }
 
 .Title h2 {
@@ -213,7 +213,7 @@
 /* ================= MAIN ================= */
 
 .main {
-  margin-top: 180px;
+  margin-top: 220px;
   flex: 1;
   display: flex;
   gap: 30px;
@@ -277,14 +277,16 @@
 
 .content {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 60px;
   padding: 40px 40px 40px 50px;
   background: #8A97B3;
   border-radius: 20px;
-  align-content: start;
-  overflow-y: auto;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin-top: 70px;
 }
 
@@ -295,9 +297,10 @@
 }
 
 .product {
-  width: 100%;
+  width: 375px;
+  flex-shrink: 0;
   background: transparent;
-  border-radius: 20px;
+  border-radius: 30px;
   display: flex;
   flex-direction: column;
   align-items: stretch;

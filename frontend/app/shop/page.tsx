@@ -13,7 +13,7 @@ export default function StorePage() {
   const products = [
   { name: 'Name', price: 'price' },
   { name: 'Name', price: 'price' },
-  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' }
 ];
 
   // load profile from backend
@@ -55,7 +55,6 @@ export default function StorePage() {
 
   return (
     <div className={styles.container}>
-      
       {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
@@ -97,19 +96,27 @@ export default function StorePage() {
       {/* ===== MAIN AREA ===== */}
       <div className={styles.main}>
         
-        {/* SIDEBAR */}
-        <div className={styles.sidebar}>
-          <button onClick={() => router.push("/shop/recommend")}>Recommend</button>
-          <button onClick={() => router.push("/shop/theme")}>Theme</button>
-          <button onClick={() => router.push("/shop/card")}>Card</button>
-          <button onClick={() => router.push("/shop/chips")}>Chips</button>
-       </div>
-
+          {/* SIDEBAR */}
+          <div className={styles.sidebar}>
+            <button className={styles.active} onClick={() => router.push("/shop/recommend")}>Recommend</button>
+            <button onClick={() => router.push("/shop/theme")}>Theme</button>
+            <button onClick={() => router.push("/shop/card")}>Card</button>
+            <button onClick={() => router.push("/shop/chips")}>Chips</button>
+          </div>
 
         {/* CONTENT */}
         <div className={styles.content}>
-        </div>
+          {products.map((p, index) => (
+          <div key={index} className={styles.product}>
+            <div className={styles.productPreview}></div>
+            <div className={styles.productInfo}>
+              <strong>{p.name}</strong>
+              <span>{p.price}</span>
+            </div>
+          </div>
+          ))}
         </div>
       </div>
+    </div>
   )
 }

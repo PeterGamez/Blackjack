@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   return {
-    width: "250px",
+    width: "17%",
     height: "64px",
     fontSize: "24px",
     fontWeight: "bold",

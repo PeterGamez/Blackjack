@@ -79,6 +79,19 @@ export default function Dealer() {
   const [timer, setTimer] = useState<number>(10)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "#e05c5c", "#e0885c", "#d4a632", "#6db86d",
+      "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0",
+      "#e05c9a", "#4ca8c8"
+    ]
+    let hash = 0
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
+
   const getChipStacks = (amount: number): ChipStack[] => {
     const chipValues = [1000, 500, 100, 25, 10, 5, 1]
     let remaining = Math.max(0, Math.floor(amount))
@@ -308,7 +321,7 @@ export default function Dealer() {
           }}
           style={{ display: "flex", alignItems: "center", gap: "12px", background: "#1f2937", borderRadius: "50px", padding: "6px 18px 6px 6px", cursor: "pointer" }}
         >
-          <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "white", flexShrink: 0 }} />
+          <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: getAvatarColor(username), flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "16px", color: "white", userSelect: "none" }}>{username ? username[0].toUpperCase() : "?"}</div>
           <span style={{ fontWeight: 600, fontSize: "15px" }}>{username}</span>
         </div>
 

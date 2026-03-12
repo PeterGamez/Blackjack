@@ -75,7 +75,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 return c.json({ message: "Bank slip verified successfully" });
             } catch (error) {
-                this.server.error("PaymentRoute", `Error processing bank slip: `);
+                this.server.error("PaymentRoute", `Error processing bank slip:`);
                 console.error(error);
                 return c.json({ error: "Error processing bank slip" }, 500);
             }
@@ -139,7 +139,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 return c.json({ message: "Voucher redeemed successfully" });
             } catch (error) {
-                this.server.error("PaymentRoute", `Error processing TrueMoney: `);
+                this.server.error("PaymentRoute", `Error processing TrueMoney:`);
                 console.error(error);
                 return c.json({ error: "Error processing TrueMoney" }, 500);
             }

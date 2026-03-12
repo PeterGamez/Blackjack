@@ -30,7 +30,7 @@ export default class CodeRoute implements RouteInterface {
                 }
 
                 if (!body) {
-                    return c.json({ error: "Invalid JSON body" }, 400);
+                    return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
                 const code = body.code;
@@ -67,7 +67,7 @@ export default class CodeRoute implements RouteInterface {
 
                 return c.json({ message: "Code redeemed successfully", amount: codeData.amount, type: codeData.type });
             } catch (error) {
-                this.server.error("CodeRoute", `Error processing redeem request: `);
+                this.server.error("CodeRoute", `Error processing redeem request:`);
                 console.error(error);
                 return c.json({ error: "Internal server error" }, 500);
             }

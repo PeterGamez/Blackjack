@@ -20,4 +20,15 @@ export default class ProductModel {
             connection.release();
         }
     }
+
+    public static async selectProduct(id: number): Promise<ProductInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [id]);
+            return (rows as ProductInterface[])[0];
+        } finally {
+            connection.release();
+        }
+    }
 }

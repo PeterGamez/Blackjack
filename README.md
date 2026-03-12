@@ -248,7 +248,7 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
 | API-USER-02 | `PATCH` | `/user/me` | `{password?}` | Bearer | อัปเดตรหัสผ่านผู้ใช้ |
 | API-USER-03 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
 | API-USER-04 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
@@ -272,6 +272,7 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-SHOP-01 | `GET` | `/shop/list` | None | Bearer | ดึงรายการสินค้าทั้งหมดในร้านค้า |
+| API-SHOP-02 | `POST` | `/shop/buy` | `{productId, payment}` | Bearer | ซื้อสินค้า และเพิ่มลง Inventory |
 
 ### 4.3 Socket.IO Events
 

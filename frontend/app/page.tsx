@@ -230,6 +230,7 @@ export default function Home() {
               cursor: "pointer",
               transition: "all 0.3s ease"
             }}
+            onClick={() => router.push("/topup")}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
               e.currentTarget.style.transform = "translateY(-2px)"

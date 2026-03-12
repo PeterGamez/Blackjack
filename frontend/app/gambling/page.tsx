@@ -89,6 +89,19 @@ export default function Home() {
     return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`
   }
 
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "#e05c5c", "#e0885c", "#d4a632", "#6db86d",
+      "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0",
+      "#e05c9a", "#4ca8c8"
+    ]
+    let hash = 0
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
+
   return (
     <div className={styles.container}>
       <div
@@ -103,7 +116,12 @@ export default function Home() {
         <div className={styles.topBar}>
           {/* Profile Section */}
           <div className={styles.profileSection}>
-            <div className={styles.profileAvatar}></div>
+            <div
+              className={styles.profileAvatar}
+              style={{ background: username ? getAvatarColor(username) : "#5c6b8a" }}
+            >
+              {username ? username[0].toUpperCase() : "?"}
+            </div>
             <span className={styles.username}>{username}</span>
           </div>
 

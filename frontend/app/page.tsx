@@ -40,6 +40,7 @@ export default function Home() {
     const cachedUsername = localStorage.getItem("cached_username")
     const cachedCoins = localStorage.getItem("cached_coins")
     const cachedTokens = localStorage.getItem("cached_tokens")
+    const storedUser = localStorage.getItem("user")
 
     if (cachedUsername) setUsername(cachedUsername)
     if (cachedCoins) setCoins(Number(cachedCoins))
@@ -54,6 +55,19 @@ export default function Home() {
     if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
     if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
   }, [username, coins, tokens])
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "#e05c5c", "#e0885c", "#d4a632", "#6db86d",
+      "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0",
+      "#e05c9a", "#4ca8c8"
+    ]
+    let hash = 0
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
 
  const buttonStyle = (name: string) => {
   let background = ""
@@ -162,13 +176,23 @@ export default function Home() {
               width: "64px",
               height: "64px",
               borderRadius: "50%",
-              background: "#ffffff",
+              background: username ? getAvatarColor(username) : "#5c6b8a",
               border: "3px solid #5c6b8a",
               zIndex: 2,
               marginLeft: "-20px",
-              marginRight: "12px"
+              marginRight: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              fontWeight: 700,
+              color: "#ffffff",
+              userSelect: "none",
+              flexShrink: 0
             }}
-          />
+          >
+            {username ? username[0].toUpperCase() : "?"}
+          </div>
           <div
             style={{
               color: "#e6eaf2",

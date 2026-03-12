@@ -286,7 +286,7 @@ export default function TopupPage() {
         textAlign: "center",
         fontSize: "1.8rem",
         position: "relative",
-        top: "90px",
+        top: "120px",
     }}
 >
     Top Up
@@ -294,9 +294,9 @@ export default function TopupPage() {
 
             <div
   style={{
-    maxWidth: "630px",
+    maxWidth: "800px",
     width: "98%",
-    margin: "120px auto 0",
+    margin: "170px auto 0",
     padding: "24px",
     background: "#e3c786e6",
     borderRadius: "20px",
@@ -314,38 +314,39 @@ export default function TopupPage() {
   }}
 >
                     {PACKAGES.map((pkg) => (
-    <div
-        key={pkg.tokens}
-        style={{
-            background: "#242B39",
-            borderRadius: "18px",
-            height: "160px",
-            width: "100%",          // ปรับความกว้างได้
-            maxWidth: "180px",     // จำกัดขนาดกล่อง
-            padding: "10px",       // ปรับระยะด้านในกล่อง
-            color: "#5c6b8a",
-            position: "relative",
-            overflow: "hidden",
-            cursor: loading ? "not-allowed" : "pointer",
-            display: "flex",       // จัด layout ภายใน
-            alignItems: "center",
-            justifyContent: "center",
-            boxSizing: "border-box"
-        }}
-                            onClick={() => !loading && handlePurchase(pkg.tokens)}
+   <div
+  key={pkg.tokens}
+  style={{
+    background:
+      "linear-gradient(180deg, #2A3447 0%, #2A3447 70%, #6C7FA3 70%, #6C7FA3 100%)",
+    borderRadius: "18px",
+    height: "200px",
+    width: "100%",
+    maxWidth: "280px",
+    padding: "10px",
+    color: "#ffffff",
+    position: "relative",
+    overflow: "hidden",
+    cursor: loading ? "not-allowed" : "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+  }}
+                            onClick={() => {
+    if (loading) return
+    router.push(`/payment?tokens=${pkg.tokens}&price=${pkg.price}`)
+}}
                         >
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    background: "rgba(0,0,0,0.5)",
-                                    color: "#ffffff",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                    fontWeight: 600,
-                                }}
+                             <div
+    style={{
+      position: "absolute",
+      bottom: 5,
+      left: 0,
+      right: 0,
+      textAlign: "center",
+      fontWeight: 600,
+    }}
                             >
                                 {pkg.tokens.toLocaleString()} Token
                                 <br />

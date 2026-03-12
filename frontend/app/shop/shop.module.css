@@ -59,7 +59,7 @@
   width: clamp(60px, 9vw, 88px);
   height: clamp(60px, 9vw, 88px);
   border-radius: 50%;
-  background: #5c6b8a;
+  background: #ffffff;
   border: 3px solid #5c6b8a;
   flex-shrink: 0;
   margin-left: -20px;
@@ -67,13 +67,6 @@
   /* make circle overflow the pill */
   margin-top: -20px;
   margin-bottom: -20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(18px, 2.5vw, 26px);
-  font-weight: 700;
-  color: #ffffff;
-  user-select: none;
 }
 
 .username {
@@ -248,7 +241,7 @@
   border: none;
   border-bottom: 1px solid #5C6B8A;
   font-size: 20px;
-  color: white;
+  color: rgb(255, 255, 255);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -263,6 +256,10 @@
   border-top: 1px solid #5C6B8A;
 }
 
+.sidebar button:not(:first-child) {
+  border-top: 1px solid #5C6B8A;
+}
+
 .sidebar button:last-child {
   border-bottom: none;
   border-radius: 0 0 20px 20px;
@@ -270,7 +267,9 @@
 
 
 .sidebar button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 10px;
+  margin: 20px 20px;
 }
 
 .active {

@@ -10,6 +10,9 @@ export default function StorePage() {
   const [username, setUsername] = useState<string>("")
   const [coins, setCoins] = useState<number>(0)
   const [tokens, setTokens] = useState<number>(0)
+  const [selected, setSelected] = useState("card")
+  const [hovered, setHovered] = useState<string | null>(null)
+  const active = hovered || selected
   const products = [
   { name: 'Name', price: 'price' },
   { name: 'Name', price: 'price' },
@@ -73,6 +76,7 @@ export default function StorePage() {
 
   return (
     <div className={styles.container}>
+      
       {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
@@ -121,11 +125,54 @@ export default function StorePage() {
         
         {/* SIDEBAR */}
         <div className={styles.sidebar}>
-          <button onClick={() => router.push("/shop")}>Recommend</button>
-          <button onClick={() => router.push("/shop/theme")}>Theme</button>
-          <button className={styles.active} onClick={() => router.push("/shop/card")}>Card</button>
-          <button onClick={() => router.push("/shop/chips")}>Chips</button>
-        </div>
+  <button
+    className={active === "recommend" ? styles.active : ""}
+    onMouseEnter={() => setHovered("recommend")}
+    onMouseLeave={() => setHovered(null)}
+    onClick={() => {
+      setSelected("recommend")
+      router.push("/shop")
+    }}
+  >
+    Recommend
+  </button>
+
+  <button
+    className={active === "theme" ? styles.active : ""}
+    onMouseEnter={() => setHovered("theme")}
+    onMouseLeave={() => setHovered(null)}
+    onClick={() => {
+      setSelected("theme")
+      router.push("/shop/theme")
+    }}
+  >
+    Theme
+  </button>
+
+  <button
+    className={active === "card" ? styles.active : ""}
+    onMouseEnter={() => setHovered("card")}
+    onMouseLeave={() => setHovered(null)}
+    onClick={() => {
+      setSelected("card")
+      router.push("/shop/card")
+    }}
+  >
+    Card
+  </button>
+
+  <button
+    className={active === "chips" ? styles.active : ""}
+    onMouseEnter={() => setHovered("chips")}
+    onMouseLeave={() => setHovered(null)}
+    onClick={() => {
+      setSelected("chips")
+      router.push("/shop/chips")
+    }}
+  >
+    Chips
+  </button>
+</div>
 
         {/* CONTENT */}
         <div className={styles.content}>

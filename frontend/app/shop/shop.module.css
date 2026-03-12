@@ -251,18 +251,25 @@
   padding: 30px 20px; /* เพิ่ม padding ด้านบน-ล่าง */
 }
 
+.sidebar button:first-child {
+  margin: 0 15px;
+}
+
 /* ให้ทุกปุ่มมีเส้นคั่นด้านบน ยกเว้นปุ่มแรก */
 .sidebar button:not(:first-child) {
   border-top: 1px solid #5C6B8A;
+  margin : 0 15px;
 }
 
 .sidebar button:not(:first-child) {
   border-top: 1px solid #5C6B8A;
+  margin : 0 15px;
 }
 
 .sidebar button:last-child {
   border-bottom: none;
   border-radius: 0 0 20px 20px;
+  margin : 0 15px;
 }
 
 

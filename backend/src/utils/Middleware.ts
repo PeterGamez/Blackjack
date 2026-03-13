@@ -3,8 +3,11 @@ import Server from "./Server";
 import { UserInterface } from "../interfaces/Database";
 import UserModel from "../models/UserModel";
 import { Context } from "hono";
+import RedisService from "../services/RedisService";
 
 export class Middleware {
+    private readonly USER_CACHE_PREFIX = "user:";
+    private readonly USER_CACHE_TTL = 60;
     private server: Server;
 
     constructor(server: Server) {
@@ -41,9 +44,19 @@ export class Middleware {
         const payload = c.get("jwtPayload");
         const { userId } = payload;
 
-        const user = await UserModel.selectUser(userId);
-        c.set("authUser", user);
+        const redisCachedUser = await RedisService.get<string>(`${this.USER_CACHE_PREFIX}${userId}`);
+        if (redisCachedUser) {
+            const userFromRedis = JSON.parse(redisCachedUser) as UserInterface;
+            c.set("authUser", userFromRedis);
+            return userFromRedis;
+        } else {
+            const user = await UserModel.selectUser(userId);
+            c.set("authUser", user);
 
-        return user;
+            await RedisService.set(`${this.USER_CACHE_PREFIX}${userId}`, JSON.stringify(user));
+            await RedisService.expire(`${this.USER_CACHE_PREFIX}${userId}`, this.USER_CACHE_TTL);
+
+            return user;
+        }
     }
 }

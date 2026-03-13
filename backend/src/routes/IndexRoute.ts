@@ -5,7 +5,7 @@ import type { RouteInterface } from "../interfaces/Route";
 import type Server from "../Server";
 
 export default class IndexRoute implements RouteInterface {
-    private readonly basePath = "/code";
+    private readonly basePath = "/";
     private app: Hono<BlankEnv, BlankSchema, typeof this.basePath>;
     private server: Server;
 

@@ -16,7 +16,7 @@ export class JWT {
             algorithm: "HS256",
         };
 
-        return jwt.sign(payload, config.auth.jwtSecret, options);
+        return jwt.sign(payload, config.auth.accessTokenSecret, options);
     }
 
     public generateRefreshToken(user: UserInterface): string {
@@ -29,12 +29,20 @@ export class JWT {
             algorithm: "HS256",
         };
 
-        return jwt.sign(payload, config.auth.jwtSecret, options);
+        return jwt.sign(payload, config.auth.refreshTokenSecret, options);
     }
 
-    public verifyToken(token: string): JWTPayload {
+    public verifyAccessToken(token: string): JWTPayload {
         try {
-            return jwt.verify(token, config.auth.jwtSecret) as JWTPayload;
+            return jwt.verify(token, config.auth.accessTokenSecret) as JWTPayload;
+        } catch {
+            return null;
+        }
+    }
+
+    public verifyRefreshToken(token: string): JWTPayload {
+        try {
+            return jwt.verify(token, config.auth.refreshTokenSecret) as JWTPayload;
         } catch {
             return null;
         }

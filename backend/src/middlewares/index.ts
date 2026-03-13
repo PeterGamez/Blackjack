@@ -25,7 +25,7 @@ export default class Middleware {
 
             const token = authHeader.split(" ")[1];
 
-            const payload = this.server.JWT.verifyToken(token);
+            const payload = this.server.JWT.verifyAccessToken(token);
             if (!payload) {
                 return c.json({ error: "Invalid or expired token" }, 401);
             }

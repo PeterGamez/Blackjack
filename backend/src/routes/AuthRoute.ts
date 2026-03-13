@@ -184,7 +184,7 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Missing refresh token" }, 400);
                 }
 
-                const payload = this.server.JWT.verifyToken(refreshToken);
+                const payload = this.server.JWT.verifyRefreshToken(refreshToken);
                 if (!payload) {
                     return c.json({ error: "Invalid or expired token" }, 400);
                 }

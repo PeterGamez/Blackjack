@@ -11,7 +11,8 @@ export default {
     },
 
     auth: {
-        jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
+        accessTokenSecret: process.env.JWT_ACCESS_TOKEN_SECRET || "default_access_token_secret",
+        refreshTokenSecret: process.env.JWT_REFRESH_TOKEN_SECRET || "default_refresh_token_secret",
         accessTokenTtl: "1h",
         refreshTokenTtl: "24h",
     },

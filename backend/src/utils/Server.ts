@@ -15,11 +15,11 @@ export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
-    private logger = new Logger();
+    private Logger = new Logger();
+    public Middleware = new Middleware(this);
 
     public Email = new Email(this);
     public JWT = new JWT();
-    public Middleware = new Middleware(this);
     public Password = new Password();
 
     public SlipOK = new SlipOK(this);
@@ -40,18 +40,18 @@ export default class Server {
     }
 
     public customLogger(message: string, ...rest: string[]) {
-        this.logger.customLogger(message, ...rest);
+        this.Logger.customLogger(message, ...rest);
     }
 
     public log(key: string, message: string) {
-        this.logger.log(key, message);
+        this.Logger.log(key, message);
     }
 
     public warn(key: string, message: string) {
-        this.logger.warn(key, message);
+        this.Logger.warn(key, message);
     }
 
     public error(key: string, message: string) {
-        this.logger.error(key, message);
+        this.Logger.error(key, message);
     }
 }

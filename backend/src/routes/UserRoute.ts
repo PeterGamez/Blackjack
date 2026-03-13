@@ -98,7 +98,6 @@ export default class UserRoute implements RouteInterface {
 
             const response = gameHistory.map((game) => {
                 const isPlayer = game.playerId === user.id;
-                const opponentId = isPlayer ? game.dealerId : game.playerId;
 
                 let result: GameHistoryInterface["result"];
 
@@ -119,7 +118,6 @@ export default class UserRoute implements RouteInterface {
 
                 return {
                     role: isPlayer ? "player" : "dealer",
-                    opponent: opponentId,
                     result: result,
                     score: myScore,
                     opponentScore: opponentScore,

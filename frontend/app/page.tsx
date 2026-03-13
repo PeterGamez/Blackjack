@@ -140,183 +140,222 @@ export default function Home() {
     <div
       style={{
         minHeight: "100vh",
+        position: "relative",
+        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "#1E2430",
-        padding: "28px 60px 56px"
+        background: "#1E2430"
       }}
     >
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0
+        }}
+      >
+        <source src="/videos/home-bg.mp4" type="video/mp4" />
+      </video>
+
       <div
         style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(180deg, rgba(10, 14, 20, 0.5) 0%, rgba(10, 14, 20, 0.75) 100%)",
+          zIndex: 0
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          minHeight: "100vh",
           display: "flex",
+          flexDirection: "column",
           justifyContent: "space-between",
-          alignItems: "center",
-          padding: "12px 0",
-          gap: "32px"
+          padding: "28px 60px 56px"
         }}
       >
         <div
-          onClick={() => router.push(username ? "/profile" : "/auth")}
           style={{
             display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
-            cursor: "pointer",
-            gap: 0,
-            background: "rgba(92, 107, 138, 0.6)",
-            border: "1px solid rgba(92, 107, 138, 0.8)",
-            borderRadius: "20px",
-            padding: "8px 24px 8px 0",
-            height: "64px",
-            flexShrink: 0
+            padding: "12px 0",
+            gap: "32px"
           }}
         >
           <div
+            onClick={() => router.push(username ? "/profile" : "/auth")}
             style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              background: username ? getAvatarColor(username) : "#5c6b8a",
-              border: "3px solid #5c6b8a",
-              zIndex: 2,
-              marginLeft: "-20px",
-              marginRight: "12px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "#ffffff",
-              userSelect: "none",
+              cursor: "pointer",
+              gap: 0,
+              background: "rgba(92, 107, 138, 0.6)",
+              border: "1px solid rgba(92, 107, 138, 0.8)",
+              borderRadius: "20px",
+              padding: "8px 24px 8px 0",
+              height: "64px",
               flexShrink: 0
-            }}
-          >
-            {username ? username[0].toUpperCase() : "?"}
-          </div>
-          <div
-            style={{
-              color: "#e6eaf2",
-              display: "flex",
-              alignItems: "center",
-              fontSize: "18px",
-              fontWeight: 400
-            }}
-          >
-            {username || "username"}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", marginRight: "0" }}>
-          <div
-            style={{
-              height: "64px",
-              minWidth: "220px",
-              borderRadius: "20px",
-              background: "rgba(92, 107, 138, 0.6)",
-              border: "1px solid rgba(92, 107, 138, 0.8)",
-              color: "#e6eaf2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              gap: "16px",
-              fontSize: "18px",
-              padding: "0 24px",
-              cursor: "pointer",
-              transition: "all 0.3s ease"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
-              e.currentTarget.style.transform = "translateY(-2px)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
-              e.currentTarget.style.transform = "translateY(0)"
-            }}
-          >
-            <span style={{ fontSize: "20px" }}>🪙</span>
-            {coins.toLocaleString()}
-          </div>
-
-          <div
-            style={{
-              height: "64px",
-              minWidth: "220px",
-              borderRadius: "20px",
-              background: "rgba(92, 107, 138, 0.6)",
-              border: "1px solid rgba(92, 107, 138, 0.8)",
-              color: "#e6eaf2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              gap: "16px",
-              fontSize: "18px",
-              padding: "0 24px",
-              cursor: "pointer",
-              transition: "all 0.3s ease"
-            }}
-            onClick={() => router.push("/topup")}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
-              e.currentTarget.style.transform = "translateY(-2px)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
-              e.currentTarget.style.transform = "translateY(0)"
             }}
           >
             <div
               style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "6px",
-                background: "#b28bff",
+                width: "64px",
+                height: "64px",
+                borderRadius: "50%",
+                background: username ? getAvatarColor(username) : "#5c6b8a",
+                border: "3px solid #5c6b8a",
+                zIndex: 2,
+                marginLeft: "-20px",
+                marginRight: "12px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "16px",
+                fontSize: "24px",
                 fontWeight: 700,
-                color: "#1a1a1a"
+                color: "#ffffff",
+                userSelect: "none",
+                flexShrink: 0
               }}
             >
-              T
+              {username ? username[0].toUpperCase() : "?"}
             </div>
-            {tokens.toLocaleString()}
-            <span style={{ fontSize: "28px", lineHeight: 1, marginLeft: "auto", fontWeight: 700 }}>+</span>
+            <div
+              style={{
+                color: "#e6eaf2",
+                display: "flex",
+                alignItems: "center",
+                fontSize: "18px",
+                fontWeight: 400
+              }}
+            >
+              {username || "username"}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "24px", marginRight: "0" }}>
+            <div
+              style={{
+                height: "64px",
+                minWidth: "220px",
+                borderRadius: "20px",
+                background: "rgba(92, 107, 138, 0.6)",
+                border: "1px solid rgba(92, 107, 138, 0.8)",
+                color: "#e6eaf2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: "16px",
+                fontSize: "18px",
+                padding: "0 24px",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
+                e.currentTarget.style.transform = "translateY(-2px)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
+                e.currentTarget.style.transform = "translateY(0)"
+              }}
+            >
+              <span style={{ fontSize: "20px" }}>🪙</span>
+              {coins.toLocaleString()}
+            </div>
+
+            <div
+              style={{
+                height: "64px",
+                minWidth: "220px",
+                borderRadius: "20px",
+                background: "rgba(92, 107, 138, 0.6)",
+                border: "1px solid rgba(92, 107, 138, 0.8)",
+                color: "#e6eaf2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: "16px",
+                fontSize: "18px",
+                padding: "0 24px",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
+              onClick={() => router.push("/topup")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(92, 107, 138, 0.8)"
+                e.currentTarget.style.transform = "translateY(-2px)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(92, 107, 138, 0.6)"
+                e.currentTarget.style.transform = "translateY(0)"
+              }}
+            >
+              <div
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "6px",
+                  background: "#b28bff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#1a1a1a"
+                }}
+              >
+                T
+              </div>
+              {tokens.toLocaleString()}
+              <span style={{ fontSize: "28px", lineHeight: 1, marginLeft: "auto", fontWeight: 700 }}>+</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ paddingLeft: "6px" }}>
+        <div style={{ paddingLeft: "6px" }}>
+          <div
+            style={{
+              width: "270px",
+              height: "420px",
+              borderRadius: "14px",
+              background: "#d9d9d9"
+            }}
+          />
+        </div>
+
         <div
           style={{
-            width: "270px",
-            height: "420px",
-            borderRadius: "14px",
-            background: "#d9d9d9"
+            display: "flex",
+            justifyContent: "center",
+            paddingBottom: "2px"
           }}
-        />
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          paddingBottom: "2px"
-        }}
-      >
-        {menuItems.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => router.push(item.path)}
-            onMouseEnter={() => setHovered(item.key)}
-            onMouseLeave={() => setHovered(null)}
-            style={buttonStyle(item.key)}
-          >
-            <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
-              {item.label}
-            </span>
-          </button>
-        ))}
+        >
+          {menuItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => router.push(item.path)}
+              onMouseEnter={() => setHovered(item.key)}
+              onMouseLeave={() => setHovered(null)}
+              style={buttonStyle(item.key)}
+            >
+              <span style={{ display: "inline-block", transform: "skewX(45deg)" }}>
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -93,10 +93,11 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Invalid token" }, 400);
                 }
 
-                const success = await UserModel.verifyEmail(email);
-                if (!success) {
+                const user = await UserModel.selectUserByUsernameOrEmail(email);
+                if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
+                await UserModel.updateUser(user.id, "isVerified", true);
 
                 this.server.log("AUTH", `Email verified: ${email}`);
 
@@ -219,6 +220,10 @@ export default class AuthRoute implements RouteInterface {
 
                 const user = await UserModel.selectUserByUsernameOrEmail(email);
                 if (user) {
+                    if (!user.isVerified) {
+                        return c.json({ error: "Account not verified" }, 403);
+                    }
+
                     try {
                         await this.server.Email.sendPasswordResetEmail(user.id, email);
                     } catch (emailError) {

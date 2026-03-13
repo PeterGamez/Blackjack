@@ -23,7 +23,15 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.get("/packages", async (c) => {
             const packages = await PackageModel.selectAllActivePackages();
-            return c.json({ packages });
+
+            const response = packages.map((pack) => ({
+                id: pack.id,
+                name: pack.name,
+                price: pack.price,
+                tokens: pack.tokens,
+            }));
+
+            return c.json(response);
         });
 
         this.app.post("/bank", async (c) => {

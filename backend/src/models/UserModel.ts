@@ -55,17 +55,6 @@ export default class UserModel {
         }
     }
 
-    public static async verifyEmail(email: string): Promise<boolean> {
-        const sql = `UPDATE ${this.table} SET isVerified = true WHERE email = ?`;
-        const connection = await this.DB.getConnection();
-        try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [email]);
-            return result.affectedRows > 0;
-        } finally {
-            connection.release();
-        }
-    }
-
     public static async updateUser<T extends keyof UserType>(id: number, type: T, value: UserType[T]): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
         const connection = await this.DB.getConnection();

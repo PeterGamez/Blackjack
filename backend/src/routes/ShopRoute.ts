@@ -22,9 +22,18 @@ export default class ShopRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
 
         this.app.get("/list", async (c) => {
-            const products = await ProductModel.selectAllProducts();
+            const products = await ProductModel.selectAllActiveProducts();
 
-            return c.json(products);
+            const response = products.map((product) => ({
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                image: product.image,
+                tokens: product.tokens,
+                coins: product.coins,
+            }));
+
+            return c.json(response);
         });
 
         this.app.post("/buy", async (c) => {

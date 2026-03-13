@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import Server from "../utils/Server";
-import { UserInterface } from "../interfaces/Database";
 import { RouteInterface } from "../interfaces/Route";
 import { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
@@ -31,8 +30,12 @@ export default class UserRoute implements RouteInterface {
 
             const userInventory = await UserInventoryModel.selectAllUserInventoryByUserId(user.id);
 
-            const response: UserInterface & { inventory: number[] } = {
-                ...user,
+            const response = {
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                tokens: user.tokens,
+                coins: user.coins,
                 inventory: userInventory.map((item) => item.productId),
             };
 

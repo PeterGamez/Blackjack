@@ -10,8 +10,8 @@ export default class ProductModel {
         this.DB = DB;
     }
 
-    public static async selectAllProducts(): Promise<ProductInterface[]> {
-        const sql = `SELECT * FROM ${this.table}`;
+    public static async selectAllActiveProducts(): Promise<ProductInterface[]> {
+        const sql = `SELECT * FROM ${this.table} WHERE isActive = true`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);

@@ -36,11 +36,10 @@ import UserService from "../../lib/UserService"
     }
   }
 
-    // load cache from localStorage on mount
     useEffect(() => {
-      const cachedUsername = localStorage.getItem("cached_username")
-      const cachedCoins = localStorage.getItem("cached_coins")
-      const cachedTokens = localStorage.getItem("cached_tokens")
+      const cachedUsername = sessionStorage.getItem("cached_username")
+      const cachedCoins = sessionStorage.getItem("cached_coins")
+      const cachedTokens = sessionStorage.getItem("cached_tokens")
 
       if (cachedUsername) setUsername(cachedUsername)
       if (cachedCoins) setCoins(Number(cachedCoins))

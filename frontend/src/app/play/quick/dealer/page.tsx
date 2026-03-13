@@ -136,7 +136,7 @@ export default function Dealer() {
   }
 
   useEffect(() => {
-    const cachedCoins = localStorage.getItem("cached_coins")
+    const cachedCoins = sessionStorage.getItem("cached_coins")
     if (cachedCoins) setPlayerChips(Number(cachedCoins))
 
     ;(async () => {
@@ -146,9 +146,9 @@ export default function Dealer() {
       setUserId(userData.id)
       setUsername(userData.username || "username")
       setPlayerChips(userData.coins ?? Number(cachedCoins ?? 0))
-      localStorage.setItem("userId", userData.id.toString())
+      sessionStorage.setItem("userId", userData.id.toString())
 
-      const token = UserService.getAccessToken()
+      const token = sessionStorage.getItem("accessToken");
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,
@@ -191,7 +191,7 @@ export default function Dealer() {
             ? data.coins
             : playerChips
         setPlayerChips(nextChips)
-        localStorage.setItem("cached_coins", nextChips.toString())
+        sessionStorage.setItem("cached_coins", nextChips.toString())
         setGameStatus("game-over")
         setIsLoading(false)
       })
@@ -229,7 +229,7 @@ export default function Dealer() {
             ? ack.coins
             : playerChips
         setPlayerChips(nextChips)
-        localStorage.setItem("cached_coins", nextChips.toString())
+        sessionStorage.setItem("cached_coins", nextChips.toString())
         setMessage("")
 
         // Blackjack on initial deal — game is already over
@@ -268,7 +268,7 @@ export default function Dealer() {
         setResult(msg)
         const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips
         setPlayerChips(nextChips)
-        localStorage.setItem("cached_coins", nextChips.toString())
+        sessionStorage.setItem("cached_coins", nextChips.toString())
         setGameStatus("game-over")
       } else {
         startTimer()

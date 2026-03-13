@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 
@@ -17,7 +17,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Blackjack Game",
   description: "Play a simple web-based Blackjack game built with Next.js.",
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

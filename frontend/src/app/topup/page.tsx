@@ -48,14 +48,14 @@ export default function TopupPage() {
     }
 
     useEffect(() => {
-        const cached = localStorage.getItem("cached_tokens")
+        const cached = sessionStorage.getItem("cached_tokens")
         if (cached) {
             setTokens(Number(cached))
         }
 
         // load coins/username as well
-        const cachedUsername = localStorage.getItem("cached_username")
-        const cachedCoins = localStorage.getItem("cached_coins")
+        const cachedUsername = sessionStorage.getItem("cached_username")
+        const cachedCoins = sessionStorage.getItem("cached_coins")
         if (cachedUsername) setUsername(cachedUsername)
         if (cachedCoins) setCoins(Number(cachedCoins))
 
@@ -63,16 +63,16 @@ export default function TopupPage() {
     }, [router])
 
     useEffect(() => {
-        if (username) localStorage.setItem("cached_username", username)
-        if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
-        if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
+        if (username) sessionStorage.setItem("cached_username", username)
+        if (coins > 0) sessionStorage.setItem("cached_coins", coins.toString())
+        if (tokens > 0) sessionStorage.setItem("cached_tokens", tokens.toString())
     }, [username, coins, tokens])
 
     const handlePurchase = async (amount: number) => {
         setError(null)
         setLoading(true)
         try {
-            const token = UserService.getAccessToken()
+            const token = sessionStorage.getItem("accessToken")
             if (!token) {
                 router.replace("/auth")
                 return
@@ -94,7 +94,7 @@ export default function TopupPage() {
 
             const newTokens = typeof data.tokens === "number" ? data.tokens : tokens + amount
             setTokens(newTokens)
-            localStorage.setItem("cached_tokens", newTokens.toString())
+            sessionStorage.setItem("cached_tokens", newTokens.toString())
             alert("Purchase successful!")
         } catch (err: any) {
             console.error("topup error", err)

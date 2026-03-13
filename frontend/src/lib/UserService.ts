@@ -4,34 +4,6 @@ import LocalStorage from "./LocalStorage"
 import SessionStorage from "./SessionStorage"
 
 export default class UserService {
-    public static setAccessToken(token: string) {
-        SessionStorage.setItem("accessToken", token)
-    }
-
-    public static clearAccessToken() {
-        SessionStorage.removeItem("accessToken")
-    }
-
-    public static setRefreshToken(token: string) {
-        LocalStorage.setItem("refreshToken", token)
-    }
-
-    public static clearRefreshToken() {
-        LocalStorage.removeItem("refreshToken")
-    }
-
-    public static getAccessToken(): string | null {
-        return SessionStorage.getItem("accessToken")
-    }
-
-    public static logout() {
-        this.clearAccessToken()
-        this.clearRefreshToken()
-        LocalStorage.removeItem("cached_username")
-        LocalStorage.removeItem("cached_coins")
-        LocalStorage.removeItem("cached_tokens")
-    }
-
     public static async login(username: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
         const res = await fetch(`${config.apiUrl}/auth/login`, {
             method: "POST",
@@ -40,9 +12,14 @@ export default class UserService {
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || "Login failed")
-        this.setAccessToken(data.accessToken)
-        this.setRefreshToken(data.refreshToken)
+        SessionStorage.setItem("accessToken", data.accessToken)
+        LocalStorage.setItem("refreshToken", data.refreshToken)
         return data
+    }
+
+    public static logout() {
+        SessionStorage.removeItem("accessToken")
+        SessionStorage.removeItem("cached_username")
     }
 
     public static async register(username: string, email: string, password: string): Promise<void> {
@@ -75,7 +52,7 @@ export default class UserService {
                 }
 
                 if (res.status === 401) {
-                    this.clearAccessToken()
+                    SessionStorage.removeItem("accessToken")
 
                     const hasRefreshed = await this.refreshAccessToken()
                     if (hasRefreshed) {
@@ -110,15 +87,15 @@ export default class UserService {
             if (refreshRes.ok) {
                 const refreshData = await refreshRes.json()
 
-                this.setAccessToken(refreshData.accessToken)
+                SessionStorage.setItem("accessToken", refreshData.accessToken)
 
                 if (refreshData.refreshToken) {
-                    this.setRefreshToken(refreshData.refreshToken)
+                    LocalStorage.setItem("refreshToken", refreshData.refreshToken)
                 }
 
                 return true
             } else {
-                this.clearRefreshToken()
+                LocalStorage.removeItem("refreshToken")
                 return false
             }
         } catch (error) {

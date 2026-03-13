@@ -4,7 +4,6 @@ import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import databaseHandler from "./handlers/databaseHandler";
 import Server from "./utils/Server";
-import route from "./route";
 import { JWTPayload } from "./interfaces/Auth";
 import { UserInterface } from "./interfaces/Database";
 
@@ -16,9 +15,6 @@ async function run() {
 
     await databaseHandler(server);
 
-    server.initModels();
-    server.initServices();
-
     app.use(logger(server.customLogger.bind(server)));
     app.use(
         cors({
@@ -29,7 +25,9 @@ async function run() {
         })
     );
 
-    route(app, server);
+    server.initRoutes(app);
+    server.initModels();
+    server.initServices();
 
     serve(
         {

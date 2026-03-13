@@ -7,7 +7,7 @@ import CodeModel from "../models/CodeModel";
 import { CodeInterface } from "../interfaces/Database";
 import PaymentModel from "../models/PaymentModel";
 
-export default class CodeRoute implements RouteInterface {
+export default class AdminRoute implements RouteInterface {
     private readonly basePath = "/admin";
     private app: Hono<BlankEnv, BlankSchema, typeof this.basePath>;
     private server: Server;

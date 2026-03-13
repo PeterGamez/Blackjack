@@ -19,6 +19,14 @@ import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
 import UserInventoryModel from "../models/UserInventoryModels";
 import ProductModel from "../models/ProductModel";
+import { Hono } from "hono";
+import AdminRoute from "../routes/AdminRoute";
+import AuthRoute from "../routes/AuthRoute";
+import CodeRoute from "../routes/CodeRoute";
+import PaymentRoute from "../routes/PaymentRoute";
+import ShopRoute from "../routes/ShopRoute";
+import UserRoute from "../routes/UserRoute";
+import IndexRoute from "../routes/IndexRoute";
 
 export default class Server {
     public config = config;
@@ -34,6 +42,19 @@ export default class Server {
     public Truemoney = new Truemoney(this);
 
     public Blackjack = new Blackjack();
+
+    public initRoutes(app: Hono) {
+        new IndexRoute(this).getApp(app);
+
+        new AuthRoute(this).getApp(app);
+
+        new CodeRoute(this).getApp(app);
+        new PaymentRoute(this).getApp(app);
+        new ShopRoute(this).getApp(app);
+        new UserRoute(this).getApp(app);
+
+        new AdminRoute(this).getApp(app);
+    }
 
     public initModels() {
         CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);

@@ -274,6 +274,18 @@
 | API-SHOP-01 | `GET` | `/shop/list` | None | Bearer | ดึงรายการสินค้าทั้งหมดในร้านค้า |
 | API-SHOP-02 | `POST` | `/shop/buy` | `{productId, payment}` | Bearer | ซื้อสินค้า และเพิ่มลง Inventory |
 
+#### 4.2.6 Admin API
+
+> ทุก endpoint ต้องการ Bearer token ของผู้ใช้ที่มี role `admin`
+
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-ADMIN-01 | `GET` | `/admin/users` | None | Bearer | ดึงรายชื่อผู้ใช้ทั้งหมดในระบบ |
+| API-ADMIN-02 | `GET` | `/admin/user/:id` | None | Bearer | ดึงข้อมูลผู้ใช้รายบุคคลตาม ID |
+| API-ADMIN-03 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
+| API-ADMIN-04 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
+| API-ADMIN-05 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |
+
 ### 4.3 Socket.IO Events
 
 #### 4.3.1 Game Socket Events

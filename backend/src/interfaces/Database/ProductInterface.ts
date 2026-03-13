@@ -1,4 +1,4 @@
-import { InterfaceBase } from "./InterfaceBase";
+import type { InterfaceBase } from "./InterfaceBase";
 
 export interface ProductInterface extends InterfaceBase {
     name: string;

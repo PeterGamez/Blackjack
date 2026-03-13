@@ -1,6 +1,6 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { UserInterface } from "../interfaces/Database";
-import { CurrencyType, UserType } from "../interfaces/Type";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+import type { UserInterface } from "../interfaces/Database";
+import type { CurrencyType, UserType } from "../interfaces/Type";
 
 export default class UserModel {
     private static table: string;

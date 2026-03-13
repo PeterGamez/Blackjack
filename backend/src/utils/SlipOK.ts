@@ -1,5 +1,5 @@
-import { ErrorResponse, SlipOKResponse } from "../interfaces/SlipOK";
-import Server from "./Server";
+import type { ErrorResponse, SlipOKResponse } from "../interfaces/SlipOK";
+import type Server from "./Server";
 
 export class SlipOK {
     private API_URL = "https://api.slipok.com";

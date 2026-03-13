@@ -1,5 +1,5 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { GameHistoryInterface } from "../interfaces/Database";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+import type { GameHistoryInterface } from "../interfaces/Database";
 
 export default class GameHistoryModel {
     private static table: string;

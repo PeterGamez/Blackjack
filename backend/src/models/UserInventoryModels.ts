@@ -1,5 +1,5 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { UserInventoryInterface } from "../interfaces/Database";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+import type { UserInventoryInterface } from "../interfaces/Database";
 
 export default class UserInventoryModel {
     private static table: string;

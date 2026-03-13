@@ -1,8 +1,9 @@
 import { Hono } from "hono";
-import Server from "../utils/Server";
+import type { BlankEnv, BlankSchema } from "hono/types";
+
 import UserModel from "../models/UserModel";
-import { RouteInterface } from "../interfaces/Route";
-import { BlankEnv, BlankSchema } from "hono/types";
+import type { RouteInterface } from "../interfaces/Route";
+import type Server from "../utils/Server";
 
 export default class AuthRoute implements RouteInterface {
     private readonly basePath = "/auth";

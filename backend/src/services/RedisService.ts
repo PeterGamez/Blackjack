@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import type Redis from "ioredis";
 
 export default class RedisService {
     public static Redis: Redis;

@@ -1,4 +1,4 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 export default class CodeHistoryModel {
     private static table: string;

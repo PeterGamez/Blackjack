@@ -1,9 +1,10 @@
-import { Server as IOServer, Socket } from "socket.io";
-import GameStateService from "../services/GameStateService";
+import type { Server as IOServer, Socket } from "socket.io";
+
+import type { GameActionPayload, GameStartPayload } from "../interfaces/Game";
+import type { AckType } from "../interfaces/Type";
 import GameService from "../services/GameService";
+import GameStateService from "../services/GameStateService";
 import type Server from "../utils/Server";
-import type { GameStartPayload, GameActionPayload } from "../interfaces/Game";
-import { AckType } from "../interfaces/Type";
 
 export default class GameSocket {
     private static io: IOServer;

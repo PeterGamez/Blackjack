@@ -1,9 +1,10 @@
+import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
-import Server from "./Server";
-import { UserInterface } from "../interfaces/Database";
+
+import type { UserInterface } from "../interfaces/Database";
 import UserModel from "../models/UserModel";
-import { Context } from "hono";
 import RedisService from "../services/RedisService";
+import type Server from "./Server";
 
 export class Middleware {
     private readonly USER_CACHE_PREFIX = "user:";

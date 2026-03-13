@@ -1,6 +1,7 @@
 import { createPool } from "mysql2/promise";
-import Server from "../utils/Server";
 import Redis from "ioredis";
+
+import type Server from "../utils/Server";
 
 export async function databaseHandler(server: Server) {
     const pool = createPool({

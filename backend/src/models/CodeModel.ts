@@ -1,5 +1,5 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { CodeInterface } from "../interfaces/Database";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+import type { CodeInterface } from "../interfaces/Database";
 
 export default class CodeModel {
     private static table: string;

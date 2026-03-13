@@ -1,7 +1,10 @@
-import { createServer, Server as HttpServer } from "http";
-import { Server as IOServer, Socket } from "socket.io";
-import Server from "../utils/Server";
+import { createServer } from "http";
+import type { Server as HttpServer } from "http";
+import { Server as IOServer } from "socket.io";
+import type { Socket } from "socket.io";
+
 import GameSocket from "../sockets/GameSocket";
+import type Server from "../utils/Server";
 
 export default class SocketService {
     public static io: IOServer;

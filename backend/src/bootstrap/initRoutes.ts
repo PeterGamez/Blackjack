@@ -1,4 +1,5 @@
-import { Hono } from "hono";
+import type { Hono } from "hono";
+
 import AdminRoute from "../routes/AdminRoute";
 import AuthRoute from "../routes/AuthRoute";
 import CodeRoute from "../routes/CodeRoute";

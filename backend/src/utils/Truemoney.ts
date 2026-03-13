@@ -1,5 +1,5 @@
-import { TruemoneyResponse } from "../interfaces/Truemoney";
-import Server from "./Server";
+import type { TruemoneyResponse } from "../interfaces/Truemoney";
+import type Server from "./Server";
 
 export class Truemoney {
     private API_URL = "https://gift.truemoney.com";

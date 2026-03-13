@@ -1,5 +1,5 @@
-import { GameType } from "../Game";
-import { InterfaceBase } from "./InterfaceBase";
+import type { GameType } from "../Game";
+import type { InterfaceBase } from "./InterfaceBase";
 
 export interface GameHistoryInterface extends InterfaceBase {
     playerId: number;

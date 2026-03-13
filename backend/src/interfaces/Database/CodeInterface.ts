@@ -1,5 +1,5 @@
-import { CurrencyType } from "../Type";
-import { InterfaceBase } from "./InterfaceBase";
+import type { CurrencyType } from "../Type";
+import type { InterfaceBase } from "./InterfaceBase";
 
 export interface CodeInterface extends InterfaceBase {
     code: string;

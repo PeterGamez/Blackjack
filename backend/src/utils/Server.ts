@@ -1,7 +1,10 @@
-import Redis from "ioredis";
-import { Pool } from "mysql2/promise";
-import { Hono } from "hono";
+import type { Hono } from "hono";
+import type Redis from "ioredis";
+import type { Pool } from "mysql2/promise";
+
+import { initModels, initRoutes, initServices } from "../bootstrap";
 import config from "../config";
+
 import { Blackjack } from "./Blackjack";
 import Email from "./Email";
 import JWT from "./JWT";
@@ -10,7 +13,6 @@ import { Middleware } from "./Middleware";
 import Password from "./Password";
 import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
-import { initModels, initRoutes, initServices } from "../bootstrap";
 
 export default class Server {
     public config = config;

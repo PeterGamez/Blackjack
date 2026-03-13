@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import Server from "../utils/Server";
-import { RouteInterface } from "../interfaces/Route";
-import { BlankEnv, BlankSchema } from "hono/types";
 import ProductModel from "../models/ProductModel";
 import UserModel from "../models/UserModel";
 import UserInventoryModel from "../models/UserInventoryModels";
+import type { RouteInterface } from "../interfaces/Route";
+import type { BlankEnv, BlankSchema } from "hono/types";
+import type Server from "../utils/Server";
 
 export default class ShopRoute implements RouteInterface {
     private readonly basePath = "/shop";

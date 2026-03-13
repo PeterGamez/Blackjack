@@ -1,5 +1,5 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { PaymentInterface } from "../interfaces/Database";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+import type { PaymentInterface } from "../interfaces/Database";
 
 export default class PaymentModel {
     private static table: string;

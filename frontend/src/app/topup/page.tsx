@@ -72,7 +72,7 @@ export default function TopupPage() {
         setError(null)
         setLoading(true)
         try {
-            const token = UserService.getAccessToken()
+            const token = sessionStorage.getItem("accessToken")
             if (!token) {
                 router.replace("/auth")
                 return

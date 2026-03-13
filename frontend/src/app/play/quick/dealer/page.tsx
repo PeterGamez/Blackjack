@@ -148,7 +148,7 @@ export default function Dealer() {
       setPlayerChips(userData.coins ?? Number(cachedCoins ?? 0))
       sessionStorage.setItem("userId", userData.id.toString())
 
-      const token = UserService.getAccessToken()
+      const token = sessionStorage.getItem("accessToken");
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,

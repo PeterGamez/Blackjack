@@ -1,5 +1,5 @@
+import type { GameCurrency, GameStateInterface, GameType } from "../interfaces/Game";
 import RedisService from "../services/RedisService";
-import type { GameStateInterface, GameType, GameCurrency } from "../interfaces/Game";
 
 export class GameState {
     private static readonly GAME_PREFIX = "socket:game:";

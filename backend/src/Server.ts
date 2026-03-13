@@ -2,7 +2,6 @@ import type Redis from "ioredis";
 import type { Pool } from "mysql2/promise";
 
 import config from "./config";
-
 import { Blackjack } from "./game/Blackjack";
 import { Email, SlipOK, Truemoney } from "./integrations";
 import { JWT, Password } from "./security";

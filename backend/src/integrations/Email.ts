@@ -2,8 +2,8 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 import type { EmailVerificationData } from "../interfaces/Cache";
-import RedisService from "../services/RedisService";
 import type Server from "../Server";
+import RedisService from "../services/RedisService";
 
 export class Email {
     private readonly PREFIX_VERIFY = "email:verify:";

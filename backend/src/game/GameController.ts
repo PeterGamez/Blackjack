@@ -1,9 +1,9 @@
-import RedisService from "../services/RedisService";
-import UserModel from "../models/UserModel";
+import { GameState } from "./GameState";
+import type { Card, GameCurrency, GameStateInterface, GameType, HitResult, StandResult, StartResult } from "../interfaces/Game";
 import GameHistoryModel from "../models/GameHistoryModel";
+import UserModel from "../models/UserModel";
 import type Server from "../Server";
-import type { Card, GameType, GameCurrency, GameStateInterface, HitResult, StandResult, StartResult } from "../interfaces/Game";
-import { GameState } from ".";
+import RedisService from "../services/RedisService";
 
 export default class GameController {
     private static server: Server;

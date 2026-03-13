@@ -1,9 +1,10 @@
 import { Hono } from "hono";
-import ProductModel from "../models/ProductModel";
-import UserModel from "../models/UserModel";
-import UserInventoryModel from "../models/UserInventoryModels";
-import type { RouteInterface } from "../interfaces/Route";
 import type { BlankEnv, BlankSchema } from "hono/types";
+
+import type { RouteInterface } from "../interfaces/Route";
+import ProductModel from "../models/ProductModel";
+import UserInventoryModel from "../models/UserInventoryModels";
+import UserModel from "../models/UserModel";
 import type Server from "../Server";
 
 export default class ShopRoute implements RouteInterface {

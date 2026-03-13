@@ -1,14 +1,14 @@
 import { serve } from "@hono/node-server";
-import { cors } from "hono/cors";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
+import { initModels, initRoutes, initServices } from "./bootstrap";
+import GameController from "./game/GameController";
 import { databaseHandler } from "./handlers";
 import type { JWTPayload } from "./interfaces/Auth";
 import type { UserInterface } from "./interfaces/Database";
 import Server from "./Server";
-import GameController from "./game/GameController";
-import { initModels, initRoutes, initServices } from "./bootstrap";
 
 const server = new Server();
 const app = new Hono().basePath(server.config.api.path);

@@ -1,5 +1,5 @@
+import type { Card, GameCurrency, GameStateInterface } from "../interfaces/Game";
 import UserModel from "../models/UserModel";
-import type { Card, GameStateInterface, GameCurrency } from "../interfaces/Game";
 
 export class Blackjack {
     public readonly SUITS = ["♠", "♥", "♦", "♣"];

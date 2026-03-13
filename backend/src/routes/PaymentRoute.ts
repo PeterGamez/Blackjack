@@ -1,9 +1,10 @@
 import { Hono } from "hono";
+import type { BlankEnv, BlankSchema } from "hono/types";
+
+import type { RouteInterface } from "../interfaces/Route";
 import PackageModel from "../models/PackageModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
-import type { RouteInterface } from "../interfaces/Route";
-import type { BlankEnv, BlankSchema } from "hono/types";
 import type Server from "../Server";
 
 export default class PaymentRoute implements RouteInterface {

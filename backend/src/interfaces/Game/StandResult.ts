@@ -1,6 +1,6 @@
-import { Card } from "./Card";
-import { GameStateInterface } from "./GameStateInterface";
-import { GameCurrency } from "./GameType";
+import type { Card } from "./Card";
+import type { GameStateInterface } from "./GameStateInterface";
+import type { GameCurrency } from "./GameType";
 
 export type StandResult =
     | { ok: false; message: string }

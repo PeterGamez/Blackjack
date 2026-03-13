@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "./config"
+import UserService from "../services/UserService"
 
 export default function Home() {
   const router = useRouter()
@@ -14,15 +14,8 @@ export default function Home() {
   // load profile from backend
   const loadProfile = async () => {
     try {
-      const token = localStorage.getItem("accessToken")
-      if (!token) return
-      const res = await fetch(`${config.apiUrl}/user/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (!res.ok) return
-      const data = await res.json()
+      const data = await UserService.getUser()
+      if (!data) return
       setUsername(data.username || "")
       if (typeof data.coins === "number") {
         setCoins(data.coins)

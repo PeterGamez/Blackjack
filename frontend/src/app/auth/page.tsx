@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import config from "../config"
+import UserService from "../../services/UserService"
 
 export default function AuthPage() {
   const router = useRouter()
@@ -57,23 +57,10 @@ export default function AuthPage() {
     setLoginError("")
     setLoginLoading(true)
     try {
-      const res = await fetch(`${config.apiUrl}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: loginUsername, password: loginPassword }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setLoginError(data.error || "Login failed")
-        setLoginLoading(false)
-        return
-      }
-      localStorage.setItem("accessToken", data.accessToken)
-      localStorage.setItem("refreshToken", data.refreshToken)
-      if (data.user) localStorage.setItem("user", JSON.stringify(data.user))
+      await UserService.login(loginUsername, loginPassword)
       router.push("/")
-    } catch {
-      setLoginError("Server error")
+    } catch (err: unknown) {
+      setLoginError(err instanceof Error ? err.message : "Server error")
     }
     setLoginLoading(false)
   }
@@ -87,21 +74,11 @@ export default function AuthPage() {
     }
     setRegLoading(true)
     try {
-      const res = await fetch(`${config.apiUrl}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: regUsername, email: regEmail, password: regPassword }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setRegMessage(data.error || "Register failed")
-        setRegLoading(false)
-        return
-      }
+      await UserService.register(regUsername, regEmail, regPassword)
       setRegMessage("Register success! Check your email.")
       setTimeout(() => switchTab("login"), 1500)
-    } catch {
-      setRegMessage("Server error")
+    } catch (err: unknown) {
+      setRegMessage(err instanceof Error ? err.message : "Server error")
     }
     setRegLoading(false)
   }

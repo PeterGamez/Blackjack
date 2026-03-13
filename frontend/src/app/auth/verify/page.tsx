@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import config from "../../config"
+import config from "../../../config"
 
 function VerifyContent() {
   const router = useRouter()

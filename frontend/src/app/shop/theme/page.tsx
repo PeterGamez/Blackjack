@@ -3,7 +3,7 @@
 import styles from "../test.module.css"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "../../config"
+import config from "../../../config"
 
 export default function StorePage() {
   const router = useRouter()

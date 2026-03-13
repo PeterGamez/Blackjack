@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "../config"
-import styles from "./gambling.module.css"
+import config from "../../config"
+import styles from "./play.module.css"
 
 export default function Home() {
   const router = useRouter()
@@ -153,19 +153,19 @@ export default function Home() {
 
         {/* Mode Title */}
         <div className={styles.modeTitle}>
-          <h2>Gambling</h2>
+          <h2>Mode</h2>
         </div>
 
         {/* Mode Selector Row */}
         <div className={styles.modeSelector}>
-          {/* Bet on - Player VS Dealer */}
+          {/* Quick Play - Player VS Dealer */}
           <button
-            onClick={() => router.push("/comingsoon")}
+            onClick={() => router.push("/play/quick/dealer")}
             onMouseEnter={() => setHovered("quickDealer")}
             onMouseLeave={() => setHovered(null)}
             className={getButtonClass("quickDealer")}
           >
-            <div className={styles.buttonTitle}>Bet on </div>
+            <div className={styles.buttonTitle}>Quick Play</div>
             <div className={styles.buttonSubtitle}>Player</div>
             <div className={styles.buttonSubtitle}>VS</div>
             <div className={styles.buttonSubtitle}>Dealer</div>
@@ -173,15 +173,25 @@ export default function Home() {
 
           {/* Quick Play - Player VS Player */}
           <button
-            onClick={() => router.push("/comingsoon")}
+            onClick={() => router.push("/play/quick/player")}
             onMouseEnter={() => setHovered("quickPlayer")}
             onMouseLeave={() => setHovered(null)}
             className={getButtonClass("quickPlayer")}
           >
-            <div className={styles.buttonTitle}>Bet on</div>
+            <div className={styles.buttonTitle}>Quick Play</div>
             <div className={styles.buttonSubtitle}>Player</div>
             <div className={styles.buttonSubtitle}>VS</div>
             <div className={styles.buttonSubtitle}>Player</div>
+          </button>
+
+          {/* Rank */}
+          <button
+            onClick={() => router.push("/play/rank")}
+            onMouseEnter={() => setHovered("rank")}
+            onMouseLeave={() => setHovered(null)}
+            className={getButtonClass("rank")}
+          >
+            <div className={styles.buttonTitle}>Rank</div>
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import styles from "../shop.module.css"
+import styles from "./shop.module.css"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import config from "../../config"
@@ -117,25 +117,17 @@ export default function StorePage() {
         
         {/* SIDEBAR */}
         <div className={styles.sidebar}>
-          <button className={styles.active} onClick={() => router.push("/shop/recommend")}>Recommend</button>
+          <button onClick={() => router.push("/shop/recommend")}>Recommend</button>
           <button onClick={() => router.push("/shop/theme")}>Theme</button>
           <button onClick={() => router.push("/shop/card")}>Card</button>
           <button onClick={() => router.push("/shop/chips")}>Chips</button>
-        </div>
+       </div>
+
 
         {/* CONTENT */}
         <div className={styles.content}>
-          {products.map((p, index) => (
-          <div key={index} className={styles.product}>
-            <div className={styles.productPreview}></div>
-            <div className={styles.productInfo}>
-              <strong>{p.name}</strong>
-              <span>{p.price}</span>
-            </div>
-          </div>
-          ))}
+        </div>
         </div>
       </div>
-    </div>
   )
 }

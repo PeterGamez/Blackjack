@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
-import config from "../../../config"
+import config from "../../../../config"
 import { io, Socket } from "socket.io-client"
 import { getCardImagePath, getCardBackImage } from "../../../utils/cardUtils"
 

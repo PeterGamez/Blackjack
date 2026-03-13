@@ -33,6 +33,7 @@ export default class UserRoute implements RouteInterface {
             const userInventory = await UserInventoryModel.selectAllUserInventoryByUserId(user.id);
 
             const response = {
+                id: user.id,
                 username: user.username,
                 email: user.email,
                 role: user.role,

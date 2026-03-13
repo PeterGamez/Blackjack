@@ -257,7 +257,7 @@
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-CODE-01 | `POST` | `/code/redeem` | `{code}` | Bearer | รับ code และให้รางวัล Coin หรือ Token |
+| API-CODE-01 | `POST` | `/code/redeem` | `{code}` | Bearer | redeem code เพื่อรับรางวัล |
 
 #### 4.2.4 Payment API
 

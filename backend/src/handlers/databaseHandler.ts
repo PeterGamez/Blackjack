@@ -1,5 +1,5 @@
-import { createPool } from "mysql2/promise";
 import Redis from "ioredis";
+import { createPool } from "mysql2/promise";
 
 import type Server from "../Server";
 

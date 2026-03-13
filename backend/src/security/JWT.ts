@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import type { SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 import config from "../config";
 import type { JWTPayload } from "../interfaces/Auth";

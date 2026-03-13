@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
+import type Server from "../Server";
 import type { GameHistoryInterface } from "../interfaces/Database";
 import type { RouteInterface } from "../interfaces/Route";
 import GameHistoryModel from "../models/GameHistoryModel";
 import PaymentModel from "../models/PaymentModel";
-import UserModel from "../models/UserModel";
 import UserInventoryModel from "../models/UserInventoryModels";
-import type Server from "../Server";
+import UserModel from "../models/UserModel";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";

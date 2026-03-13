@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 
+import type Server from "../Server";
 import AdminRoute from "../routes/AdminRoute";
 import AuthRoute from "../routes/AuthRoute";
 import CodeRoute from "../routes/CodeRoute";
@@ -7,7 +8,6 @@ import IndexRoute from "../routes/IndexRoute";
 import PaymentRoute from "../routes/PaymentRoute";
 import ShopRoute from "../routes/ShopRoute";
 import UserRoute from "../routes/UserRoute";
-import type Server from "../Server";
 
 export function initRoutes(server: Server, app: Hono) {
     new IndexRoute(server).getApp(app);

@@ -1,9 +1,9 @@
 import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 
+import type Server from "../Server";
 import type { UserInterface } from "../interfaces/Database";
 import UserModel from "../models/UserModel";
-import type Server from "../Server";
 import RedisService from "../services/RedisService";
 
 export default class Middleware {

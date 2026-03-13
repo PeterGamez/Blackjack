@@ -1,8 +1,9 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
+
 import nodemailer from "nodemailer";
 
-import type { EmailVerificationData } from "../interfaces/Cache";
 import type Server from "../Server";
+import type { EmailVerificationData } from "../interfaces/Cache";
 import RedisService from "../services/RedisService";
 
 export class Email {

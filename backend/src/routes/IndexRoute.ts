@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
-import type { RouteInterface } from "../interfaces/Route";
 import type Server from "../Server";
+import type { RouteInterface } from "../interfaces/Route";
 
 export default class IndexRoute implements RouteInterface {
     private readonly basePath = "/";

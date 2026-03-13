@@ -1,4 +1,5 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
+
 import type { CodeInterface } from "../interfaces/Database";
 
 export default class CodeModel {

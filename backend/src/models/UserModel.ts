@@ -1,4 +1,5 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
+
 import type { UserInterface } from "../interfaces/Database";
 import type { CurrencyType, UserType } from "../interfaces/Type";
 

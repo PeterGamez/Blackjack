@@ -1,4 +1,5 @@
 import type { Pool } from "mysql2/promise";
+
 import type { PackageInterface } from "../interfaces/Database";
 
 export default class PackageModel {

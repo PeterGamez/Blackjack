@@ -1,5 +1,7 @@
-import type { TruemoneyResponse } from "../interfaces/Truemoney";
+import { fetch } from "bun";
+
 import type Server from "../Server";
+import type { TruemoneyResponse } from "../interfaces/Truemoney";
 
 export class Truemoney {
     private API_URL = "https://gift.truemoney.com";

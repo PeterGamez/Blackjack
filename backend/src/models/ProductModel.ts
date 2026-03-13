@@ -1,4 +1,5 @@
 import type { Pool } from "mysql2/promise";
+
 import type { ProductInterface } from "../interfaces/Database";
 
 export default class ProductModel {

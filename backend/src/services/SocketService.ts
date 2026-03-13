@@ -1,5 +1,6 @@
-import type { Server as HttpServer } from "http";
-import { createServer } from "http";
+import type { Server as HttpServer } from "node:http";
+import { createServer } from "node:http";
+
 import type { Socket } from "socket.io";
 import { Server as IOServer } from "socket.io";
 

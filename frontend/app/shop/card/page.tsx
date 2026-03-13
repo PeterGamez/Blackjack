@@ -1,19 +1,25 @@
 "use client"
 
+import styles from "../test.module.css"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "../config"
-import styles from "./gambling.module.css"
+import config from "../../config"
 
-export default function Home() {
+export default function StorePage() {
   const router = useRouter()
-  const [hovered, setHovered] = useState<string | null>(null)
   const [username, setUsername] = useState<string>("")
   const [coins, setCoins] = useState<number>(0)
   const [tokens, setTokens] = useState<number>(0)
-  const [stageScale, setStageScale] = useState<number>(1)
-  const [stageTop, setStageTop] = useState<number>(0)
-  const [stageLeft, setStageLeft] = useState<number>(0)
+  const products = [
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+];
 
   // load profile from backend
   const loadProfile = async () => {
@@ -41,12 +47,6 @@ export default function Home() {
 
   // load cache from localStorage on mount
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    if (!token) {
-      router.replace("/auth")
-      return
-    }
-
     const cachedUsername = localStorage.getItem("cached_username")
     const cachedCoins = localStorage.getItem("cached_coins")
     const cachedTokens = localStorage.getItem("cached_tokens")
@@ -56,38 +56,7 @@ export default function Home() {
     if (cachedTokens) setTokens(Number(cachedTokens))
 
     loadProfile()
-  }, [router])
-
-  // save to cache whenever username, coins, or tokens change
-  useEffect(() => {
-    if (username) localStorage.setItem("cached_username", username)
-    if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
-    if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
-  }, [username, coins, tokens])
-
-  useEffect(() => {
-    const updateStageScale = () => {
-      const widthScale = window.innerWidth / 1920
-      const heightScale = window.innerHeight / 1080
-      const nextScale = Math.min(widthScale, heightScale)
-      const scaledWidth = 1920 * nextScale
-      const scaledHeight = 1080 * nextScale
-      const nextLeft = Math.max((window.innerWidth - scaledWidth) / 2, 0)
-      const nextTop = Math.max((window.innerHeight - scaledHeight) / 2, 12)
-
-      setStageScale(nextScale)
-      setStageLeft(nextLeft)
-      setStageTop(nextTop)
-    }
-
-    updateStageScale()
-    window.addEventListener("resize", updateStageScale)
-    return () => window.removeEventListener("resize", updateStageScale)
   }, [])
-
-  const getButtonClass = (name: string): string => {
-    return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`
-  }
 
   const getAvatarColor = (name: string) => {
     const colors = [
@@ -104,15 +73,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div
-        className={styles.stage}
-        style={{
-          left: `${stageLeft}px`,
-          top: `${stageTop}px`,
-          transform: `scale(${stageScale})`,
-        }}
-      >
-        {/* Top Bar with User Info */}
+      {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
           <div className={styles.profileSection}>
@@ -150,39 +111,33 @@ export default function Home() {
         >
           ← Lobby
         </button>
-
         {/* Mode Title */}
-        <div className={styles.modeTitle}>
-          <h2>Gambling</h2>
+        <div className={styles.Title}>
+          <h2>Shop</h2>
         </div>
 
-        {/* Mode Selector Row */}
-        <div className={styles.modeSelector}>
-          {/* Bet on - Player VS Dealer */}
-          <button
-            onClick={() => router.push("/comingsoon")}
-            onMouseEnter={() => setHovered("quickDealer")}
-            onMouseLeave={() => setHovered(null)}
-            className={getButtonClass("quickDealer")}
-          >
-            <div className={styles.buttonTitle}>Bet on </div>
-            <div className={styles.buttonSubtitle}>Player</div>
-            <div className={styles.buttonSubtitle}>VS</div>
-            <div className={styles.buttonSubtitle}>Dealer</div>
-          </button>
+      {/* ===== MAIN AREA ===== */}
+      <div className={styles.main}>
+        
+        {/* SIDEBAR */}
+        <div className={styles.sidebar}>
+          <button onClick={() => router.push("/shop")}>Recommend</button>
+          <button onClick={() => router.push("/shop/theme")}>Theme</button>
+          <button className={styles.active} onClick={() => router.push("/shop/card")}>Card</button>
+          <button onClick={() => router.push("/shop/chips")}>Chips</button>
+        </div>
 
-          {/* Quick Play - Player VS Player */}
-          <button
-            onClick={() => router.push("/comingsoon")}
-            onMouseEnter={() => setHovered("quickPlayer")}
-            onMouseLeave={() => setHovered(null)}
-            className={getButtonClass("quickPlayer")}
-          >
-            <div className={styles.buttonTitle}>Bet on</div>
-            <div className={styles.buttonSubtitle}>Player</div>
-            <div className={styles.buttonSubtitle}>VS</div>
-            <div className={styles.buttonSubtitle}>Player</div>
-          </button>
+        {/* CONTENT */}
+        <div className={styles.content}>
+          {products.map((p, index) => (
+          <div key={index} className={styles.product}>
+            <div className={styles.productPreview}></div>
+            <div className={styles.productInfo}>
+              <strong>{p.name}</strong>
+              <span>{p.price}</span>
+            </div>
+          </div>
+          ))}
         </div>
       </div>
     </div>

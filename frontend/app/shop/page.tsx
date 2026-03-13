@@ -10,6 +10,11 @@ export default function StorePage() {
   const [username, setUsername] = useState<string>("")
   const [coins, setCoins] = useState<number>(0)
   const [tokens, setTokens] = useState<number>(0)
+  const products = [
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' },
+  { name: 'Name', price: 'price' }
+];
 
   // load profile from backend
   const loadProfile = async () => {
@@ -48,14 +53,31 @@ export default function StorePage() {
     loadProfile()
   }, [])
 
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "#e05c5c", "#e0885c", "#d4a632", "#6db86d",
+      "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0",
+      "#e05c9a", "#4ca8c8"
+    ]
+    let hash = 0
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
+
   return (
     <div className={styles.container}>
-      
       {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
           <div className={styles.profileSection}>
-            <div className={styles.profileAvatar}></div>
+            <div
+              className={styles.profileAvatar}
+              style={{ background: username ? getAvatarColor(username) : "#5c6b8a" }}
+            >
+              {username ? username[0].toUpperCase() : "?"}
+            </div>
             <span className={styles.username}>{username}</span>
           </div>
 
@@ -85,24 +107,33 @@ export default function StorePage() {
           ← Lobby
         </button>
         {/* Mode Title */}
-        <div className={styles.modeTitle}>
+        <div className={styles.Title}>
           <h2>Shop</h2>
         </div>
 
       {/* ===== MAIN AREA ===== */}
       <div className={styles.main}>
         
-        {/* SIDEBAR */}
-        <div className={styles.sidebar}>
-          <button>Recommend</button>
-          <button>Theme</button>
-          <button>Card</button>
-          <button>Chips</button>
-        </div>
+          {/* SIDEBAR */}
+          <div className={styles.sidebar}>
+            <button className={styles.active} onClick={() => router.push("/shop/recommend")}>Recommend</button>
+            <button onClick={() => router.push("/shop/theme")}>Theme</button>
+            <button onClick={() => router.push("/shop/card")}>Card</button>
+            <button onClick={() => router.push("/shop/chips")}>Chips</button>
+          </div>
 
         {/* CONTENT */}
-        <div className={styles.content}></div>
-
+        <div className={styles.content}>
+          {products.map((p, index) => (
+          <div key={index} className={styles.product}>
+            <div className={styles.productPreview}></div>
+            <div className={styles.productInfo}>
+              <strong>{p.name}</strong>
+              <span>{p.price}</span>
+            </div>
+          </div>
+          ))}
+        </div>
       </div>
     </div>
   )

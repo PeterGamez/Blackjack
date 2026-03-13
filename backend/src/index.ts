@@ -1,11 +1,12 @@
+import { serve } from "@hono/node-server";
+import { cors } from "hono/cors";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import { cors } from "hono/cors";
-import { serve } from "@hono/node-server";
-import databaseHandler from "./handlers/databaseHandler";
+
+import { databaseHandler } from "./handlers";
+import type { JWTPayload } from "./interfaces/Auth";
+import type { UserInterface } from "./interfaces/Database";
 import Server from "./utils/Server";
-import { JWTPayload } from "./interfaces/Auth";
-import { UserInterface } from "./interfaces/Database";
 
 const server = new Server();
 const app = new Hono().basePath(server.config.api.path);

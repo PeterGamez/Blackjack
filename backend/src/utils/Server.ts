@@ -1,37 +1,22 @@
 import Redis from "ioredis";
 import { Pool } from "mysql2/promise";
+import { Hono } from "hono";
 import config from "../config";
-import CodeHistoryModel from "../models/CodeHistoryModel";
-import CodeModel from "../models/CodeModel";
-import GameHistoryModel from "../models/GameHistoryModel";
-import PackageModel from "../models/PackageModel";
-import PaymentModel from "../models/PaymentModel";
-import UserModel from "../models/UserModel";
-import GameService from "../services/GameService";
-import RedisService from "../services/RedisService";
-import SocketService from "../services/SocketService";
 import { Blackjack } from "./Blackjack";
 import Email from "./Email";
 import JWT from "./JWT";
+import Logger from "./Logger";
 import { Middleware } from "./Middleware";
 import Password from "./Password";
 import { SlipOK } from "./SlipOK";
 import { Truemoney } from "./Truemoney";
-import UserInventoryModel from "../models/UserInventoryModels";
-import ProductModel from "../models/ProductModel";
-import { Hono } from "hono";
-import AdminRoute from "../routes/AdminRoute";
-import AuthRoute from "../routes/AuthRoute";
-import CodeRoute from "../routes/CodeRoute";
-import PaymentRoute from "../routes/PaymentRoute";
-import ShopRoute from "../routes/ShopRoute";
-import UserRoute from "../routes/UserRoute";
-import IndexRoute from "../routes/IndexRoute";
+import { initModels, initRoutes, initServices } from "../bootstrap";
 
 export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
+    private logger = new Logger();
 
     public Email = new Email(this);
     public JWT = new JWT();
@@ -44,65 +29,30 @@ export default class Server {
     public Blackjack = new Blackjack();
 
     public initRoutes(app: Hono) {
-        new IndexRoute(this).getApp(app);
-
-        new AuthRoute(this).getApp(app);
-
-        new CodeRoute(this).getApp(app);
-        new PaymentRoute(this).getApp(app);
-        new ShopRoute(this).getApp(app);
-        new UserRoute(this).getApp(app);
-
-        new AdminRoute(this).getApp(app);
+        initRoutes(this, app);
     }
 
     public initModels() {
-        CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);
-        CodeModel.init(this.config.mysql.table.code, this.DB);
-        GameHistoryModel.init(this.config.mysql.table.gameHistory, this.DB);
-        PackageModel.init(this.config.mysql.table.package, this.DB);
-        PaymentModel.init(this.config.mysql.table.payment, this.DB);
-        ProductModel.init(this.config.mysql.table.product, this.DB);
-        UserModel.init(this.config.mysql.table.user, this.DB);
-        UserInventoryModel.init(this.config.mysql.table.userInventory, this.DB);
+        initModels(this);
     }
 
     public initServices() {
-        GameService.init(this);
-        RedisService.init(this.Redis);
-        SocketService.init(this);
+        initServices(this);
     }
 
     public customLogger(message: string, ...rest: string[]) {
-        this.log("REST", `${message} ${rest.join(" ")}`);
+        this.logger.customLogger(message, ...rest);
     }
 
     public log(key: string, message: string) {
-        key = `${key}`;
-        if (key.length < 20) key = key.padEnd(20, " ");
-        console.log(`[${this.formatDate(new Date())}] ${key} : ${message}`);
+        this.logger.log(key, message);
     }
+
     public warn(key: string, message: string) {
-        key = `${key}`;
-        if (key.length < 20) key = key.padEnd(20, " ");
-        console.warn(`[${this.formatDate(new Date())}] ${key} : ${message}`);
+        this.logger.warn(key, message);
     }
+
     public error(key: string, message: string) {
-        key = `${key}`;
-        if (key.length < 20) key = key.padEnd(20, " ");
-        console.error(`[${this.formatDate(new Date())}] ${key} : ${message}`);
-    }
-
-    private formatDate(date: Date) {
-        const pad = (n: number) => n.toString().padStart(2, "0");
-
-        const day = pad(date.getDate());
-        const month = pad(date.getMonth() + 1);
-        const year = date.getFullYear();
-        const hours = pad(date.getHours());
-        const minutes = pad(date.getMinutes());
-        const seconds = pad(date.getSeconds());
-
-        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+        this.logger.error(key, message);
     }
 }

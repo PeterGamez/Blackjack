@@ -19,7 +19,11 @@ export default class UserService {
 
     public static logout() {
         SessionStorage.removeItem("accessToken")
+        LocalStorage.removeItem("refreshToken")
+
         SessionStorage.removeItem("cached_username")
+        SessionStorage.removeItem("cached_coins")
+        SessionStorage.removeItem("cached_tokens")
     }
 
     public static async register(username: string, email: string, password: string): Promise<void> {

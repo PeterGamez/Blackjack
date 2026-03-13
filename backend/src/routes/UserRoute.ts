@@ -6,6 +6,7 @@ import UserModel from "../models/UserModel";
 import UserInventoryModel from "../models/UserInventoryModels";
 import PaymentModel from "../models/PaymentModel";
 import GameHistoryModel from "../models/GameHistoryModel";
+import { GameHistoryInterface } from "../interfaces/Database";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";
@@ -77,7 +78,14 @@ export default class UserRoute implements RouteInterface {
 
             const paymentHistory = await PaymentModel.selectAllPaymentsByUserId(user.id);
 
-            return c.json(paymentHistory);
+            const response = paymentHistory.map((payment) => ({
+                receiptRef: payment.receiptRef,
+                type: payment.type,
+                amount: payment.amount,
+                createdAt: payment.createdAt,
+            }));
+
+            return c.json(response);
         });
 
         this.app.get("/game-history", async (c) => {
@@ -88,7 +96,41 @@ export default class UserRoute implements RouteInterface {
 
             const gameHistory = await GameHistoryModel.selectAllGameHistoryByUserId(user.id);
 
-            return c.json(gameHistory);
+            const response = gameHistory.map((game) => {
+                const isPlayer = game.playerId === user.id;
+                const opponentId = isPlayer ? game.dealerId : game.playerId;
+
+                let result: GameHistoryInterface["result"];
+
+                if (game.result === "draw") {
+                    result = "draw";
+                } else if (game.result === "blackjack") {
+                    result = isPlayer ? "win" : "lose";
+                } else if (isPlayer) {
+                    result = game.result;
+                } else {
+                    result = game.result === "win" ? "lose" : "win";
+                }
+
+                const reward = isPlayer ? game.playerPayout : game.dealerPayout;
+
+                const myScore = isPlayer ? game.playerScore : game.dealerScore;
+                const opponentScore = isPlayer ? game.dealerScore : game.playerScore;
+
+                return {
+                    role: isPlayer ? "player" : "dealer",
+                    opponent: opponentId,
+                    result: result,
+                    score: myScore,
+                    opponentScore: opponentScore,
+                    bet: game.bet,
+                    mode: game.mode,
+                    reward: reward,
+                    createdAt: game.createdAt,
+                };
+            });
+
+            return c.json(response);
         });
     }
 

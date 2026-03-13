@@ -10,11 +10,23 @@ export default class GameHistoryModel {
         this.DB = DB;
     }
 
-    public static async createGameHistory(userId1: number, userId2: number, gameResult: string, mode: string, bet: number, reward: number): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (userId1, userId2, result, mode, bet, reward) VALUES (?, ?, ?, ?, ?, ?)`;
+    public static async createGameHistory(
+        playerId: number,
+        dealerId: number,
+        mode: GameHistoryInterface["mode"],
+        bet: number,
+        playerScore: number,
+        dealerScore: number,
+        gameResult: GameHistoryInterface["result"],
+        playerPayout: number,
+        dealerPayout: number
+    ): Promise<number> {
+        const sql = `INSERT INTO ${this.table}
+            (playerId, dealerId, mode, bet, playerScore, dealerScore, result, playerPayout, dealerPayout)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [userId1, userId2, gameResult, mode, bet, reward]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [playerId, dealerId, mode, bet, playerScore, dealerScore, gameResult, playerPayout, dealerPayout]);
             return result.insertId;
         } finally {
             connection.release();
@@ -22,7 +34,7 @@ export default class GameHistoryModel {
     }
 
     public static async selectAllGameHistoryByUserId(userId: number): Promise<GameHistoryInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE userId1 = ? OR userId2 = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE playerId = ? OR dealerId = ? ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [userId, userId]);

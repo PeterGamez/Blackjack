@@ -11,7 +11,7 @@ export interface GameState {
     dealerHand: string;
     playerValue: number;
     dealerValue: number;
-    result: "win" | "lose" | "push" | "pending";
+    result: "win" | "lose" | "draw" | "pending";
     reward: number;
     deck: string;
     createdAt: number;

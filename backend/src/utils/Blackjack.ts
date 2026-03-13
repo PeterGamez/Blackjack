@@ -40,7 +40,7 @@ export class Blackjack {
         dealerHand: Card[];
         playerValue: number;
         dealerValue: number;
-        result: "win" | "lose" | "push";
+        result: "win" | "lose" | "draw";
         reward: number;
         currency: GameCurrency;
         balance: number;
@@ -56,7 +56,7 @@ export class Blackjack {
         const playerValue = this.calcValue(playerHand);
         const dealerValue = this.calcValue(dealerHand);
 
-        let result: "win" | "lose" | "push";
+        let result: "win" | "lose" | "draw";
         let reward = 0;
 
         if (dealerValue > 21 || playerValue > dealerValue) {
@@ -66,7 +66,7 @@ export class Blackjack {
             result = "lose";
             reward = 0;
         } else {
-            result = "push";
+            result = "draw";
             reward = gameState.playerBet;
         }
 

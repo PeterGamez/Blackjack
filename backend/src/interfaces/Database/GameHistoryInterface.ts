@@ -1,10 +1,15 @@
+import { GameType } from "../Game";
 import { InterfaceBase } from "./InterfaceBase";
 
 export interface GameHistoryInterface extends InterfaceBase {
-    userId1: number;
-    userId2: number;
-    result: string;
-    mode: string;
+    playerId: number;
+    dealerId: number;
+    mode: GameType;
     bet: number;
-    reward: number;
+    playerScore: number;
+    dealerScore: number;
+    // ยึดผลจากมุม player
+    result: "win" | "lose" | "draw" | "blackjack";
+    playerPayout: number;
+    dealerPayout: number;
 }

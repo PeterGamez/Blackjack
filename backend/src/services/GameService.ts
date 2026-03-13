@@ -46,7 +46,7 @@ export default class GameService {
         if (isBlackjack || isDealerBlackjack) {
             status = "game-over";
             if (isBlackjack && isDealerBlackjack) {
-                result = "push";
+                result = "draw";
                 reward = bet;
             } else if (isBlackjack) {
                 result = "win";
@@ -84,7 +84,8 @@ export default class GameService {
             if (reward > 0) {
                 await UserModel.increaseBalance(userId, currency, reward);
             }
-            await GameHistoryModel.createGameHistory(userId, 0, result, gameType, bet, reward);
+            const historyResult = isBlackjack && !isDealerBlackjack ? "blackjack" : result === "draw" ? "draw" : result === "win" ? "win" : "lose";
+            await GameHistoryModel.createGameHistory(userId, 0, gameType, bet, playerValue, dealerValue, historyResult, reward, result === "lose" ? bet : 0);
             return {
                 ok: true,
                 gameOver: true,
@@ -98,7 +99,7 @@ export default class GameService {
                 balance,
                 blackjack: isBlackjack,
                 dealerBlackjack: isDealerBlackjack,
-                result: result as "win" | "lose" | "push",
+                result: result as "win" | "lose" | "draw",
                 reward,
             };
         }
@@ -143,13 +144,26 @@ export default class GameService {
             gameState.status = "game-over";
             gameState.reward = 0;
             await GameStateService.saveGameState(gameId, gameState);
-            await GameHistoryModel.createGameHistory(gameState.userId, 0, "lose", gameState.gameType, gameState.playerBet, 0);
+            const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
+            const dealerValue = this.server.Blackjack.calcValue(dealerHand);
+            await GameHistoryModel.createGameHistory(gameState.userId, 0, gameState.gameType, gameState.playerBet, playerValue, dealerValue, "lose", 0, gameState.playerBet);
             return { ok: true, outcome: "bust", playerHand, playerValue };
         }
 
         if (playerValue === 21) {
             const resolved = await this.server.Blackjack.resolveDealer(gameState, GameStateService.saveGameState.bind(GameStateService));
-            await GameHistoryModel.createGameHistory(gameState.userId, 0, resolved.result, gameState.gameType, gameState.playerBet, resolved.reward);
+            const historyResult = resolved.result;
+            await GameHistoryModel.createGameHistory(
+                gameState.userId,
+                0,
+                gameState.gameType,
+                gameState.playerBet,
+                resolved.playerValue,
+                resolved.dealerValue,
+                historyResult,
+                resolved.reward,
+                resolved.result === "lose" ? gameState.playerBet : 0
+            );
             return { ok: true, outcome: "finished", gameId, ...resolved };
         }
 
@@ -167,7 +181,18 @@ export default class GameService {
         }
 
         const resolved = await this.server.Blackjack.resolveDealer(gameState, GameStateService.saveGameState.bind(GameStateService));
-        await GameHistoryModel.createGameHistory(gameState.userId, 0, resolved.result, gameState.gameType, gameState.playerBet, resolved.reward);
+        const historyResult = resolved.result;
+        await GameHistoryModel.createGameHistory(
+            gameState.userId,
+            0,
+            gameState.gameType,
+            gameState.playerBet,
+            resolved.playerValue,
+            resolved.dealerValue,
+            historyResult,
+            resolved.reward,
+            resolved.result === "lose" ? gameState.playerBet : 0
+        );
         return { ok: true, gameId, ...resolved };
     }
 }

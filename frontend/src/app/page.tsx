@@ -28,12 +28,11 @@ export default function Home() {
     }
   }
 
-  // load cache from localStorage on mount
   useEffect(() => {
-    const cachedUsername = localStorage.getItem("cached_username")
-    const cachedCoins = localStorage.getItem("cached_coins")
-    const cachedTokens = localStorage.getItem("cached_tokens")
-    const storedUser = localStorage.getItem("user")
+    const cachedUsername = sessionStorage.getItem("cached_username")
+    const cachedCoins = sessionStorage.getItem("cached_coins")
+    const cachedTokens = sessionStorage.getItem("cached_tokens")
+    const storedUser = sessionStorage.getItem("user")
 
     if (cachedUsername) setUsername(cachedUsername)
     if (cachedCoins) setCoins(Number(cachedCoins))
@@ -44,9 +43,9 @@ export default function Home() {
 
   // save to cache whenever username, coins, or tokens change
   useEffect(() => {
-    if (username) localStorage.setItem("cached_username", username)
-    if (coins > 0) localStorage.setItem("cached_coins", coins.toString())
-    if (tokens > 0) localStorage.setItem("cached_tokens", tokens.toString())
+    if (username) sessionStorage.setItem("cached_username", username)
+    if (coins > 0) sessionStorage.setItem("cached_coins", coins.toString())
+    if (tokens > 0) sessionStorage.setItem("cached_tokens", tokens.toString())
   }, [username, coins, tokens])
 
   const getAvatarColor = (name: string) => {

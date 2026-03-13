@@ -45,8 +45,7 @@ export default class ShopRoute implements RouteInterface {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
-                const productId = body.productId;
-                const payment = body.payment;
+                const { productId, payment } = body;
 
                 if (!productId || !payment) {
                     return c.json({ error: "Missing productId or payment" }, 400);

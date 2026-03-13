@@ -15,7 +15,7 @@ export class Middleware {
     }
 
     public auth() {
-        return createMiddleware(async (c, next) => {
+        return createMiddleware(async (c, next): Promise<Response> => {
             const authHeader = c.req.header("Authorization");
 
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -30,6 +30,21 @@ export class Middleware {
             }
 
             c.set("jwtPayload", payload);
+
+            await next();
+        });
+    }
+
+    public adminOnly() {
+        return createMiddleware(async (c, next): Promise<Response> => {
+            const user = await this.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            if (user.role !== "admin") {
+                return c.json({ error: "Forbidden" }, 403);
+            }
 
             await next();
         });

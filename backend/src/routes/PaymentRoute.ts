@@ -43,8 +43,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Invalid request body" }, 400);
                 }
 
-                const image = body.image;
-                const packageIdStr = body.packageId;
+                const { image, packageId: packageIdStr } = body;
 
                 if (!image || !packageIdStr) {
                     return c.json({ error: "Missing image or packageId" }, 400);
@@ -97,8 +96,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Invalid request body" }, 400);
                 }
 
-                const url = body.url;
-                const packageId = body.packageId;
+                const { url, packageId } = body;
 
                 if (!url || !packageId) {
                     return c.json({ error: "Missing url or packageId" }, 400);

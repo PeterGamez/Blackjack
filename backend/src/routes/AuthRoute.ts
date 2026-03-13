@@ -29,9 +29,12 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
-                const username = body.username?.trim()?.toLowerCase();
-                const email = body.email?.trim()?.toLowerCase();
-                const password = body.password?.trim();
+                let { username, email, password } = body;
+
+                username = username?.trim()?.toLowerCase();
+                email = email?.trim()?.toLowerCase();
+                password = password?.trim();
+
                 if (!username || !email || !password) {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
@@ -77,6 +80,7 @@ export default class AuthRoute implements RouteInterface {
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
+
                 const { token } = body;
 
                 if (!token) {
@@ -87,6 +91,7 @@ export default class AuthRoute implements RouteInterface {
                 if (!payload) {
                     return c.json({ error: "Invalid or expired token" }, 400);
                 }
+
                 const { email } = payload;
 
                 if (!email) {
@@ -118,8 +123,11 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
-                const username = body.username?.trim()?.toLowerCase();
-                const password = body.password?.trim();
+                let { username, password } = body;
+
+                username = username?.trim()?.toLowerCase();
+                password = password?.trim();
+
                 if (!username || !password) {
                     return c.json({ error: "Missing username/email or password" }, 400);
                 }
@@ -168,6 +176,7 @@ export default class AuthRoute implements RouteInterface {
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
+
                 const { refreshToken } = body;
 
                 if (!refreshToken) {
@@ -212,6 +221,7 @@ export default class AuthRoute implements RouteInterface {
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
+
                 const { email } = body;
 
                 if (!email) {
@@ -250,6 +260,7 @@ export default class AuthRoute implements RouteInterface {
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
+
                 const { token, password } = body;
 
                 if (!token || !password) {

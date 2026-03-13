@@ -35,7 +35,7 @@ export default class CodeRoute implements RouteInterface {
                     return c.json({ error: "User not found" }, 404);
                 }
 
-                const code = body.code;
+                const { code } = body;
 
                 if (!code) {
                     return c.json({ error: "Missing code" }, 400);

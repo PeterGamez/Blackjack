@@ -85,7 +85,7 @@ export default class GameController {
                 await UserModel.increaseBalance(userId, currency, reward);
             }
             const historyResult = isBlackjack && !isDealerBlackjack ? "blackjack" : result === "draw" ? "draw" : result === "win" ? "win" : "lose";
-            await GameHistoryModel.createGameHistory(userId, 0, gameType, bet, playerValue, dealerValue, historyResult, reward, result === "lose" ? bet : 0);
+            await GameHistoryModel.createGameHistory(userId, 1, gameType, bet, playerValue, dealerValue, historyResult, reward, result === "lose" ? bet : 0);
             return {
                 ok: true,
                 gameOver: true,
@@ -146,7 +146,7 @@ export default class GameController {
             await GameState.saveGameState(gameId, gameState);
             const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
             const dealerValue = this.server.Blackjack.calcValue(dealerHand);
-            await GameHistoryModel.createGameHistory(gameState.userId, 0, gameState.gameType, gameState.playerBet, playerValue, dealerValue, "lose", 0, gameState.playerBet);
+            await GameHistoryModel.createGameHistory(gameState.userId, 1, gameState.gameType, gameState.playerBet, playerValue, dealerValue, "lose", 0, gameState.playerBet);
             return { ok: true, outcome: "bust", playerHand, playerValue };
         }
 
@@ -155,7 +155,7 @@ export default class GameController {
             const historyResult = resolved.result;
             await GameHistoryModel.createGameHistory(
                 gameState.userId,
-                0,
+                1,
                 gameState.gameType,
                 gameState.playerBet,
                 resolved.playerValue,
@@ -184,7 +184,7 @@ export default class GameController {
         const historyResult = resolved.result;
         await GameHistoryModel.createGameHistory(
             gameState.userId,
-            0,
+            1,
             gameState.gameType,
             gameState.playerBet,
             resolved.playerValue,

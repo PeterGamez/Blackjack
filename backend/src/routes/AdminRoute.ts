@@ -6,7 +6,7 @@ import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export default class AdminRoute implements RouteInterface {
     private readonly basePath = "/admin";

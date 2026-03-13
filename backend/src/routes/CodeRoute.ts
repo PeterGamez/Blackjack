@@ -4,7 +4,7 @@ import CodeModel from "../models/CodeModel";
 import type { RouteInterface } from "../interfaces/Route";
 import type { BlankEnv, BlankSchema } from "hono/types";
 import UserModel from "../models/UserModel";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export default class CodeRoute implements RouteInterface {
     private readonly basePath = "/code";

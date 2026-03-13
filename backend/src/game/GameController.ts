@@ -1,11 +1,11 @@
-import RedisService from "./RedisService";
-import GameStateService from "./GameStateService";
+import RedisService from "../services/RedisService";
 import UserModel from "../models/UserModel";
 import GameHistoryModel from "../models/GameHistoryModel";
-import type Server from "../utils/Server";
-import type { Card, GameType, GameCurrency, GameState, HitResult, StandResult, StartResult } from "../interfaces/Game";
+import type Server from "../Server";
+import type { Card, GameType, GameCurrency, GameStateInterface, HitResult, StandResult, StartResult } from "../interfaces/Game";
+import { GameState } from ".";
 
-export default class GameService {
+export default class GameController {
     private static server: Server;
 
     public static init(server: Server): void {
@@ -39,8 +39,8 @@ export default class GameService {
         const isBlackjack = playerValue === 21;
         const isDealerBlackjack = dealerValue === 21;
 
-        let status: GameState["status"] = "playing";
-        let result: GameState["result"] = "pending";
+        let status: GameStateInterface["status"] = "playing";
+        let result: GameStateInterface["result"] = "pending";
         let reward = 0;
 
         if (isBlackjack || isDealerBlackjack) {
@@ -56,7 +56,7 @@ export default class GameService {
             }
         }
 
-        const gameState: GameState = {
+        const gameState: GameStateInterface = {
             gameId,
             userId,
             gameType,
@@ -73,9 +73,9 @@ export default class GameService {
             createdAt: Date.now(),
         };
 
-        await GameStateService.saveGameState(gameId, gameState);
-        await GameStateService.setUserCurrentGame(userId, gameId);
-        await GameStateService.setSocketUser(socketId, userId);
+        await GameState.saveGameState(gameId, gameState);
+        await GameState.setUserCurrentGame(userId, gameId);
+        await GameState.setSocketUser(socketId, userId);
         await UserModel.decreaseBalance(userId, currency, bet);
 
         const balance = user[currency] - bet + reward;
@@ -119,7 +119,7 @@ export default class GameService {
     }
 
     public static async hitGame(gameId: number, userId: number): Promise<HitResult> {
-        const gameState = await GameStateService.getGameState(gameId);
+        const gameState = await GameState.getGameState(gameId);
         if (!gameState || gameState.userId !== userId) {
             return { ok: false, message: "Game not found or unauthorized" };
         }
@@ -143,7 +143,7 @@ export default class GameService {
             gameState.result = "lose";
             gameState.status = "game-over";
             gameState.reward = 0;
-            await GameStateService.saveGameState(gameId, gameState);
+            await GameState.saveGameState(gameId, gameState);
             const dealerHand: Card[] = JSON.parse(gameState.dealerHand);
             const dealerValue = this.server.Blackjack.calcValue(dealerHand);
             await GameHistoryModel.createGameHistory(gameState.userId, 0, gameState.gameType, gameState.playerBet, playerValue, dealerValue, "lose", 0, gameState.playerBet);
@@ -151,7 +151,7 @@ export default class GameService {
         }
 
         if (playerValue === 21) {
-            const resolved = await this.server.Blackjack.resolveDealer(gameState, GameStateService.saveGameState.bind(GameStateService));
+            const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
             const historyResult = resolved.result;
             await GameHistoryModel.createGameHistory(
                 gameState.userId,
@@ -167,12 +167,12 @@ export default class GameService {
             return { ok: true, outcome: "finished", gameId, ...resolved };
         }
 
-        await GameStateService.saveGameState(gameId, gameState);
+        await GameState.saveGameState(gameId, gameState);
         return { ok: true, outcome: "continue", playerHand, playerValue };
     }
 
     public static async standGame(gameId: number, userId: number): Promise<StandResult> {
-        const gameState = await GameStateService.getGameState(gameId);
+        const gameState = await GameState.getGameState(gameId);
         if (!gameState || gameState.userId !== userId) {
             return { ok: false, message: "Game not found or unauthorized" };
         }
@@ -180,7 +180,7 @@ export default class GameService {
             return { ok: false, message: "Game is already over" };
         }
 
-        const resolved = await this.server.Blackjack.resolveDealer(gameState, GameStateService.saveGameState.bind(GameStateService));
+        const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
         const historyResult = resolved.result;
         await GameHistoryModel.createGameHistory(
             gameState.userId,

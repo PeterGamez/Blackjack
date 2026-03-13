@@ -1,6 +1,6 @@
 import { GameType, GameCurrency } from "./GameType";
 
-export interface GameState {
+export interface GameStateInterface {
     gameId: number;
     userId: number;
     gameType: GameType;

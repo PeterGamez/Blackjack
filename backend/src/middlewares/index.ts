@@ -4,9 +4,9 @@ import { createMiddleware } from "hono/factory";
 import type { UserInterface } from "../interfaces/Database";
 import UserModel from "../models/UserModel";
 import RedisService from "../services/RedisService";
-import type Server from "./Server";
+import type Server from "../Server";
 
-export class Middleware {
+export default class Middleware {
     private readonly USER_CACHE_PREFIX = "user:";
     private readonly USER_CACHE_TTL = 60;
     private server: Server;

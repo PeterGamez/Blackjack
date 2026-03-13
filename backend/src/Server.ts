@@ -1,4 +1,28 @@
-export default class Logger {
+import type Redis from "ioredis";
+import type { Pool } from "mysql2/promise";
+
+import config from "./config";
+
+import { Blackjack } from "./game/Blackjack";
+import { Email, SlipOK, Truemoney } from "./integrations";
+import { JWT, Password } from "./security";
+import Middleware from "./middlewares";
+
+export default class Server {
+    public config = config;
+    public DB: Pool;
+    public Redis: Redis;
+    public Middleware = new Middleware(this);
+
+    public Email = new Email(this);
+    public JWT = new JWT();
+    public Password = new Password();
+
+    public SlipOK = new SlipOK(this);
+    public Truemoney = new Truemoney(this);
+
+    public Blackjack = new Blackjack();
+
     public customLogger(message: string, ...rest: string[]) {
         this.log("REST", `${message} ${rest.join(" ")}`);
     }

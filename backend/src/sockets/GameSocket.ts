@@ -2,9 +2,9 @@ import type { Server as IOServer, Socket } from "socket.io";
 
 import type { GameActionPayload, GameStartPayload } from "../interfaces/Game";
 import type { AckType } from "../interfaces/Type";
-import GameService from "../services/GameService";
-import GameStateService from "../services/GameStateService";
-import type Server from "../utils/Server";
+import GameController from "../game/GameController";
+import type Server from "../Server";
+import { GameState } from "../game";
 
 export default class GameSocket {
     private static io: IOServer;
@@ -16,20 +16,20 @@ export default class GameSocket {
     }
 
     public static emitToGame(gameId: number, event: string, data: unknown): void {
-        this.io.to(GameStateService.gameRoom(gameId)).emit(event, data);
+        this.io.to(GameState.gameRoom(gameId)).emit(event, data);
     }
 
     public static broadcastToGame(gameId: number, excludeSocketId: string, event: string, data: unknown): void {
-        this.io.to(GameStateService.gameRoom(gameId)).except(excludeSocketId).emit(event, data);
+        this.io.to(GameState.gameRoom(gameId)).except(excludeSocketId).emit(event, data);
     }
 
     public static async join(socket: Socket, gameId: number): Promise<void> {
-        socket.join(GameStateService.gameRoom(gameId));
+        socket.join(GameState.gameRoom(gameId));
         this.server.log("GameSocket", `${socket.id} joined game ${gameId}`);
     }
 
     public static async leave(socket: Socket, gameId: number): Promise<void> {
-        socket.leave(GameStateService.gameRoom(gameId));
+        socket.leave(GameState.gameRoom(gameId));
         this.server.log("GameSocket", `${socket.id} left game ${gameId}`);
     }
 
@@ -41,7 +41,7 @@ export default class GameSocket {
                 return;
             }
             try {
-                const result = await GameService.startGame(userId, gameType, bet, socket.id);
+                const result = await GameController.startGame(userId, gameType, bet, socket.id);
                 if (result.ok === false) {
                     ack?.({ ok: false, message: result.message });
                     return;
@@ -89,7 +89,7 @@ export default class GameSocket {
                 return;
             }
             try {
-                const result = await GameService.hitGame(gameId, userId);
+                const result = await GameController.hitGame(gameId, userId);
                 if (result.ok === false) {
                     ack?.({ ok: false, message: result.message });
                     return;
@@ -118,7 +118,7 @@ export default class GameSocket {
                 return;
             }
             try {
-                const result = await GameService.standGame(gameId, userId);
+                const result = await GameController.standGame(gameId, userId);
                 if (result.ok === false) {
                     ack?.({ ok: false, message: result.message });
                     return;
@@ -144,7 +144,7 @@ export default class GameSocket {
 
         socket.on("disconnect", async () => {
             this.server.log("GameSocket", `Client disconnected: ${socket.id}`);
-            await GameStateService.removeSocketUser(socket.id);
+            await GameState.removeSocketUser(socket.id);
         });
     }
 }

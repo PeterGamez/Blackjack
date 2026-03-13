@@ -4,7 +4,7 @@ import { Server as IOServer } from "socket.io";
 import type { Socket } from "socket.io";
 
 import GameSocket from "../sockets/GameSocket";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export default class SocketService {
     public static io: IOServer;

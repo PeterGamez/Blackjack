@@ -4,7 +4,7 @@ import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
 import type { RouteInterface } from "../interfaces/Route";
 import type { BlankEnv, BlankSchema } from "hono/types";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export default class PaymentRoute implements RouteInterface {
     private readonly basePath = "/payment";

@@ -7,7 +7,7 @@ import GameHistoryModel from "../models/GameHistoryModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
 import UserInventoryModel from "../models/UserInventoryModels";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export default class UserRoute implements RouteInterface {
     private readonly basePath = "/user";

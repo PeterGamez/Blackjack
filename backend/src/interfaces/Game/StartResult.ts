@@ -1,5 +1,5 @@
 import { Card } from "./Card";
-import { GameState } from "./GameState";
+import { GameStateInterface } from "./GameStateInterface";
 import { GameCurrency } from "./GameType";
 
 export type StartResult =
@@ -29,6 +29,6 @@ export type StartResult =
           balance: number;
           blackjack: boolean;
           dealerBlackjack: boolean;
-          result: Omit<GameState["result"], "pending">;
+          result: Omit<GameStateInterface["result"], "pending">;
           reward: number;
       };

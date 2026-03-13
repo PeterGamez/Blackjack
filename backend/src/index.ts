@@ -6,7 +6,9 @@ import { logger } from "hono/logger";
 import { databaseHandler } from "./handlers";
 import type { JWTPayload } from "./interfaces/Auth";
 import type { UserInterface } from "./interfaces/Database";
-import Server from "./utils/Server";
+import Server from "./Server";
+import GameController from "./game/GameController";
+import { initModels, initRoutes, initServices } from "./bootstrap";
 
 const server = new Server();
 const app = new Hono().basePath(server.config.api.path);
@@ -26,9 +28,10 @@ async function run() {
         })
     );
 
-    server.initRoutes(app);
-    server.initModels();
-    server.initServices();
+    initRoutes(server, app);
+    initModels(server);
+    initServices(server);
+    GameController.init(server);
 
     serve(
         {

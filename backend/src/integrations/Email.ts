@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 
 import type { EmailVerificationData } from "../interfaces/Cache";
 import RedisService from "../services/RedisService";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export class Email {
     private readonly PREFIX_VERIFY = "email:verify:";

@@ -7,7 +7,7 @@ import IndexRoute from "../routes/IndexRoute";
 import PaymentRoute from "../routes/PaymentRoute";
 import ShopRoute from "../routes/ShopRoute";
 import UserRoute from "../routes/UserRoute";
-import type Server from "../utils/Server";
+import type Server from "../Server";
 
 export function initRoutes(server: Server, app: Hono) {
     new IndexRoute(server).getApp(app);

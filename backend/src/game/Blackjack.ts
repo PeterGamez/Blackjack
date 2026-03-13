@@ -1,5 +1,5 @@
 import UserModel from "../models/UserModel";
-import type { Card, GameState, GameCurrency } from "../interfaces/Game";
+import type { Card, GameStateInterface, GameCurrency } from "../interfaces/Game";
 
 export class Blackjack {
     public readonly SUITS = ["♠", "♥", "♦", "♣"];
@@ -33,8 +33,8 @@ export class Blackjack {
     }
 
     public async resolveDealer(
-        gameState: GameState,
-        saveGameState: (gameId: number, state: GameState) => Promise<void>
+        gameState: GameStateInterface,
+        saveGameState: (gameId: number, state: GameStateInterface) => Promise<void>
     ): Promise<{
         playerHand: Card[];
         dealerHand: Card[];

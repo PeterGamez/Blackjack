@@ -1,7 +1,7 @@
-import RedisService from "./RedisService";
-import type { GameState, GameType, GameCurrency } from "../interfaces/Game";
+import RedisService from "../services/RedisService";
+import type { GameStateInterface, GameType, GameCurrency } from "../interfaces/Game";
 
-export default class GameStateService {
+export class GameState {
     private static readonly GAME_PREFIX = "socket:game:";
     private static readonly USER_GAME_PREFIX = "socket:user_game:";
     private static readonly SOCKET_CONN_PREFIX = "socket:conn:";
@@ -62,7 +62,7 @@ export default class GameStateService {
         await RedisService.expire(gameKey, 86400);
     }
 
-    public static async getGameState(gameId: number): Promise<GameState> {
+    public static async getGameState(gameId: number): Promise<GameStateInterface> {
         const data = await RedisService.hgetall<Record<string, string>>(this.gameKey(gameId));
         if (!data || Object.keys(data).length === 0) return null;
         return {
@@ -70,13 +70,13 @@ export default class GameStateService {
             userId: parseInt(data.userId),
             gameType: data.gameType as GameType,
             currency: data.currency as GameCurrency,
-            status: data.status as GameState["status"],
+            status: data.status as GameStateInterface["status"],
             playerBet: parseInt(data.playerBet),
             playerHand: data.playerHand,
             dealerHand: data.dealerHand,
             playerValue: parseInt(data.playerValue),
             dealerValue: parseInt(data.dealerValue),
-            result: data.result as GameState["result"],
+            result: data.result as GameStateInterface["result"],
             reward: parseInt(data.reward),
             deck: data.deck,
             createdAt: parseInt(data.createdAt),

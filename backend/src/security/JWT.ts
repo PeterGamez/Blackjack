@@ -5,7 +5,7 @@ import config from "../config";
 import type { JWTPayload } from "../interfaces/Auth";
 import type { UserInterface } from "../interfaces/Database";
 
-export default class JWT {
+export class JWT {
     public generateAccessToken(user: UserInterface): string {
         const payload: JWTPayload = {
             userId: user.id,

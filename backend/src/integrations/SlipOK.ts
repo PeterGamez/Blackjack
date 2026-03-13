@@ -1,5 +1,5 @@
 import type { ErrorResponse, SlipOKResponse } from "../interfaces/SlipOK";
-import type Server from "./Server";
+import type Server from "../utils/Server";
 
 export class SlipOK {
     private API_URL = "https://api.slipok.com";
@@ -84,10 +84,10 @@ export class SlipOK {
     public constructor(server: Server) {
         this.server = server;
     }
+
     public async request(file: File): Promise<SlipOKResponse & ErrorResponse> {
         const formData = new FormData();
         formData.append("files", file);
-        // formData.append("log", "true");
 
         const response = await fetch(`${this.API_URL}/api/line/apikey/${this.server.config.slipok.branch}`, {
             method: "POST",

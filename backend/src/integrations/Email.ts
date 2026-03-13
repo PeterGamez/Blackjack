@@ -3,9 +3,9 @@ import nodemailer from "nodemailer";
 
 import type { EmailVerificationData } from "../interfaces/Cache";
 import RedisService from "../services/RedisService";
-import type Server from "./Server";
+import type Server from "../utils/Server";
 
-export default class Email {
+export class Email {
     private readonly PREFIX_VERIFY = "email:verify:";
     private readonly PREFIX_RESET = "email:reset:";
 

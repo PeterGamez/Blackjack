@@ -40,8 +40,8 @@ export default class ShopRoute implements RouteInterface {
             try {
                 let body: { productId: number; payment: "tokens" | "coins" };
                 try {
-                    body = await c.req.json();
-                } catch (err) {
+                    body = await c.req.json<typeof body>();
+                } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
@@ -52,13 +52,12 @@ export default class ShopRoute implements RouteInterface {
                     return c.json({ error: "Missing productId or payment" }, 400);
                 }
 
-                const user = await this.server.Middleware.getUser(c);
+                const [user, product] = await Promise.all([this.server.Middleware.getUser(c), ProductModel.selectProduct(productId)]);
 
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
 
-                const product = await ProductModel.selectProduct(body.productId);
                 if (!product) {
                     return c.json({ error: "Product not found" }, 404);
                 }

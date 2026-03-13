@@ -6,6 +6,7 @@ import databaseHandler from "./handlers/databaseHandler";
 import Server from "./utils/Server";
 import route from "./route";
 import { JWTPayload } from "./interfaces/Auth";
+import { UserInterface } from "./interfaces/Database";
 
 const server = new Server();
 const app = new Hono().basePath(server.config.api.path);
@@ -46,5 +47,6 @@ run();
 declare module "hono" {
     interface ContextVariableMap {
         jwtPayload: JWTPayload;
+        authUser: UserInterface;
     }
 }

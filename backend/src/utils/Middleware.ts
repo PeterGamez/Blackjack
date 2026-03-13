@@ -33,10 +33,20 @@ export class Middleware {
     }
 
     public async getUser(c: Context): Promise<UserInterface> {
+        const cachedUser = c.get("authUser");
+        if (cachedUser) {
+            return cachedUser;
+        }
+
         const payload = c.get("jwtPayload");
         const userId = payload.userId;
 
         const user = await UserModel.selectUser(userId);
+
+        if (user) {
+            c.set("authUser", user);
+        }
+
         return user;
     }
 }

@@ -36,11 +36,6 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.post("/bank", async (c) => {
             try {
-                const user = await this.server.Middleware.getUser(c);
-                if (!user) {
-                    return c.json({ error: "User not found" }, 404);
-                }
-
                 let body: { image: File; packageId: string };
                 try {
                     body = await c.req.parseBody();
@@ -55,18 +50,22 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Missing image or packageId" }, 400);
                 }
 
-                const packageId = Number(packageIdStr);
-
-                const pack = await PackageModel.selectPackage(packageId);
-                if (!pack) {
-                    return c.json({ error: "Package not found" }, 404);
-                }
-
                 if (!(image instanceof File)) {
                     return c.json({ error: "Invalid file" }, 400);
                 }
 
-                const response = await this.server.SlipOK.request(image);
+                const packageId = Number(packageIdStr);
+
+                const [user, pack, response] = await Promise.all([this.server.Middleware.getUser(c), PackageModel.selectPackage(packageId), this.server.SlipOK.request(image)]);
+
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                if (!pack) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
                 if (!response.success) {
                     this.server.warn("PaymentRoute", `Failed to verify slip: ${response.message}`);
                     return c.json({ error: "Failed to verify slip" }, 400);
@@ -91,11 +90,6 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.post("/truemoney", async (c) => {
             try {
-                const user = await this.server.Middleware.getUser(c);
-                if (!user) {
-                    return c.json({ error: "User not found" }, 404);
-                }
-
                 let body: { url: string; packageId: number };
                 try {
                     body = await c.req.json<typeof body>();
@@ -110,21 +104,23 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Missing url or packageId" }, 400);
                 }
 
-                const pack = await PackageModel.selectPackage(packageId);
+                const [user, pack, verifyResponse] = await Promise.all([this.server.Middleware.getUser(c), PackageModel.selectPackage(packageId), this.server.Truemoney.verify(url)]);
+
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
                 if (!pack) {
                     return c.json({ error: "Package not found" }, 404);
                 }
 
-                const verifyResponse = await this.server.Truemoney.verify(url);
-
                 if (verifyResponse.status.code != "SUCCESS") {
-                    if (verifyResponse.status.code == "INVALID_INPUT") {
-                        return c.json({ error: "Invalid voucher URL" }, 400);
-                    } else if (verifyResponse.status.code == "VOUCHER_OUT_OF_STOCK") {
-                        return c.json({ error: "Voucher has already been redeemed" }, 400);
-                    } else {
-                        return c.json({ error: "Failed to verify voucher", message: verifyResponse.status.message }, 400);
-                    }
+                    const statusErrors: Record<string, string> = {
+                        INVALID_INPUT: "Invalid voucher URL",
+                        VOUCHER_OUT_OF_STOCK: "Voucher has already been redeemed",
+                    };
+
+                    return c.json({ error: statusErrors[verifyResponse.status.code] ?? "Failed to verify voucher", message: verifyResponse.status.message }, 400);
                 }
 
                 const voucher = verifyResponse.data.voucher;

@@ -23,14 +23,16 @@ export default class CodeRoute implements RouteInterface {
 
         this.app.post("/redeem", async (c) => {
             try {
-                const [user, body] = await Promise.all([this.server.Middleware.getUser(c), c.req.json<{ code: string }>().catch(() => null)]);
-
-                if (!user) {
-                    return c.json({ error: "User not found" }, 404);
+                let body: { code: string };
+                try {
+                    body = await c.req.json<typeof body>();
+                } catch {
+                    return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
-                if (!body) {
-                    return c.json({ error: "Invalid or missing JSON body" }, 400);
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
                 }
 
                 const code = body.code;

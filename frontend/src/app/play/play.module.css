@@ -1,0 +1,308 @@
+/* Main Container */
+.container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #1e2430;
+  overflow: hidden;
+  font-family: 'Sora', sans-serif;
+}
+
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+}
+
+/* ===== TOP BAR SECTION ===== */
+.topBar {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  --side-offset: 56px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(30, 36, 48, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  gap: 2rem;
+}
+
+/* Profile Section */
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 0 0 auto;
+  margin-left: var(--side-offset);
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem 0.75rem 0rem;
+  height: clamp(54px, 7vw, 70px);
+}
+
+.profileAvatar {
+  width: clamp(60px, 9vw, 88px);
+  height: clamp(60px, 9vw, 88px);
+  border-radius: 50%;
+  background: #5c6b8a;
+  border: 3px solid #5c6b8a;
+  flex-shrink: 0;
+  margin-left: -20px;
+  margin-right: 0.75rem;
+  /* make circle overflow the pill */
+  margin-top: -20px;
+  margin-bottom: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 700;
+  color: #ffffff;
+  user-select: none;
+}
+
+.username {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: #e6eaf2;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+/* Resources Section */
+.resourcesSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-right: var(--side-offset);
+}
+
+.resourceBox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(92, 107, 138, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  min-width: 220px;
+  width: 220px;
+  transition: all 0.3s ease;
+  justify-content: flex-start;
+}
+
+.resourceBox:hover {
+  background: rgba(92, 107, 138, 0.8);
+  transform: translateY(-2px);
+}
+
+.coinIcon {
+  width: 45px;
+  height: 45px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tokenIcon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(59.54deg, #8f86aa 7.63%, #7e7599 50%, #4f4766 92.37%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0px 3px 6px rgba(74, 67, 95, 0.007);
+  flex-shrink: 0;
+}
+
+.tokenLetter {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 800;
+  background: linear-gradient(179.64deg, #f2c879 0.31%, #e6b85c 50%, #c99a3f 99.69%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resourceValue {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #e6eaf2;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plusButton {
+  background: transparent;
+  border: none;
+  color: #e6eaf2;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.plusButton:hover {
+  color: #f2c879;
+  transform: scale(1.1);
+}
+
+/* ===== BACK BUTTON ===== */
+.backButton {
+  position: absolute;
+  top: 190px;
+  left: 80px;
+  background: transparent;
+  border: none;
+  color: #e6eaf2;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  z-index: 50;
+  text-transform: uppercase;
+}
+
+.backButton:hover {
+  background: rgba(92, 107, 138, 0.6);
+  transform: translateX(-5px);
+}
+
+/* ===== MODE TITLE ===== */
+.modeTitle {
+  position: absolute;
+  top: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 100%;
+  text-align: center;
+}
+
+.modeTitle h2 {
+  margin: 0;
+  font-size: 3rem;
+  color: #e6eaf2;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* ===== MODE SELECTOR ===== */
+.modeSelector {
+  position: absolute;
+  top: 270px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2.75rem;
+  justify-content: center;
+  align-items: center;
+  width: 1800px;
+  padding: 2rem;
+}
+
+/* ===== GAME BUTTON ===== */
+.gameButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+
+  /* Sizing */
+  flex: 0 0 500px;
+  aspect-ratio: 3 / 4;
+  min-height: 664px;
+
+  /* Container */
+  padding: 2rem;
+  border: 20px solid #ffffff;
+  border-radius: 30px;
+
+  /* Visual */
+  background: linear-gradient(
+    48.01deg,
+    #f2c879 11.6%,
+    #ecc06b 30.8%,
+    #c99a3f 50%,
+    #e6b85c 69.2%,
+    #f2c879 88.4%
+  );
+
+  box-shadow:
+    0px 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0px 1px 2px rgba(255, 255, 255, 0.2);
+
+  /* Interaction */
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-family: 'Sora', sans-serif;
+
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+}
+
+.gameButton:hover {
+  transform: translateY(-10px) scale(1.06);
+  box-shadow:
+    0px 36px 32px rgba(0, 0, 0, 0.25),
+    0 0 40px rgba(255, 255, 255, 0.6),
+    0 0 80px rgba(255, 255, 255, 0.4);
+}
+
+/* ===== TEXT ===== */
+.buttonTitle {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1f2a44;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+
+.buttonSubtitle {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1f2a44;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Print Styles */
+@media print {
+  .container {
+    background: white;
+  }
+  
+  .topBar,
+  .backButton,
+  .gameButton {
+    display: none;
+  }
+}

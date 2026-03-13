@@ -17,6 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Blackjack Game",
   description: "Play a simple web-based Blackjack game built with Next.js.",
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({

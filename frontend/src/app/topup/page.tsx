@@ -255,23 +255,34 @@ export default function TopupPage() {
             </div>
 
             <button
-                onClick={() => router.back()}
-                style={{
-                    position: "absolute",
-                    top: "20px",
-                    left: "20px",
-                    padding: "8px 16px",
-                    background: "#e3c786",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                }}
-            >
+  onClick={() => router.push("/")}
+  style={{
+    position: "absolute",
+    top: "210px",
+    left: "30px",
+    padding: "16px 24px",
+    background: "#d4a74a",
+    border: "none",
+    borderRadius: "12px",
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+    fontSize: "14px",
+    transition: "all 0.2s ease"
+  }}
+  onMouseEnter={(e)=>{
+    e.currentTarget.style.transform="translateY(-2px)"
+    e.currentTarget.style.background="#f0d79b"
+  }}
+  onMouseLeave={(e)=>{
+    e.currentTarget.style.transform="translateY(0)"
+    e.currentTarget.style.background="#e3c786"
+  }}
+>
+
                 ← Lobby
             </button>
-            {/* heading placed outside gold box */}
+            
             <h1
     style={{
         textAlign: "center",

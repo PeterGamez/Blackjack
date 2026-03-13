@@ -39,13 +39,10 @@ export class Middleware {
         }
 
         const payload = c.get("jwtPayload");
-        const userId = payload.userId;
+        const { userId } = payload;
 
         const user = await UserModel.selectUser(userId);
-
-        if (user) {
-            c.set("authUser", user);
-        }
+        c.set("authUser", user);
 
         return user;
     }

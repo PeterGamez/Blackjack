@@ -1,7 +1,11 @@
-import { createServer, Server as HttpServer } from "http";
-import { Server as IOServer, Socket } from "socket.io";
-import Server from "../utils/Server";
-import GameSocket from "../socket/GameSocket";
+import type { Server as HttpServer } from "node:http";
+import { createServer } from "node:http";
+
+import type { Socket } from "socket.io";
+import { Server as IOServer } from "socket.io";
+
+import type Server from "../Server";
+import GameSocket from "../sockets/GameSocket";
 
 export default class SocketService {
     public static io: IOServer;
@@ -24,7 +28,7 @@ export default class SocketService {
         this.registerEvents();
 
         this.httpServer.listen(server.config.socket.port, () => {
-            server.log("Socket.IO", `Socket server running on port ${server.config.socket.port}`);
+            server.log("Socket.IO", `Socket server running at http://localhost:${server.config.socket.port}`);
         });
     }
 

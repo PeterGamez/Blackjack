@@ -1,5 +1,4 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { CodeHistoryInterface } from "../interfaces/Database";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 export default class CodeHistoryModel {
     private static table: string;
@@ -21,12 +20,23 @@ export default class CodeHistoryModel {
         }
     }
 
-    public static async selectCodeHistoryByUserId(userId: number): Promise<CodeHistoryInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE userId = ?`;
+    public static async selectCodeHistoryCountByCodeId(codeId: number): Promise<number> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [userId]);
-            return rows as CodeHistoryInterface[];
+            const [rows] = await connection.execute(sql, [codeId]);
+            return rows[0].count;
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async isRedeemCodeHistoryByCodeIdAndUserId(codeId: number, userId: number): Promise<boolean> {
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND userId = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [codeId, userId]);
+            return rows[0].count > 0;
         } finally {
             connection.release();
         }

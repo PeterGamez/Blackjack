@@ -26,7 +26,12 @@ const config = {
     useTabs: false,
 
     requirePragma: false,
-    insertPragma: false
+    insertPragma: false,
+
+    plugins: ["@trivago/prettier-plugin-sort-imports"],
+    importOrder: ["<BUILTIN_MODULES>", "<THIRD_PARTY_MODULES>", "^[./]"],
+    importOrderSeparation: true,
+    importOrderSortSpecifiers: true
 };
 
 module.exports = config;

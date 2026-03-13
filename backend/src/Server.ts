@@ -1,39 +1,26 @@
-import { Pool } from "mysql2/promise";
-import config from "../config";
-import Redis from "ioredis";
-import UserModel from "../models/UserModel";
-import RedisService from "../services/RedisService";
-import Email from "./Email";
-import JWT from "./JWT";
-import Password from "./Password";
-import SocketService from "../services/SocketService";
-import UserSkinModel from "../models/UserSkinModels";
-import CodeHistoryModel from "../models/CodeHistoryModel";
-import CodeModel from "../models/CodeModel";
-import GameHistoryModel from "../models/GameHistoryModel";
-import PaymentModel from "../models/PaymentModel";
+import type Redis from "ioredis";
+import type { Pool } from "mysql2/promise";
+
+import config from "./config";
+import { Blackjack } from "./game/Blackjack";
+import { Email, SlipOK, Truemoney } from "./integrations";
+import Middleware from "./middlewares";
+import { JWT, Password } from "./security";
 
 export default class Server {
     public config = config;
     public DB: Pool;
     public Redis: Redis;
+    public Middleware = new Middleware(this);
+
     public Email = new Email(this);
     public JWT = new JWT();
     public Password = new Password();
 
-    public initModels() {
-        CodeHistoryModel.init(this.config.mysql.table.codeHistory, this.DB);
-        CodeModel.init(this.config.mysql.table.code, this.DB);
-        GameHistoryModel.init(this.config.mysql.table.gameHistory, this.DB);
-        PaymentModel.init(this.config.mysql.table.payment, this.DB);
-        UserModel.init(this.config.mysql.table.user, this.DB);
-        UserSkinModel.init(this.config.mysql.table.userSkin, this.DB);
-    }
+    public SlipOK = new SlipOK(this);
+    public Truemoney = new Truemoney(this);
 
-    public initServices() {
-        RedisService.init(this.Redis);
-        SocketService.init(this);
-    }
+    public Blackjack = new Blackjack();
 
     public customLogger(message: string, ...rest: string[]) {
         this.log("REST", `${message} ${rest.join(" ")}`);
@@ -44,11 +31,13 @@ export default class Server {
         if (key.length < 20) key = key.padEnd(20, " ");
         console.log(`[${this.formatDate(new Date())}] ${key} : ${message}`);
     }
+
     public warn(key: string, message: string) {
         key = `${key}`;
         if (key.length < 20) key = key.padEnd(20, " ");
         console.warn(`[${this.formatDate(new Date())}] ${key} : ${message}`);
     }
+
     public error(key: string, message: string) {
         key = `${key}`;
         if (key.length < 20) key = key.padEnd(20, " ");

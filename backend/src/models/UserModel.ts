@@ -1,6 +1,7 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
-import { UserInterface } from "../interfaces/Database";
-import { UserType } from "../interfaces/Type";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
+
+import type { UserInterface } from "../interfaces/Database";
+import type { CurrencyType, UserType } from "../interfaces/Type";
 
 export default class UserModel {
     private static table: string;
@@ -33,6 +34,17 @@ export default class UserModel {
         }
     }
 
+    public static async selectAllUser(): Promise<UserInterface[]> {
+        const sql = `SELECT * FROM ${this.table}`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql);
+            return rows as UserInterface[];
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async selectUserByUsernameOrEmail(user: string): Promise<UserInterface> {
         const sql = `SELECT * FROM ${this.table} WHERE username = ? OR email = ?`;
         const connection = await this.DB.getConnection();
@@ -55,22 +67,31 @@ export default class UserModel {
         }
     }
 
-    public static async verifyEmail(email: string): Promise<boolean> {
-        const sql = `UPDATE ${this.table} SET isVerified = true WHERE email = ?`;
-        const connection = await this.DB.getConnection();
-        try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [email]);
-            return result.affectedRows > 0;
-        } finally {
-            connection.release();
-        }
-    }
-
     public static async updateUser<T extends keyof UserType>(id: number, type: T, value: UserType[T]): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async increaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [amount, id]);
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async decreaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} - ? WHERE id = ? AND ${type} >= ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [amount, id, amount]);
         } finally {
             connection.release();
         }

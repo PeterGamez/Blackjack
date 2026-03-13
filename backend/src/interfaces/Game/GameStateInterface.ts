@@ -1,6 +1,6 @@
-import { GameType, GameCurrency } from "./GameType";
+import type { GameCurrency, GameType } from "./GameType";
 
-export interface GameState {
+export interface GameStateInterface {
     gameId: number;
     userId: number;
     gameType: GameType;
@@ -11,7 +11,7 @@ export interface GameState {
     dealerHand: string;
     playerValue: number;
     dealerValue: number;
-    result: "win" | "lose" | "push" | "pending";
+    result: "win" | "lose" | "draw" | "pending";
     reward: number;
     deck: string;
     createdAt: number;

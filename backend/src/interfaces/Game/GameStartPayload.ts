@@ -1,4 +1,4 @@
-import { GameType } from "./GameType";
+import type { GameType } from "./GameType";
 
 export interface GameStartPayload {
     userId: number;

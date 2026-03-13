@@ -1,8 +1,8 @@
-import { InterfaceBase } from "./InterfaceBase";
+import type { InterfaceBase } from "./InterfaceBase";
 
 export interface PaymentInterface extends InterfaceBase {
     userId: number;
     receiptRef: string;
+    type: "bank" | "truemoney";
     amount: number;
-    currencyType: "tokens" | "coins";
 }

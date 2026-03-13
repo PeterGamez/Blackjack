@@ -1,10 +1,12 @@
-import crypto from "crypto";
-import RedisService from "../services/RedisService";
-import nodemailer from "nodemailer";
-import { EmailVerificationData } from "../interfaces/Cache";
-import Server from "./Server";
+import crypto from "node:crypto";
 
-export default class Email {
+import nodemailer from "nodemailer";
+
+import type Server from "../Server";
+import type { EmailVerificationData } from "../interfaces/Cache";
+import RedisService from "../services/RedisService";
+
+export class Email {
     private readonly PREFIX_VERIFY = "email:verify:";
     private readonly PREFIX_RESET = "email:reset:";
 
@@ -16,9 +18,8 @@ export default class Email {
         return `
             <h1>Email Verification</h1>
             <p>Thank you for registering! Please click the link below to verify your email address:</p>
-            <a href="${verificationUrl}">Verify Email</a>
-            <p>${verificationUrl}</p>
-            <p>This link will expire in ${this.server.config.email.verifyExpiresIn} hours.</p>
+            <a href="${verificationUrl}">${verificationUrl}</a>
+            <p>This link will expire in ${this.server.config.email.verifyExpiresIn} minutes.</p>
             <p>If you did not create an account, please ignore this email.</p>
         `;
     }
@@ -27,8 +28,7 @@ export default class Email {
         return `
             <h1>Password Reset</h1>
             <p>You requested a password reset. Please click the link below to reset your password:</p>
-            <a href="${resetUrl}">Reset Password</a>
-            <p>${resetUrl}</p>
+            <a href="${resetUrl}">${resetUrl}</a>
             <p>This link will expire in ${this.server.config.email.resetPasswordExpiresIn} minutes.</p>
             <p>If you did not request a password reset, please ignore this email.</p>
         `;
@@ -64,7 +64,7 @@ export default class Email {
         });
     }
 
-    public async verifyEmail(token: string): Promise<{ userId: number; email: string } | null> {
+    public async verifyEmail(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX_VERIFY}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);
@@ -93,7 +93,7 @@ export default class Email {
         });
     }
 
-    public async verifyPasswordReset(token: string): Promise<{ userId: number; email: string } | null> {
+    public async verifyPasswordReset(token: string): Promise<{ userId: number; email: string }> {
         const key = `${this.PREFIX_RESET}${token}`;
 
         const value = await RedisService.hgetall<EmailVerificationData>(key);

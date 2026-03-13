@@ -1,8 +1,9 @@
-import { createPool } from "mysql2/promise";
-import Server from "../utils/Server";
 import Redis from "ioredis";
+import { createPool } from "mysql2/promise";
 
-export default async (server: Server) => {
+import type Server from "../Server";
+
+export async function databaseHandler(server: Server) {
     const pool = createPool({
         host: server.config.mysql.host,
         port: server.config.mysql.port,
@@ -51,4 +52,4 @@ export default async (server: Server) => {
     });
 
     return true;
-};
+}

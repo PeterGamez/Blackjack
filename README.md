@@ -238,104 +238,73 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-AUTH-01 | `POST` | `/auth/register` | `{username, email, password}` | None | สมัครสมาชิก ส่งอีเมลยืนยัน |
-| API-AUTH-02 | `POST` | `/auth/verify` | `${token}` | None | ยืนยันอีเมลด้วย parameter token |
+| API-AUTH-02 | `POST` | `/auth/verify` | `{token}` | None | ยืนยันอีเมลด้วย token ใน body |
 | API-AUTH-03 | `POST` | `/auth/login` | `{username, password}` | None | เข้าสู่ระบบ คืน access token และ refresh token |
 | API-AUTH-04 | `POST` | `/auth/refresh` | `{refreshToken}` | None | รีเฟรช access token ด้วย refresh token |
 | API-AUTH-05 | `POST` | `/auth/reset-password` | `{email}` | None | ขอรีเซ็ตรหัสผ่าน ส่งลิงก์ไปยังอีเมล |
-| API-AUTH-06 | `POST` | `/auth/reset-password/verify` | `{token, newPassword}` | None | ยืนยัน token และตั้งรหัสผ่านใหม่ |
+| API-AUTH-06 | `POST` | `/auth/reset-password/verify` | `{token, password}` | None | ยืนยัน token และตั้งรหัสผ่านใหม่ |
 
 #### 4.2.2 User Profile API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Skin ที่มี |
-| API-USER-02 | `GET` | `/user/stats` | None | Bearer | ดึงสถิติการเล่นของผู้ใช้ เช่น จำนวนเกม ชนะ/แพ้ Rank score |
-| API-USER-03 | `PATCH` | `/user/profile` | `{avatar?, password?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
-| API-USER-04 | `GET` | `/user/transactions` | None | Bearer | ดึงประวัติธุรกรรม Coin และ Token ของผู้ใช้ |
-| API-USER-05 | `GET` | `/user/history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ พร้อมผลแพ้ชนะและเงินที่ได้รับ |
+| API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
+| API-USER-02 | `PATCH` | `/user/me` | `{password?}` | Bearer | อัปเดตรหัสผ่านผู้ใช้ |
+| API-USER-03 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
+| API-USER-04 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
 
-#### 4.2.3 Lobby & Mode API
-
-| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
-|----|--------|----------|------|------|----------|
-| API-LOBBY-01 | `GET` | `/lobby/modes` | None | Bearer | ดึงรายการโหมดเกมที่รองรับ เช่น QuickPlay และ Rank Mode พร้อมรายละเอียด |
-| API-LOBBY-02 | `GET` | `/lobby/leaderboard` | None | Bearer | ดึงอันดับผู้เล่นสูงสุดจากคะแนน Rank หรือ Token |
-
-#### 4.2.4 Matchmaking API
+#### 4.2.3 Code API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-MATCH-01 | `POST` | `/match/find` | `{mode, betAmount}` | Bearer | เริ่มค้นหาคู่แข่งตามโหมดและจำนวนเดิมพันที่เลือก |
-| API-MATCH-02 | `POST` | `/match/cancel` | `{matchId}` | Bearer | ยกเลิกการค้นหาคู่แข่งที่กำลังรอ |
-| API-MATCH-03 | `GET` | `/match/status` | None | Bearer | ดึงสถานะการจับคู่ปัจจุบันของผู้ใช้ |
+| API-CODE-01 | `POST` | `/code/redeem` | `{code}` | Bearer | redeem code เพื่อรับรางวัล |
 
-#### 4.2.5 Payment API
+#### 4.2.4 Payment API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-PAYMENT-01 | `POST` | `/payment/purchase` | `{amount, method}` | Bearer | เติม Token เข้าบัญชีผู้ใช้ผ่านช่องทางชำระเงินที่เลือก |
+| API-PAYMENT-01 | `GET` | `/payment/packages` | None | Bearer | ดึงรายการแพ็กเกจเติมเงินทั้งหมด |
+| API-PAYMENT-02 | `POST` | `/payment/bank` | `{image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
+| API-PAYMENT-03 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
 
-#### 4.2.6 Skin System API
+#### 4.2.5 Shop API
 
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
-| API-SKIN-01 | `GET` | `/skin/list` | None | Bearer | ดึงรายการ Skin ทั้งหมดที่มีในร้านค้า พร้อมราคาและประเภท |
-| API-SKIN-02 | `POST` | `/skin/buy` | `{skinId}` | Bearer | ซื้อ Skin ด้วย Coin หรือ Token และเพิ่มเข้า Inventory |
+| API-SHOP-01 | `GET` | `/shop/list` | None | Bearer | ดึงรายการสินค้าทั้งหมดในร้านค้า |
+| API-SHOP-02 | `POST` | `/shop/buy` | `{productId, payment}` | Bearer | ซื้อสินค้า และเพิ่มลง Inventory |
+
+#### 4.2.6 Admin API
+
+> ทุก endpoint ต้องการ Bearer token ของผู้ใช้ที่มี role `admin`
+
+| ID | Method | Endpoint | Body | Auth | คำอธิบาย |
+|----|--------|----------|------|------|----------|
+| API-ADMIN-01 | `GET` | `/admin/users` | None | Bearer | ดึงรายชื่อผู้ใช้ทั้งหมดในระบบ |
+| API-ADMIN-02 | `GET` | `/admin/user/:id` | None | Bearer | ดึงข้อมูลผู้ใช้รายบุคคลตาม ID |
+| API-ADMIN-03 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
+| API-ADMIN-04 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
+| API-ADMIN-05 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |
 
 ### 4.3 Socket.IO Events
 
-#### 4.3.1 Table Socket Events
+#### 4.3.1 Game Socket Events
 
 **Client → Server**
 
 | Event | Payload | Ack | คำอธิบาย |
 |-------|---------|-----|----------|
-| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าร่วมโต๊ะ |
-| `room:leave` | `tableId: string` | `{ ok, message? }` | ออกจากโต๊ะ |
-| `room:message` | `{ tableId, data }` | `{ ok, message? }` | ส่งข้อมูลไปยังผู้เล่นในโต๊ะ |
+| `game:start` | `{ userId, gameType, bet }` | `{ ok, gameId, playerHand, dealerHand, playerValue, dealerValue, bet, currency, balance, blackjack?, dealerBlackjack?, result?, reward? }` | เริ่มเกม วาง bet และรับไพ่เริ่มต้น |
+| `game:hit` | `{ gameId, userId }` | `{ ok, playerHand, playerValue, bust }` หรือ `{ ok, ...finishedPayload, bust: false }` | จั่วไพ่เพิ่ม |
+| `game:stand` | `{ gameId, userId }` | `{ ok, gameId, playerHand, dealerHand, playerValue, dealerValue, result, reward, currency, balance }` | หยุดจั่ว ให้ Dealer เปิดไพ่ |
+| `game:leave` | `{ gameId, userId }` | `{ ok }` | ออกจากห้องเกม |
 
 **Server → Client**
 
 | Event | Payload | คำอธิบาย |
 |-------|---------|----------|
-| `room:state` | `{ tableId, members[] }` | สถานะห้องปัจจุบัน (broadcast ทุกคนในห้อง) |
-| `room:player-joined` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นเข้าร่วม |
-| `room:player-left` | `{ tableId, socketId }` | แจ้งเมื่อมีผู้เล่นออก |
-| `room:data` | `{ tableId, from, data }` | ข้อมูลที่ผู้เล่นส่งมา (relay) |
-
-#### 4.3.2 Gameplay Socket Events (Socket.IO)
-
-**Client → Server**
-
-| Event | Payload | Ack | คำอธิบาย |
-|-------|---------|-----|----------|
-| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าร่วมโต๊ะเกม |
-| `room:message` | `{ tableId, data: { action } }` | `{ ok, message? }` | ส่ง action ของผู้เล่น เช่น Hit, Stand |
-
-**Server → Client**
-
-| Event | Payload | คำอธิบาย |
-|-------|---------|----------|
-| `room:state` | `{ tableId, members[] }` | สถานะห้อง |
-| `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลลัพธ์ |
-
-#### 4.3.3 Spectator Socket Events (Socket.IO)
-
-**Client → Server**
-
-| Event | Payload | Ack | คำอธิบาย |
-|-------|---------|-----|----------|
-| `room:join` | `tableId: string` | `{ ok, message? }` | เข้าชมโต๊ะในฐานะ Viewer |
-| `room:leave` | `tableId: string` | `{ ok, message? }` | ออกจากโต๊ะ |
-| `room:message` | `{ tableId, data: { bet, side } }` | `{ ok, message? }` | ส่งข้อมูลการเดิมพันของ Viewer |
-
-**Server → Client**
-
-| Event | Payload | คำอธิบาย |
-|-------|---------|----------|
-| `room:state` | `{ tableId, members[] }` | สถานะห้อง |
-| `room:player-joined` | `{ tableId, socketId }` | มี Viewer เข้าร่วม |
-| `room:player-left` | `{ tableId, socketId }` | Viewer ออกจากห้อง |
-| `room:data` | `{ tableId, from, data }` | อัปเดตสถานะเกม / ผลเดิมพัน |
+| `game:player-hit` | `{ playerHand, playerValue }` | broadcast เมื่อผู้เล่นจั่วไพ่ (ยังไม่จบ) |
+| `game:bust` | `{ playerHand, playerValue }` | broadcast เมื่อผู้เล่น bust (> 21) |
+| `game:finished` | `{ gameId, playerHand, dealerHand, playerValue, dealerValue, result, reward, currency, balance }` | broadcast เมื่อเกมจบ |
 
 ---

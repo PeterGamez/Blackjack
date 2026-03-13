@@ -11,7 +11,8 @@ export default {
     },
 
     auth: {
-        jwtSecret: process.env.JWT_SECRET || "change-me-to-a-secret-key",
+        accessTokenSecret: process.env.JWT_ACCESS_TOKEN_SECRET || "default_access_token_secret",
+        refreshTokenSecret: process.env.JWT_REFRESH_TOKEN_SECRET || "default_refresh_token_secret",
         accessTokenTtl: "1h",
         refreshTokenTtl: "24h",
     },
@@ -26,8 +27,17 @@ export default {
         },
         from: process.env.EMAIL_FROM || "",
 
-        verifyExpiresIn: 24, // hours
-        resetPasswordExpiresIn: 15, // minutes
+        verifyExpiresIn: 30, // minutes
+        resetPasswordExpiresIn: 30, // minutes
+    },
+
+    slipok: {
+        branch: process.env.SLIPOK_BRANCH || "",
+        authorization: process.env.SLIPOK_AUTHORIZATION || "",
+    },
+
+    truemoney: {
+        phone: process.env.TRUEMONEY_PHONE || "",
     },
 
     mysql: {
@@ -41,9 +51,11 @@ export default {
             codeHistory: "codeHistory",
             code: "code",
             gameHistory: "gameHistory",
+            package: "package",
             payment: "payment",
+            product: "product",
             user: "user",
-            userSkin: "userSkin",
+            userInventory: "userInventory",
         },
     },
 

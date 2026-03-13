@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 03, 2026 at 09:44 AM
+-- Generation Time: Mar 11, 2026 at 09:01 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
--- PHP Version: 8.2.29
+-- PHP Version: 8.2.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -67,6 +67,23 @@ CREATE TABLE `gameHistory` (
   `mode` varchar(255) NOT NULL,
   `bet` int(11) NOT NULL DEFAULT 0,
   `reward` int(11) NOT NULL DEFAULT 0,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `package`
+--
+
+CREATE TABLE `package` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `price` int(11) NOT NULL,
+  `tokens` int(11) NOT NULL,
+  `isActive` tinyint(1) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -140,6 +157,12 @@ ALTER TABLE `codeHistory`
 -- Indexes for table `gameHistory`
 --
 ALTER TABLE `gameHistory`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `package`
+--
+ALTER TABLE `package`
   ADD PRIMARY KEY (`id`);
 
 --

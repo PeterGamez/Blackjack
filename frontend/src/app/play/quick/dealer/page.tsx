@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import config from "../../../../config"
+import UserService from "../../../../lib/UserService"
 import { io, Socket } from "socket.io-client"
-import { getCardImagePath, getCardBackImage } from "../../../utils/cardUtils"
+import { getCardImagePath, getCardBackImage } from "../../../../lib/cardUtils"
 
 interface Card {
   suit: string
@@ -135,77 +136,71 @@ export default function Dealer() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    if (!token) { router.push("/auth"); return }
-
     const cachedCoins = localStorage.getItem("cached_coins")
     if (cachedCoins) setPlayerChips(Number(cachedCoins))
 
     ;(async () => {
-      try {
-        const res = await fetch(`${config.apiUrl}/user/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        if (res.ok) {
-          const data = await res.json()
-          setUserId(data.id)
-          setUsername(data.username || data.name || "username")
-          setPlayerChips(data.coins ?? Number(cachedCoins ?? 0))
-          localStorage.setItem("userId", data.id.toString())
-        }
-      } catch { /* ignore */ }
+      const userData = await UserService.getUser()
+      if (!userData) { router.push("/auth"); return }
+
+      setUserId(userData.id)
+      setUsername(userData.username || "username")
+      setPlayerChips(userData.coins ?? Number(cachedCoins ?? 0))
+      localStorage.setItem("userId", userData.id.toString())
+
+      const token = UserService.getAccessToken()
+      const socket = io(config.socketUrl, {
+        reconnection: true,
+        reconnectionAttempts: 5,
+        auth: { token },
+      })
+
+      socket.on("connect", () => console.log("Socket connected"))
+
+      socket.on("game:player-hit", (data: { playerHand: Card[]; playerValue: number }) => {
+        setPlayerHand(data.playerHand)
+        startTimer()
+      })
+
+      socket.on("game:bust", (data: { playerHand: Card[]; playerValue: number }) => {
+        stopTimer()
+        setPlayerHand(data.playerHand)
+        setResult("BUST! Dealer wins")
+        setGameStatus("game-over")
+        setIsLoading(false)
+      })
+
+      socket.on("game:finished", (data: {
+        playerHand: Card[]
+        dealerHand: Card[]
+        playerValue: number
+        dealerValue: number
+        result: "win" | "lose" | "push"
+        reward: number
+        balance?: number
+        coins?: number
+      }) => {
+        stopTimer()
+        setPlayerHand(data.playerHand)
+        setDealerHand(data.dealerHand)
+        const msg = data.result === "win" ? "You win! 🎉" : data.result === "push" ? "Push!" : "Dealer wins"
+        setResult(msg)
+        const nextChips = typeof data.balance === "number"
+          ? data.balance
+          : typeof data.coins === "number"
+            ? data.coins
+            : playerChips
+        setPlayerChips(nextChips)
+        localStorage.setItem("cached_coins", nextChips.toString())
+        setGameStatus("game-over")
+        setIsLoading(false)
+      })
+
+      socket.on("disconnect", () => console.log("Socket disconnected"))
+
+      socketRef.current = socket
     })()
 
-    const socket = io(config.socketUrl, {
-      reconnection: true,
-      reconnectionAttempts: 5,
-      auth: { token },
-    })
-
-    socket.on("connect", () => console.log("Socket connected"))
-
-    socket.on("game:player-hit", (data: { playerHand: Card[]; playerValue: number }) => {
-      setPlayerHand(data.playerHand)
-      startTimer()
-    })
-
-    socket.on("game:bust", (data: { playerHand: Card[]; playerValue: number }) => {
-      stopTimer()
-      setPlayerHand(data.playerHand)
-      setResult("BUST! Dealer wins")
-      setGameStatus("game-over")
-      setIsLoading(false)
-    })
-
-    socket.on("game:finished", (data: {
-      playerHand: Card[]
-      dealerHand: Card[]
-      playerValue: number
-      dealerValue: number
-      result: "win" | "lose" | "push"
-      reward: number
-      balance?: number
-      coins?: number
-    }) => {
-      stopTimer()
-      setPlayerHand(data.playerHand)
-      setDealerHand(data.dealerHand)
-      const msg = data.result === "win" ? "You win! 🎉" : data.result === "push" ? "Push!" : "Dealer wins"
-      setResult(msg)
-      const nextChips = typeof data.balance === "number"
-        ? data.balance
-        : typeof data.coins === "number"
-          ? data.coins
-          : playerChips
-      setPlayerChips(nextChips)
-      localStorage.setItem("cached_coins", nextChips.toString())
-      setGameStatus("game-over")
-      setIsLoading(false)
-    })
-
-    socket.on("disconnect", () => console.log("Socket disconnected"))
-
-    socketRef.current = socket
     return () => { stopTimer(); socketRef.current?.disconnect() }
   }, [])
 

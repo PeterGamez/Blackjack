@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import config from "../../config"
+import UserService from "../../lib/UserService"
 import styles from "./play.module.css"
 
 export default function Home() {
@@ -18,15 +18,11 @@ export default function Home() {
   // load profile from backend
   const loadProfile = async () => {
     try {
-      const token = localStorage.getItem("accessToken")
-      if (!token) return
-      const res = await fetch(`${config.apiUrl}/user/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (!res.ok) return
-      const data = await res.json()
+      const data = await UserService.getUser()
+      if (!data) {
+        router.replace("/auth")
+        return
+      }
       setUsername(data.username || "")
       if (typeof data.coins === "number") {
         setCoins(data.coins)
@@ -41,12 +37,6 @@ export default function Home() {
 
   // load cache from localStorage on mount
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    if (!token) {
-      router.replace("/auth")
-      return
-    }
-
     const cachedUsername = localStorage.getItem("cached_username")
     const cachedCoins = localStorage.getItem("cached_coins")
     const cachedTokens = localStorage.getItem("cached_tokens")

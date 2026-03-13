@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import UserService from "../../lib/UserService"
 
 export default function Skin() {
   const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    if (!token) router.replace("/auth")
+    UserService.getUser().then((user) => {
+      if (!user) router.replace("/auth")
+    })
   }, [router])
 
   return (

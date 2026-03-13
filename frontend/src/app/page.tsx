@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import UserService from "../services/UserService"
+import UserService from "../lib/UserService"
 
 export default function Home() {
   const router = useRouter()

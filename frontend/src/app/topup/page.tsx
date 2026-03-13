@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import config from "../../config"
+import UserService from "../../lib/UserService"
 
 interface Package {
     tokens: number
@@ -29,15 +30,11 @@ export default function TopupPage() {
 
     const loadProfile = async () => {
         try {
-            const token = localStorage.getItem("accessToken")
-            if (!token) return
-            const res = await fetch(`${config.apiUrl}/user/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            if (!res.ok) return
-            const data = await res.json()
+            const data = await UserService.getUser()
+            if (!data) {
+                router.replace("/auth")
+                return
+            }
             setUsername(data.username || "")
             if (typeof data.coins === "number") {
                 setCoins(data.coins)
@@ -51,12 +48,6 @@ export default function TopupPage() {
     }
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken")
-        if (!accessToken) {
-            router.replace("/auth")
-            return
-        }
-
         const cached = localStorage.getItem("cached_tokens")
         if (cached) {
             setTokens(Number(cached))
@@ -81,7 +72,7 @@ export default function TopupPage() {
         setError(null)
         setLoading(true)
         try {
-            const token = localStorage.getItem("accessToken")
+            const token = UserService.getAccessToken()
             if (!token) {
                 router.replace("/auth")
                 return

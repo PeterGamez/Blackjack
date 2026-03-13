@@ -2,19 +2,17 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
+import UserService from "../../../lib/UserService"
 
 export default function Qmode() {
   const router = useRouter()
   const [hovered, setHovered] = useState<string | null>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    if (!token) {
-      router.replace("/auth")
-    } else {
-      // this index is no longer used; always bounce back to main 'play' screen
-      router.replace("/play")
-    }
+    UserService.getUser().then((user) => {
+      if (!user) router.replace("/auth")
+      else router.replace("/play")
+    })
   }, [])
 
   const buttonStyle = (name: string) => ({

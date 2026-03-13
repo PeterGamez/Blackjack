@@ -2,35 +2,20 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-
-interface User {
-  username: string
-  email: string
-  role: string
-}
+import UserService from "../../lib/UserService"
 
 export default function ProfilePage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<{ username: string; email: string; role: string } | null>(null)
 
   useEffect(() => {
-    const stored = localStorage.getItem("user")
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored))
-      } catch {
-        setUser(null)
-      }
-    }
+    UserService.getUser().then((data) => {
+      if (data) setUser(data)
+    })
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    localStorage.removeItem("user")
-    localStorage.removeItem("cached_username")
-    localStorage.removeItem("cached_coins")
-    localStorage.removeItem("cached_tokens")
+    UserService.logout()
     router.push("/auth")
   }
 

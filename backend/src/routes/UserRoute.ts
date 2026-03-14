@@ -59,22 +59,31 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            let body: { password?: string };
+            let body: { password?: string, cardId?: number, chipId?: number, themeId?: number };
             try {
                 body = await c.req.parseBody();
             } catch {
                 return c.json({ error: "Invalid request body" }, 400);
             }
 
-            const { password } = body;
+            const { password, cardId, chipId, themeId } = body;
 
-            if (!password) {
+            if (!password && !cardId && !chipId && !themeId) {
                 return c.json({ error: "Missing fields to update" }, 400);
             }
 
             if (password) {
                 const hashedPassword = await this.server.Password.hash(password);
                 await UserModel.updateUser(user.id, "password", hashedPassword);
+            }
+            if (cardId) {
+                await UserModel.updateUser(user.id, "cardId", cardId);
+            }
+            if (chipId) {
+                await UserModel.updateUser(user.id, "chipId", chipId);
+            }
+            if (themeId) {
+                await UserModel.updateUser(user.id, "themeId", themeId);
             }
 
             return c.json({ ok: true });

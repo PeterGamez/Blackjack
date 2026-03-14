@@ -1,110 +1,110 @@
-import config from "../config"
-import { UserInterface } from "../interfaces/API/UserInterface"
-import LocalStorage from "./LocalStorage"
-import SessionStorage from "./SessionStorage"
+import config from "../config";
+import { UserInterface } from "../interfaces/API/UserInterface";
+import LocalStorage from "./LocalStorage";
+import SessionStorage from "./SessionStorage";
 
 export default class UserService {
-    public static async login(username: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
-        const res = await fetch(`${config.apiUrl}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || "Login failed")
-        SessionStorage.setItem("accessToken", data.accessToken)
-        LocalStorage.setItem("refreshToken", data.refreshToken)
-        return data
+  public static async login(username: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const res = await fetch(`${config.apiUrl}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Login failed");
+    SessionStorage.setItem("accessToken", data.accessToken);
+    LocalStorage.setItem("refreshToken", data.refreshToken);
+    return data;
+  }
+
+  public static logout() {
+    SessionStorage.removeItem("accessToken");
+    LocalStorage.removeItem("refreshToken");
+
+    SessionStorage.removeItem("cached_username");
+    SessionStorage.removeItem("cached_coins");
+    SessionStorage.removeItem("cached_tokens");
+  }
+
+  public static async register(username: string, email: string, password: string): Promise<void> {
+    const res = await fetch(`${config.apiUrl}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Register failed");
+  }
+
+  public static async getUser(): Promise<UserInterface | null> {
+    let token = SessionStorage.getItem("accessToken");
+
+    if (!token) {
+      const hasRefreshed = await this.refreshAccessToken();
+      if (!hasRefreshed) return null;
+      token = SessionStorage.getItem("accessToken");
     }
 
-    public static logout() {
-        SessionStorage.removeItem("accessToken")
-        LocalStorage.removeItem("refreshToken")
+    if (token) {
+      try {
+        const res = await fetch(`${config.apiUrl}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        SessionStorage.removeItem("cached_username")
-        SessionStorage.removeItem("cached_coins")
-        SessionStorage.removeItem("cached_tokens")
-    }
-
-    public static async register(username: string, email: string, password: string): Promise<void> {
-        const res = await fetch(`${config.apiUrl}/auth/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || "Register failed")
-    }
-
-    public static async getUser(): Promise<UserInterface | null> {
-        let token = SessionStorage.getItem("accessToken")
-
-        if (!token) {
-            const hasRefreshed = await this.refreshAccessToken()
-            if (!hasRefreshed) return null
-            token = SessionStorage.getItem("accessToken")
+        if (res.ok) {
+          return await res.json();
         }
 
-        if (token) {
-            try {
-                const res = await fetch(`${config.apiUrl}/user/me`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
+        if (res.status === 401) {
+          SessionStorage.removeItem("accessToken");
 
-                if (res.ok) {
-                    return await res.json()
-                }
+          const hasRefreshed = await this.refreshAccessToken();
+          if (hasRefreshed) {
+            const newToken = SessionStorage.getItem("accessToken");
 
-                if (res.status === 401) {
-                    SessionStorage.removeItem("accessToken")
+            const retryRes = await fetch(`${config.apiUrl}/user/me`, {
+              headers: { Authorization: `Bearer ${newToken}` },
+            });
 
-                    const hasRefreshed = await this.refreshAccessToken()
-                    if (hasRefreshed) {
-                        const newToken = SessionStorage.getItem("accessToken")
-
-                        const retryRes = await fetch(`${config.apiUrl}/user/me`, {
-                            headers: { Authorization: `Bearer ${newToken}` },
-                        })
-
-                        if (retryRes.ok) return await retryRes.json()
-                    }
-                }
-            } catch (error) {
-                console.error("Fetch user error:", error)
-            }
+            if (retryRes.ok) return await retryRes.json();
+          }
         }
-
-        return null
+      } catch (error) {
+        console.error("Fetch user error:", error);
+      }
     }
 
-    private static async refreshAccessToken(): Promise<boolean> {
-        const refreshToken = LocalStorage.getItem("refreshToken")
-        if (!refreshToken) return false
+    return null;
+  }
 
-        try {
-            const refreshRes = await fetch(`${config.apiUrl}/auth/refresh`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ refreshToken }),
-            })
+  private static async refreshAccessToken(): Promise<boolean> {
+    const refreshToken = LocalStorage.getItem("refreshToken");
+    if (!refreshToken) return false;
 
-            if (refreshRes.ok) {
-                const refreshData = await refreshRes.json()
+    try {
+      const refreshRes = await fetch(`${config.apiUrl}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-                SessionStorage.setItem("accessToken", refreshData.accessToken)
+      if (refreshRes.ok) {
+        const refreshData = await refreshRes.json();
 
-                if (refreshData.refreshToken) {
-                    LocalStorage.setItem("refreshToken", refreshData.refreshToken)
-                }
+        SessionStorage.setItem("accessToken", refreshData.accessToken);
 
-                return true
-            } else {
-                LocalStorage.removeItem("refreshToken")
-                return false
-            }
-        } catch (error) {
-            console.error("Refresh token error:", error)
-            return false
+        if (refreshData.refreshToken) {
+          LocalStorage.setItem("refreshToken", refreshData.refreshToken);
         }
+
+        return true;
+      } else {
+        LocalStorage.removeItem("refreshToken");
+        return false;
+      }
+    } catch (error) {
+      console.error("Refresh token error:", error);
+      return false;
     }
+  }
 }

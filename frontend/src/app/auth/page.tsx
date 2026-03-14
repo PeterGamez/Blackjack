@@ -1,126 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import UserService from "../../lib/UserService"
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function AuthPage() {
-  const router = useRouter()
-  const [tab, setTab] = useState<"login" | "register">("login")
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left")
+import UserService from "../../lib/UserService";
 
-  // Login state
-  const [loginUsername, setLoginUsername] = useState("")
-  const [loginPassword, setLoginPassword] = useState("")
-  const [loginError, setLoginError] = useState("")
-  const [loginLoading, setLoginLoading] = useState(false)
-  const [showLoginPassword, setShowLoginPassword] = useState(false)
-
-  // Register state
-  const [regUsername, setRegUsername] = useState("")
-  const [regEmail, setRegEmail] = useState("")
-  const [regPassword, setRegPassword] = useState("")
-  const [regConfirm, setRegConfirm] = useState("")
-  const [regMessage, setRegMessage] = useState("")
-  const [regLoading, setRegLoading] = useState(false)
-  const [showRegPassword, setShowRegPassword] = useState(false)
-  const [showRegConfirm, setShowRegConfirm] = useState(false)
-  const [hoveredBtn, setHoveredBtn] = useState<string | null>(null)
-  const [isBackHovered, setIsBackHovered] = useState(false)
-
-  const switchTab = (nextTab: "login" | "register") => {
-    if (nextTab === tab) return
-    setSlideDirection(nextTab === "register" ? "left" : "right")
-    setTab(nextTab)
-  }
-
-  const goldGradient = "linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%)"
-  const btnStyle = (key: string, disabled: boolean): React.CSSProperties => ({
-    border: "none",
-    borderRadius: "50px",
-    color: "#1a2234",
-    fontWeight: "700",
-    fontSize: "22px",
-    cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.65 : 1,
-    letterSpacing: "0.5px",
-    background: disabled ? "#a07830" : goldGradient,
-    boxShadow: hoveredBtn === key && !disabled
-      ? "0px 18px 24px rgba(0,0,0,0.25), 0 0 28px rgba(255,255,255,0.5), 0 0 55px rgba(255,255,255,0.25)"
-      : "0px 4px 12px rgba(0,0,0,0.15), inset 0px 1px 2px rgba(255,255,255,0.2)",
-    transform: hoveredBtn === key && !disabled ? "translateY(-4px) scale(1.04)" : "none",
-    transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease",
-  })
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoginError("")
-    setLoginLoading(true)
-    try {
-      await UserService.login(loginUsername, loginPassword)
-      router.push("/")
-    } catch (err: unknown) {
-      setLoginError(err instanceof Error ? err.message : "Server error")
-    }
-    setLoginLoading(false)
-  }
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setRegMessage("")
-    if (regPassword !== regConfirm) {
-      setRegMessage("Passwords do not match")
-      return
-    }
-    setRegLoading(true)
-    try {
-      await UserService.register(regUsername, regEmail, regPassword)
-      setRegMessage("Register success! Check your email.")
-      setTimeout(() => switchTab("login"), 1500)
-    } catch (err: unknown) {
-      setRegMessage(err instanceof Error ? err.message : "Server error")
-    }
-    setRegLoading(false)
-  }
-
-  
-  const inputWrapStyle: React.CSSProperties = {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-  }
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "20px 22px",
-    background: "#3d4f6e",
-    border: "none",
-    borderRadius: "20px",
-    color: "#c8d0e0",
-    fontSize: "21px",
-    fontFamily: "var(--font-inter), sans-serif",
-    outline: "none",
-    boxSizing: "border-box",
-  }
-
-  const labelStyle: React.CSSProperties = {
-    color: "#c8d0e0",
-    fontSize: "21px",
-    marginBottom: "9px",
-    display: "block",
-  }
-
-  const EyeIcon = ({ closed }: { closed: boolean }) => (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#8899bb"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+function EyeIcon({ closed }: { closed: boolean }) {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8899bb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       {closed ? (
         <>
           <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
@@ -134,7 +21,114 @@ export default function AuthPage() {
         </>
       )}
     </svg>
-  )
+  );
+}
+
+export default function AuthPage() {
+  const router = useRouter();
+  const [tab, setTab] = useState<"login" | "register">("login");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
+
+  // Login state
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+  // Register state
+  const [regUsername, setRegUsername] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirm, setRegConfirm] = useState("");
+  const [regMessage, setRegMessage] = useState("");
+  const [regLoading, setRegLoading] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirm, setShowRegConfirm] = useState(false);
+  const [hoveredBtn, setHoveredBtn] = useState<string | null>(null);
+  const [isBackHovered, setIsBackHovered] = useState(false);
+
+  const switchTab = (nextTab: "login" | "register") => {
+    if (nextTab === tab) return;
+    setSlideDirection(nextTab === "register" ? "left" : "right");
+    setTab(nextTab);
+  };
+
+  const goldGradient = "linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%)";
+  const btnStyle = (key: string, disabled: boolean): React.CSSProperties => ({
+    border: "none",
+    borderRadius: "50px",
+    color: "#1a2234",
+    fontWeight: "700",
+    fontSize: "22px",
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.65 : 1,
+    letterSpacing: "0.5px",
+    background: disabled ? "#a07830" : goldGradient,
+    boxShadow:
+      hoveredBtn === key && !disabled
+        ? "0px 18px 24px rgba(0,0,0,0.25), 0 0 28px rgba(255,255,255,0.5), 0 0 55px rgba(255,255,255,0.25)"
+        : "0px 4px 12px rgba(0,0,0,0.15), inset 0px 1px 2px rgba(255,255,255,0.2)",
+    transform: hoveredBtn === key && !disabled ? "translateY(-4px) scale(1.04)" : "none",
+    transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease",
+  });
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    try {
+      await UserService.login(loginUsername, loginPassword);
+      router.push("/");
+    } catch (err: unknown) {
+      setLoginError(err instanceof Error ? err.message : "Server error");
+    }
+    setLoginLoading(false);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegMessage("");
+    if (regPassword !== regConfirm) {
+      setRegMessage("Passwords do not match");
+      return;
+    }
+    setRegLoading(true);
+    try {
+      await UserService.register(regUsername, regEmail, regPassword);
+      setRegMessage("Register success! Check your email.");
+      setTimeout(() => switchTab("login"), 1500);
+    } catch (err: unknown) {
+      setRegMessage(err instanceof Error ? err.message : "Server error");
+    }
+    setRegLoading(false);
+  };
+
+  const inputWrapStyle: React.CSSProperties = {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "20px 22px",
+    background: "#3d4f6e",
+    border: "none",
+    borderRadius: "20px",
+    color: "#c8d0e0",
+    fontSize: "21px",
+    fontFamily: "var(--font-inter), sans-serif",
+    outline: "none",
+    boxSizing: "border-box",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    color: "#c8d0e0",
+    fontSize: "21px",
+    marginBottom: "9px",
+    display: "block",
+  };
 
   return (
     <div
@@ -146,8 +140,7 @@ export default function AuthPage() {
         alignItems: "center",
         background: "#1a2234",
         fontFamily: "Sora, sans-serif",
-      }}
-    >
+      }}>
       <button
         type="button"
         onClick={() => router.push("/")}
@@ -170,8 +163,7 @@ export default function AuthPage() {
           zIndex: 50,
           transform: isBackHovered ? "translateX(-5px)" : "translateX(0)",
           transition: "all 0.3s ease",
-        }}
-      >
+        }}>
         ← Lobby
       </button>
 
@@ -183,8 +175,7 @@ export default function AuthPage() {
           alignItems: "center",
           padding: "0 28px",
           transition: "width 0.3s ease",
-        }}
-      >
+        }}>
         {/* Avatar */}
         <div
           style={{
@@ -205,8 +196,7 @@ export default function AuthPage() {
             width: "290px",
             marginBottom: "50px",
             alignItems: "end",
-          }}
-        >
+          }}>
           <div
             style={{
               position: "absolute",
@@ -231,8 +221,7 @@ export default function AuthPage() {
               borderBottom: "2px solid transparent",
               paddingBottom: "9px",
               transition: "color 0.28s ease",
-            }}
-          >
+            }}>
             Sign in
           </button>
           <button
@@ -247,8 +236,7 @@ export default function AuthPage() {
               borderBottom: "2px solid transparent",
               paddingBottom: "9px",
               transition: "color 0.28s ease",
-            }}
-          >
+            }}>
             Sign up
           </button>
         </div>
@@ -259,21 +247,13 @@ export default function AuthPage() {
           style={{
             width: "100%",
             animation: `${slideDirection === "left" ? "slideInFromRight" : "slideInFromLeft"} 0.28s ease`,
-          }}
-        >
+          }}>
           {tab === "login" ? (
             <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               <div>
                 <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
                 <div style={inputWrapStyle}>
-                  <input
-                    type="text"
-                    placeholder="username/email"
-                    value={loginUsername}
-                    onChange={(e) => setLoginUsername(e.target.value)}
-                    required
-                    style={inputStyle}
-                  />
+                  <input type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required style={inputStyle} />
                 </div>
               </div>
 
@@ -300,24 +280,20 @@ export default function AuthPage() {
                       padding: 0,
                       display: "flex",
                       alignItems: "center",
-                    }}
-                  >
+                    }}>
                     <EyeIcon closed={!showLoginPassword} />
                   </button>
                 </div>
               </div>
 
-              {loginError && (
-                <div style={{ color: "#ff6b6b", fontSize: "18px", textAlign: "center" }}>{loginError}</div>
-              )}
+              {loginError && <div style={{ color: "#ff6b6b", fontSize: "18px", textAlign: "center" }}>{loginError}</div>}
 
               <button
                 type="submit"
                 disabled={loginLoading}
                 onMouseEnter={() => setHoveredBtn("signin")}
                 onMouseLeave={() => setHoveredBtn(null)}
-                style={{ marginTop: "11px", alignSelf: "center", padding: "20px 72px", ...btnStyle("signin", loginLoading), fontWeight: "400", textTransform: "uppercase" }}
-              >
+                style={{ marginTop: "11px", alignSelf: "center", padding: "20px 72px", ...btnStyle("signin", loginLoading), fontWeight: "400", textTransform: "uppercase" }}>
                 {loginLoading ? "SIGNING IN..." : "SIGN IN"}
               </button>
 
@@ -333,8 +309,7 @@ export default function AuthPage() {
                   cursor: "pointer",
                   textTransform: "uppercase",
                   marginTop: "6px",
-                }}
-              >
+                }}>
                 Forget Password
               </button>
             </form>
@@ -346,19 +321,12 @@ export default function AuthPage() {
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
                   gap: "28px 40px",
-                }}
-              >
+                }}>
                 {/* Username */}
                 <div>
                   <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
                   <div style={inputWrapStyle}>
-                    <input
-                      placeholder="username/email"
-                      value={regUsername}
-                      onChange={(e) => setRegUsername(e.target.value)}
-                      required
-                      style={inputStyle}
-                    />
+                    <input placeholder="username/email" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required style={inputStyle} />
                   </div>
                 </div>
 
@@ -366,9 +334,7 @@ export default function AuthPage() {
                 <div>
                   <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px", display: "flex", alignItems: "baseline", gap: "10px" }}>
                     Password
-                    <span style={{ fontSize: "13px", color: "#8899bb", fontWeight: "400" }}>
-                      At Least 8 Characters: A–Z, a–z, 0–9, Symbols.
-                    </span>
+                    <span style={{ fontSize: "13px", color: "#8899bb", fontWeight: "400" }}>At Least 8 Characters: A–Z, a–z, 0–9, Symbols.</span>
                   </label>
                   <div style={inputWrapStyle}>
                     <input
@@ -391,8 +357,7 @@ export default function AuthPage() {
                         padding: 0,
                         display: "flex",
                         alignItems: "center",
-                      }}
-                    >
+                      }}>
                       <EyeIcon closed={!showRegPassword} />
                     </button>
                   </div>
@@ -402,13 +367,7 @@ export default function AuthPage() {
                 <div>
                   <label style={labelStyle}>Email</label>
                   <div style={inputWrapStyle}>
-                    <input
-                      placeholder="Email"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      required
-                      style={inputStyle}
-                    />
+                    <input placeholder="Email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required style={inputStyle} />
                   </div>
                 </div>
 
@@ -436,8 +395,7 @@ export default function AuthPage() {
                         padding: 0,
                         display: "flex",
                         alignItems: "center",
-                      }}
-                    >
+                      }}>
                       <EyeIcon closed={!showRegConfirm} />
                     </button>
                   </div>
@@ -450,8 +408,7 @@ export default function AuthPage() {
                     fontSize: "18px",
                     textAlign: "center",
                     color: regMessage.includes("success") ? "#4ade80" : "#ff6b6b",
-                  }}
-                >
+                  }}>
                   {regMessage}
                 </div>
               )}
@@ -462,8 +419,7 @@ export default function AuthPage() {
                   disabled={regLoading}
                   onMouseEnter={() => setHoveredBtn("signup")}
                   onMouseLeave={() => setHoveredBtn(null)}
-                  style={{ padding: "20px 80px", ...btnStyle("signup", regLoading) }}
-                >
+                  style={{ padding: "20px 80px", ...btnStyle("signup", regLoading) }}>
                   {regLoading ? "Creating..." : "Create Account"}
                 </button>
               </div>
@@ -495,5 +451,5 @@ export default function AuthPage() {
         `}</style>
       </div>
     </div>
-  )
+  );
 }

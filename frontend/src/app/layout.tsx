@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
+
 import "./globals.css";
 
 const sora = Sora({
@@ -31,9 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} ${inter.variable} antialiased`}>
-        {children}
-      </body>
+      <body className={`${sora.variable} ${inter.variable} antialiased`}>{children}</body>
     </html>
   );
 }

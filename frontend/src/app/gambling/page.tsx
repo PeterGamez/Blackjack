@@ -1,95 +1,83 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import UserService from "../../lib/UserService"
-import styles from "./gambling.module.css"
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import SessionCache from "../../lib/SessionCache";
+import UserService from "../../lib/UserService";
+import styles from "./gambling.module.css";
 
 export default function Home() {
-  const router = useRouter()
-  const [hovered, setHovered] = useState<string | null>(null)
-  const [username, setUsername] = useState<string>("")
-  const [coins, setCoins] = useState<number>(0)
-  const [tokens, setTokens] = useState<number>(0)
-  const [stageScale, setStageScale] = useState<number>(1)
-  const [stageTop, setStageTop] = useState<number>(0)
-  const [stageLeft, setStageLeft] = useState<number>(0)
-
-  // load profile from backend
-  const loadProfile = async () => {
-    try {
-      const data = await UserService.getUser()
-      if (!data) {
-        router.replace("/auth")
-        return
-      }
-      setUsername(data.username || "")
-      if (typeof data.coins === "number") {
-        setCoins(data.coins)
-      }
-      if (typeof data.tokens === "number") {
-        setTokens(data.tokens)
-      }
-    } catch (err) {
-      console.error("failed to load profile", err)
-    }
-  }
+  const router = useRouter();
+  const cachedProfile = SessionCache.getCachedProfileSnapshot();
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>(cachedProfile.username);
+  const [coins, setCoins] = useState<number>(cachedProfile.coins);
+  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
+  const [stageScale, setStageScale] = useState<number>(1);
+  const [stageTop, setStageTop] = useState<number>(0);
+  const [stageLeft, setStageLeft] = useState<number>(0);
 
   useEffect(() => {
-    const cachedUsername = sessionStorage.getItem("cached_username")
-    const cachedCoins = sessionStorage.getItem("cached_coins")
-    const cachedTokens = sessionStorage.getItem("cached_tokens")
+    const loadProfile = async () => {
+      try {
+        const data = await UserService.getUser();
+        if (!data) {
+          router.replace("/auth");
+          return;
+        }
+        setUsername(data.username || "");
+        if (typeof data.coins === "number") {
+          setCoins(data.coins);
+        }
+        if (typeof data.tokens === "number") {
+          setTokens(data.tokens);
+        }
+      } catch (err) {
+        console.error("failed to load profile", err);
+      }
+    };
 
-    if (cachedUsername) setUsername(cachedUsername)
-    if (cachedCoins) setCoins(Number(cachedCoins))
-    if (cachedTokens) setTokens(Number(cachedTokens))
-
-    loadProfile()
-  }, [router])
+    void loadProfile();
+  }, [router]);
 
   // save to cache whenever username, coins, or tokens change
   useEffect(() => {
-    if (username) sessionStorage.setItem("cached_username", username)
-    if (coins > 0) sessionStorage.setItem("cached_coins", coins.toString())
-    if (tokens > 0) sessionStorage.setItem("cached_tokens", tokens.toString())
-  }, [username, coins, tokens])
+    SessionCache.persistCachedProfile({ username, coins, tokens });
+  }, [username, coins, tokens]);
 
   useEffect(() => {
     const updateStageScale = () => {
-      const widthScale = window.innerWidth / 1920
-      const heightScale = window.innerHeight / 1080
-      const nextScale = Math.min(widthScale, heightScale)
-      const scaledWidth = 1920 * nextScale
-      const scaledHeight = 1080 * nextScale
-      const nextLeft = Math.max((window.innerWidth - scaledWidth) / 2, 0)
-      const nextTop = Math.max((window.innerHeight - scaledHeight) / 2, 12)
+      const widthScale = window.innerWidth / 1920;
+      const heightScale = window.innerHeight / 1080;
+      const nextScale = Math.min(widthScale, heightScale);
+      const scaledWidth = 1920 * nextScale;
+      const scaledHeight = 1080 * nextScale;
+      const nextLeft = Math.max((window.innerWidth - scaledWidth) / 2, 0);
+      const nextTop = Math.max((window.innerHeight - scaledHeight) / 2, 12);
 
-      setStageScale(nextScale)
-      setStageLeft(nextLeft)
-      setStageTop(nextTop)
-    }
+      setStageScale(nextScale);
+      setStageLeft(nextLeft);
+      setStageTop(nextTop);
+    };
 
-    updateStageScale()
-    window.addEventListener("resize", updateStageScale)
-    return () => window.removeEventListener("resize", updateStageScale)
-  }, [])
+    updateStageScale();
+    window.addEventListener("resize", updateStageScale);
+    return () => window.removeEventListener("resize", updateStageScale);
+  }, []);
 
   const getButtonClass = (name: string): string => {
-    return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`
-  }
+    return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`;
+  };
 
   const getAvatarColor = (name: string) => {
-    const colors = [
-      "#e05c5c", "#e0885c", "#d4a632", "#6db86d",
-      "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0",
-      "#e05c9a", "#4ca8c8"
-    ]
-    let hash = 0
+    const colors = ["#e05c5c", "#e0885c", "#d4a632", "#6db86d", "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0", "#e05c9a", "#4ca8c8"];
+    let hash = 0;
     for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash)
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return colors[Math.abs(hash) % colors.length]
-  }
+    return colors[Math.abs(hash) % colors.length];
+  };
 
   return (
     <div className={styles.container}>
@@ -99,16 +87,12 @@ export default function Home() {
           left: `${stageLeft}px`,
           top: `${stageTop}px`,
           transform: `scale(${stageScale})`,
-        }}
-      >
+        }}>
         {/* Top Bar with User Info */}
         <div className={styles.topBar}>
           {/* Profile Section */}
           <div className={styles.profileSection}>
-            <div
-              className={styles.profileAvatar}
-              style={{ background: username ? getAvatarColor(username) : "#5c6b8a" }}
-            >
+            <div className={styles.profileAvatar} style={{ background: username ? getAvatarColor(username) : "#5c6b8a" }}>
               {username ? username[0].toUpperCase() : "?"}
             </div>
             <span className={styles.username}>{username}</span>
@@ -133,10 +117,7 @@ export default function Home() {
           </div>
         </div>
         {/* Back Button */}
-        <button
-          onClick={() => router.push("/")}
-          className={styles.backButton}
-        >
+        <button onClick={() => router.push("/")} className={styles.backButton}>
           ← Lobby
         </button>
 
@@ -148,12 +129,7 @@ export default function Home() {
         {/* Mode Selector Row */}
         <div className={styles.modeSelector}>
           {/* Bet on - Player VS Dealer */}
-          <button
-            onClick={() => router.push("/comingsoon")}
-            onMouseEnter={() => setHovered("quickDealer")}
-            onMouseLeave={() => setHovered(null)}
-            className={getButtonClass("quickDealer")}
-          >
+          <button onClick={() => router.push("/comingsoon")} onMouseEnter={() => setHovered("quickDealer")} onMouseLeave={() => setHovered(null)} className={getButtonClass("quickDealer")}>
             <div className={styles.buttonTitle}>Bet on </div>
             <div className={styles.buttonSubtitle}>Player</div>
             <div className={styles.buttonSubtitle}>VS</div>
@@ -161,12 +137,7 @@ export default function Home() {
           </button>
 
           {/* Quick Play - Player VS Player */}
-          <button
-            onClick={() => router.push("/comingsoon")}
-            onMouseEnter={() => setHovered("quickPlayer")}
-            onMouseLeave={() => setHovered(null)}
-            className={getButtonClass("quickPlayer")}
-          >
+          <button onClick={() => router.push("/comingsoon")} onMouseEnter={() => setHovered("quickPlayer")} onMouseLeave={() => setHovered(null)} className={getButtonClass("quickPlayer")}>
             <div className={styles.buttonTitle}>Bet on</div>
             <div className={styles.buttonSubtitle}>Player</div>
             <div className={styles.buttonSubtitle}>VS</div>
@@ -175,5 +146,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }

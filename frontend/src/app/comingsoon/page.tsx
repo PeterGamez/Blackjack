@@ -1,17 +1,18 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import UserService from "../../lib/UserService"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import UserService from "../../lib/UserService";
 
 export default function Skin() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     UserService.getUser().then((user) => {
-      if (!user) router.replace("/auth")
-    })
-  }, [router])
+      if (!user) router.replace("/auth");
+    });
+  }, [router]);
 
   return (
     <div
@@ -23,8 +24,7 @@ export default function Skin() {
         background: "#d9d3c7",
         flexDirection: "column",
         gap: "20px",
-      }}
-    >
+      }}>
       <h1 style={{ fontSize: "32px", color: "#333" }}>Coming soon</h1>
       <p style={{ color: "#666" }}>Gambling mode is under development.</p>
       <button
@@ -36,10 +36,9 @@ export default function Skin() {
           border: "none",
           borderRadius: "5px",
           cursor: "pointer",
-        }}
-      >
+        }}>
         Back to home
       </button>
     </div>
-  )
+  );
 }

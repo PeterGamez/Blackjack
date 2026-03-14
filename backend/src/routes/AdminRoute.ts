@@ -7,6 +7,7 @@ import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PaymentModel from "../models/PaymentModel";
 import UserModel from "../models/UserModel";
+import PackageModel from "../models/PackageModel";
 
 export default class AdminRoute implements RouteInterface {
     private readonly basePath = "/admin";
@@ -118,6 +119,42 @@ export default class AdminRoute implements RouteInterface {
 
             return c.json(response);
         });
+
+        this.app.get("/packages", async (c) => {
+            const packages = await PackageModel.selectAllPackages();
+
+            const response = packages.map((pkg) => ({
+                id: pkg.id,
+                image: pkg.image,
+                price: pkg.price,
+                tokens: pkg.tokens,
+                isActive: pkg.isActive,
+                updatedAt: pkg.updatedAt,
+            }));
+
+            return c.json(response);
+
+        });
+
+        this.app.post("/package", async (c) => {
+            let body: { image: string; price: number; tokens: number; isActive: boolean };
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { image, price, tokens, isActive } = body;
+
+            if (!image || !price || !tokens || typeof isActive !== "boolean") {
+                return c.json({ error: "Missing required fields" }, 400);
+            }
+
+            const newPackageId = await PackageModel.createPackage(image, price, tokens, isActive);
+
+            return c.json({ message: "Package created successfully", packageId: newPackageId });
+        });
+
     }
 
     public getApp(app: Hono) {

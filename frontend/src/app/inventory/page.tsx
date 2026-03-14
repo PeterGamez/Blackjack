@@ -17,6 +17,7 @@ interface SkinItem {
   id: string; // folder name used in /cards/{id}/
   name: string;
   preview: string; // image path for preview
+  productId?: number;
   builtIn?: boolean;
 }
 
@@ -68,8 +69,14 @@ export default function InventoryPage() {
             id: toFolderName(p.name),
             name: p.name,
             preview: p.image || getCardBackImage(toFolderName(p.name)),
+            productId: p.id,
           }));
         setOwnedSkins(owned);
+
+        const matched = data.cardId ? owned.find((s) => s.productId === data.cardId) : null;
+        const resolvedSkin = matched?.id ?? "Default";
+        setSelectedCardSkin(resolvedSkin);
+        LocalStorage.setItem("selectedCardSkin", resolvedSkin);
       } catch {
         // no products in DB yet — that's fine
       }
@@ -77,9 +84,15 @@ export default function InventoryPage() {
     void load();
   }, [router]);
 
-  const selectSkin = (skinId: string) => {
+  const selectSkin = async (skinId: string, productId?: number) => {
     setSelectedCardSkin(skinId);
     LocalStorage.setItem("selectedCardSkin", skinId);
+    const token = LocalStorage.getItem("accessToken");
+    await fetch(`${config.apiUrl}/user/me`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: productId ?? 0 }),
+    });
   };
 
   const activeHover = hovered || activeTab;
@@ -112,7 +125,7 @@ export default function InventoryPage() {
             displayedSkins.map((skin) => {
               const isEquipped = activeTab === "card" && selectedCardSkin === skin.id;
               return (
-                <div key={skin.id} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => activeTab === "card" && selectSkin(skin.id)}>
+                <div key={skin.id} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => activeTab === "card" && selectSkin(skin.id, skin.productId)}>
                   <div className={styles.skinPreview}>
                     <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>

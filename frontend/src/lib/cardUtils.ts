@@ -1,7 +1,7 @@
 interface Card {
-  suit: string
-  rank: string
-  value: number
+  suit: string;
+  rank: string;
+  value: number;
 }
 
 export const getCardImagePath = (card: Card): string => {
@@ -11,7 +11,7 @@ export const getCardImagePath = (card: Card): string => {
     "♣": "clubs",
     "♥": "hearts",
     "♦": "diamonds",
-  }
+  };
 
   // Map rank to image name
   const rankMap: { [key: string]: string } = {
@@ -19,14 +19,14 @@ export const getCardImagePath = (card: Card): string => {
     J: "jack",
     Q: "queen",
     K: "king",
-  }
+  };
 
-  const suit = suitMap[card.suit] || "spades"
-  const rank = rankMap[card.rank] ? rankMap[card.rank] : card.rank === "10" ? "10" : `0${card.rank}`
+  const suit = suitMap[card.suit] || "spades";
+  const rank = rankMap[card.rank] ? rankMap[card.rank] : card.rank === "10" ? "10" : `0${card.rank}`;
 
-  return `/cards/${suit}_${rank}.png`
-}
+  return `/cards/${suit}_${rank}.png`;
+};
 
 export const getCardBackImage = (variant: number = 1): string => {
-  return `/cards/back0${Math.max(1, Math.min(variant, 7))}.png`
-}
+  return `/cards/back0${Math.max(1, Math.min(variant, 7))}.png`;
+};

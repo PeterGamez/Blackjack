@@ -52,13 +52,13 @@ type GameStatus = "betting" | "playing" | "game-over";
 
 const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
 const CHIP_IMAGES: Record<number, string> = {
-  1000: "/chips/chips1000.png",
-  500: "/chips/chip500.png",
-  100: "/chips/chip100.png",
-  25: "/chips/chip25.png",
-  10: "/chips/chip10.png",
-  5: "/chips/chip5.png",
-  1: "/chips/chip1.png",
+  1000: "/chips/default/chips1000.png",
+  500: "/chips/default/chip500.png",
+  100: "/chips/default/chip100.png",
+  25: "/chips/default/chip25.png",
+  10: "/chips/default/chip10.png",
+  5: "/chips/default/chip5.png",
+  1: "/chips/default/chip1.png",
 };
 
 export default function Dealer() {

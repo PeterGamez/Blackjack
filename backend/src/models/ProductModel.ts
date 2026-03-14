@@ -1,4 +1,4 @@
-import type { Pool } from "mysql2/promise";
+import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { ProductInterface } from "../interfaces/Database";
 
@@ -9,6 +9,25 @@ export default class ProductModel {
     public static init(table: string, DB: Pool) {
         this.table = table;
         this.DB = DB;
+    }
+
+    public static async insertProduct(product: Omit<ProductInterface, "id" | "createdAt" | "updatedAt">): Promise<void> {
+        const sql = `INSERT INTO ${this.table} (name, description, image, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute<ResultSetHeader>(sql, [
+                product.name,
+                product.description,
+                product.image,
+                product.tokens,
+                product.coins,
+                product.type,
+                product.isRecommend,
+                product.isActive,
+            ]);
+        } finally {
+            connection.release();
+        }
     }
 
     public static async selectAllActiveProducts(): Promise<ProductInterface[]> {

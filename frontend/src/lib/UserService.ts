@@ -3,6 +3,7 @@ import { UserInterface } from "@interfaces/API/UserInterface";
 import config from "@/config";
 
 import LocalStorage from "./LocalStorage";
+import ShopService from "./ShopService";
 
 export default class UserService {
   private static setUser(data: UserInterface) {
@@ -10,6 +11,24 @@ export default class UserService {
     LocalStorage.setItem("username", data.username);
     LocalStorage.setItem("coins", data.coins.toString());
     LocalStorage.setItem("tokens", data.tokens.toString());
+
+    ShopService.getProducts().then((products) => {
+      const ownedProducts = data.inventory.map((item) => {
+        const product = products.find((p) => p.id === item.productId);
+        return {
+          ...product,
+          type: item.type,
+        };
+      });
+
+      const cardSkin = ownedProducts.find((p) => p.type === "card" && p.path) || { path: "default" };
+      const chipSkin = ownedProducts.find((p) => p.type === "chip" && p.path) || { path: "default" };
+      const tableSkin = ownedProducts.find((p) => p.type === "table" && p.path) || { path: "default" };
+
+      LocalStorage.setItem("cardSkin", cardSkin.path);
+      LocalStorage.setItem("chipSkin", chipSkin.path);
+      LocalStorage.setItem("tableSkin", tableSkin.path);
+    });
   }
 
   public static async login(username: string, password: string): Promise<void> {
@@ -19,7 +38,10 @@ export default class UserService {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Login failed");
+    if (!res.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+
     LocalStorage.setItem("accessToken", data.accessToken);
     LocalStorage.setItem("refreshToken", data.refreshToken);
 

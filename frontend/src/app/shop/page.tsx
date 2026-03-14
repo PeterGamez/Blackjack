@@ -14,6 +14,7 @@ import config from "@/config";
 
 import Navbar from "../components/Navbar";
 import styles from "./shop.module.css";
+import ShopService from "@/lib/ShopService";
 
 type ShopTab = "recommend" | "table" | "card" | "chip";
 
@@ -71,20 +72,20 @@ function StorePageContent() {
       const inventorySet = new Set<number>((data.inventory ?? []).map((item) => item.productId));
 
       try {
-        const token = LocalStorage.getItem("accessToken");
-        const res = await fetch(`${config.apiUrl}/shop/list`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok || cancelled) {
+        const all: ProductInterface[] = await ShopService.getProducts();
+        if (cancelled) {
           return;
         }
 
-        const all: ProductInterface[] = await res.json();
-        if (!cancelled) {
-          setProducts(all);
-          setOwned(new Set(all.filter((p) => inventorySet.has(p.id)).map((p) => p.id)));
+        const ownedIds = new Set<number>();
+        for (const product of all) {
+          if (inventorySet.has(product.id)) {
+            ownedIds.add(product.id);
+          }
         }
+
+        setProducts(all);
+        setOwned(ownedIds);
       } catch {
         // ignore network errors on initial load
       }

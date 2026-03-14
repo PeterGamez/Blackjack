@@ -9,7 +9,7 @@ import UserModel from "../models/UserModel";
 
 export default class PaymentRoute implements RouteInterface {
     private readonly basePath = "/payment";
-    private app: Hono<BlankEnv, BlankSchema, "/payment">;
+    private app: Hono<BlankEnv, BlankSchema, typeof this.basePath>;
     private server: Server;
 
     constructor(server: Server) {
@@ -27,7 +27,7 @@ export default class PaymentRoute implements RouteInterface {
 
             const response = packages.map((pack) => ({
                 id: pack.id,
-                name: pack.name,
+                image: pack.image,
                 price: pack.price,
                 tokens: pack.tokens,
             }));

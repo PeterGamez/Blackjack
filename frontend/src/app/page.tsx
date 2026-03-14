@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import { getAvatarColor } from "../lib/colorUtils";
 import SessionCache from "../lib/SessionCache";
 import UserService from "../lib/UserService";
+import { getAvatarColor } from "../lib/colorUtils";
 import styles from "./page.module.css";
 
 const menuItems = [

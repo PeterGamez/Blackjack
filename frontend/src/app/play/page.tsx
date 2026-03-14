@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getAvatarColor } from "../../lib/colorUtils";
 import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
+import { getAvatarColor } from "../../lib/colorUtils";
 import styles from "./play.module.css";
 
 export default function Home() {

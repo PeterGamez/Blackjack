@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import config from "../../../../config";
-import { getAvatarColor } from "../../../../lib/colorUtils";
 import SessionCache from "../../../../lib/SessionCache";
 import UserService from "../../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
+import { getAvatarColor } from "../../../../lib/colorUtils";
 
 interface Card {
   suit: string;

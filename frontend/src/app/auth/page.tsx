@@ -136,8 +136,8 @@ export default function AuthPage() {
                 {loginLoading ? "SIGNING IN..." : "SIGN IN"}
               </button>
 
-              <button type="button" onClick={() => router.push("/auth/verify")} className={styles.linkButton}>
-                Forget Password
+              <button type="button" onClick={() => router.push("/comingsoon")} className={styles.linkButton}>
+                Forgot Password
               </button>
             </form>
           ) : (

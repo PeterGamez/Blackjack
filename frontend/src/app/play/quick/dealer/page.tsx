@@ -7,7 +7,7 @@ import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "@lib/cardUtils";
+import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getChipSkin } from "@lib/skinUtils";
 
 import config from "@/config";
 
@@ -53,15 +53,6 @@ interface GameActionAck {
 type GameStatus = "betting" | "playing" | "game-over";
 
 const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
-const CHIP_IMAGES: Record<number, string> = {
-  1000: "/chips/default/chips1000.png",
-  500: "/chips/default/chip500.png",
-  100: "/chips/default/chip100.png",
-  25: "/chips/default/chip25.png",
-  10: "/chips/default/chip10.png",
-  5: "/chips/default/chip5.png",
-  1: "/chips/default/chip1.png",
-};
 
 export default function Dealer() {
   const router = useRouter();
@@ -82,7 +73,8 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin] = useState<string>(getSelectedCardSkin);
+  const [cardSkin] = useState<string>(getCardSkin);
+  const [chipSkin] = useState<string>(getChipSkin);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -93,7 +85,7 @@ export default function Dealer() {
       if (remaining < value) continue;
       const count = Math.floor(remaining / value);
       remaining -= count * value;
-      stacks.push({ value, count, image: CHIP_IMAGES[value] ?? "/chips/chip1.png" });
+      stacks.push({ value, count, image: getChipImagePath(value, chipSkin) });
     }
     return stacks;
   };
@@ -368,7 +360,7 @@ export default function Dealer() {
                 <div className={styles.chipRow}>
                   {CHIP_VALUES.map((v) => (
                     <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
-                      <Image src={CHIP_IMAGES[v]} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
+                      <Image src={getChipImagePath(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
                     </button>
                   ))}
                 </div>

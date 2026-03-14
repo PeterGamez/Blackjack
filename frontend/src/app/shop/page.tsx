@@ -8,7 +8,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath } from "@lib/cardUtils";
+import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
 
 import config from "@/config";
 

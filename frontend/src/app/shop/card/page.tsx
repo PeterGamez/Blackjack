@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import config from "../../../config";
 import SessionCache from "../../../lib/SessionCache";
 import UserService from "../../../lib/UserService";
+import { getCardBackImage, getCardImagePath } from "../../../lib/cardUtils";
 import ProfileAvatar from "../../components/ProfileAvatar";
 import styles from "../test.module.css";
 
@@ -21,7 +22,7 @@ interface ApiProduct {
 }
 
 function toFolderName(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, "_");
+  return name.replace(/\s+/g, "_");
 }
 
 export default function CardShopPage() {
@@ -164,10 +165,10 @@ export default function CardShopPage() {
                       return (
                         <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
-                            <Image src={`/cards/${folder}/back01.png`} alt="back" width={75} height={110} unoptimized style={cardStyle} />
+                            <Image src={getCardBackImage(folder)} alt="back" width={75} height={110} unoptimized style={cardStyle} />
                           </div>
                           <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                            <Image src={`/cards/${folder}/hearts_king.png`} alt="king" width={75} height={110} unoptimized style={cardStyle} />
+                            <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, folder)} alt="king" width={75} height={110} unoptimized style={cardStyle} />
                           </div>
                         </div>
                       );

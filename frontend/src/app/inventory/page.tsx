@@ -8,6 +8,7 @@ import config from "../../config";
 import LocalStorage from "../../lib/LocalStorage";
 import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
+import { getCardBackImage, getCardImagePath } from "../../lib/cardUtils";
 import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
 
@@ -28,13 +29,13 @@ interface ApiProduct {
 }
 
 const BUILT_IN_SKINS: Record<TabType, SkinItem[]> = {
-  card: [{ id: "default", name: "Default", preview: "/cards/default/back01.png", builtIn: true }],
+  card: [{ id: "Default", name: "Default", preview: "/cards/Default/backcard.png", builtIn: true }],
   chips: [],
   theme: [],
 };
 
 function toFolderName(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, "_");
+  return name.replace(/\s+/g, "_");
 }
 
 export default function InventoryPage() {
@@ -45,7 +46,7 @@ export default function InventoryPage() {
   const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
   const [activeTab, setActiveTab] = useState<TabType>("card");
   const [selectedCardSkin, setSelectedCardSkin] = useState<string>(
-    LocalStorage.getItem("selectedCardSkin") ?? "default"
+    LocalStorage.getItem("selectedCardSkin") ?? "Default"
   );
   const [ownedSkins, setOwnedSkins] = useState<SkinItem[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export default function InventoryPage() {
           .map((p) => ({
             id: toFolderName(p.name),
             name: p.name,
-            preview: p.image || `/cards/${toFolderName(p.name)}/back01.png`,
+            preview: p.image || getCardBackImage(toFolderName(p.name)),
           }));
         setOwnedSkins(owned);
       } catch {
@@ -149,10 +150,10 @@ export default function InventoryPage() {
                   <div className={styles.skinPreview}>
                     <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
-                        <Image src={`/cards/${skin.id}/back01.png`} alt="back" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
+                        <Image src={getCardBackImage(skin.id)} alt="back" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
                       </div>
                       <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                        <Image src={`/cards/${skin.id}/hearts_king.png`} alt="king" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
+                        <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.id)} alt="king" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
                       </div>
                     </div>
                   </div>

@@ -78,7 +78,7 @@ export default function Dealer() {
   const [userId, setUserId] = useState<number>(0);
   const [username, setUsername] = useState<string>("username");
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin, setCardSkin] = useState<string>("default");
+  const [cardSkin, setCardSkin] = useState<string>("Default");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -141,7 +141,7 @@ export default function Dealer() {
       setUserId(userData.id);
       setUsername(userData.username || "username");
       setPlayerChips(userData.coins ?? cachedProfile.coins);
-      setCardSkin(LocalStorage.getItem("selectedCardSkin") ?? "default");
+      setCardSkin(LocalStorage.getItem("selectedCardSkin") ?? "Default");
       sessionStorage.setItem("userId", userData.id.toString());
 
       const token = sessionStorage.getItem("accessToken");
@@ -353,7 +353,7 @@ export default function Dealer() {
                 ))}
               {gameStatus === "playing" && (
                 <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
-                  <Image src={getCardBackImage(1, cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
+                  <Image src={getCardBackImage(cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
                 </div>
               )}
             </div>

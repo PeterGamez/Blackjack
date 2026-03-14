@@ -4,8 +4,7 @@ interface Card {
   value: number;
 }
 
-export const getCardImagePath = (card: Card, skin: string = "default"): string => {
-  // Map suit symbols to folder names
+export const getCardImagePath = (card: Card, skin: string = "Default"): string => {
   const suitMap: { [key: string]: string } = {
     "♠": "spades",
     "♣": "clubs",
@@ -13,12 +12,11 @@ export const getCardImagePath = (card: Card, skin: string = "default"): string =
     "♦": "diamonds",
   };
 
-  // Map rank to image name
   const rankMap: { [key: string]: string } = {
-    A: "ace",
-    J: "jack",
-    Q: "queen",
-    K: "king",
+    A: "a",
+    J: "j",
+    Q: "q",
+    K: "k",
   };
 
   const suit = suitMap[card.suit] || "spades";
@@ -27,11 +25,11 @@ export const getCardImagePath = (card: Card, skin: string = "default"): string =
   return `/cards/${skin}/${suit}_${rank}.png`;
 };
 
-export const getCardBackImage = (variant: number = 1, skin: string = "default"): string => {
-  return `/cards/${skin}/back0${Math.max(1, Math.min(variant, 8))}.png`;
+export const getCardBackImage = (skin: string = "Default"): string => {
+  return `/cards/${skin}/backcard.png`;
 };
 
 export const getSelectedSkin = (): string => {
-  if (typeof window === "undefined") return "default";
-  return localStorage.getItem("selectedCardSkin") ?? "default";
+  if (typeof window === "undefined") return "Default";
+  return localStorage.getItem("selectedCardSkin") ?? "Default";
 };

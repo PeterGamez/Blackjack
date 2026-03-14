@@ -31,7 +31,27 @@ export const getCardBackImage = (skin: string = "default"): string => {
   return `/cards/${skin}/backcard.png`;
 };
 
-export const getSelectedCardSkin = (): string => {
+export const getCardSkin = (): string => {
   if (typeof window === "undefined") return "default";
-  return LocalStorage.getItem("selectedCardSkin") || "default";
+  return LocalStorage.getItem("cardSkin") || "default";
+};
+
+export const getChipSkin = (): string => {
+  if (typeof window === "undefined") return "default";
+  return LocalStorage.getItem("chipSkin") || "default";
+};
+
+export const getTableImage = (skin: string = "default"): string => {
+  return `/tables/${skin}/table.png`;
+};
+
+export const getTableSkin = (): string => {
+  if (typeof window === "undefined") return "default";
+  return LocalStorage.getItem("tableSkin") || "default";
+};
+
+export const getChipImagePath = (value: number, skin: string = "default"): string => {
+  const normalized = Math.max(1, Math.floor(value));
+  const filename = normalized === 1000 ? "chips1000" : `chip${normalized}`;
+  return `/chips/${skin}/${filename}.png`;
 };

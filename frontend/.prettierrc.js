@@ -29,7 +29,7 @@ const config = {
     insertPragma: false,
 
     plugins: ["@trivago/prettier-plugin-sort-imports"],
-    importOrder: ["<BUILTIN_MODULES>", "<THIRD_PARTY_MODULES>", "^[./]"],
+    importOrder: ["<BUILTIN_MODULES>", "<THIRD_PARTY_MODULES>", "^@interfaces/(.*)$", "^@lib/(.*)$", "^@/(.*)$", "^[./]"],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true
 };

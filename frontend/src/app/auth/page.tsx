@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import UserService from "../../lib/UserService";
+import AuthService from "@lib/AuthService";
+
 import styles from "./page.module.css";
 
 function EyeIcon({ closed }: { closed: boolean }) {
@@ -58,7 +59,7 @@ export default function AuthPage() {
     setLoginError("");
     setLoginLoading(true);
     try {
-      await UserService.login(loginUsername, loginPassword);
+      await AuthService.login(loginUsername, loginPassword);
       router.push("/");
     } catch (err: unknown) {
       setLoginError(err instanceof Error ? err.message : "Server error");
@@ -75,7 +76,7 @@ export default function AuthPage() {
     }
     setRegLoading(true);
     try {
-      await UserService.register(regUsername, regEmail, regPassword);
+      await AuthService.register(regUsername, regEmail, regPassword);
       setRegMessage("Register success! Check your email.");
       setTimeout(() => switchTab("login"), 1500);
     } catch (err: unknown) {

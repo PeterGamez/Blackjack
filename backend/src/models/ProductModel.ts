@@ -16,10 +16,20 @@ export default class ProductModel {
     }
 
     public static async insertProduct(product: Omit<ProductInterface, "id" | "createdAt" | "updatedAt">): Promise<void> {
-        const sql = `INSERT INTO ${this.table} (name, description, image, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO ${this.table} (name, description, image, path, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute<ResultSetHeader>(sql, [product.name, product.description, product.image, product.tokens, product.coins, product.type, product.isRecommend, product.isActive]);
+            await connection.execute<ResultSetHeader>(sql, [
+                product.name,
+                product.description,
+                product.image,
+                product.path,
+                product.tokens,
+                product.coins,
+                product.type,
+                product.isRecommend,
+                product.isActive,
+            ]);
         } finally {
             connection.release();
         }

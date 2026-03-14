@@ -41,7 +41,7 @@ export default class UserRoute implements RouteInterface {
                 coins: user.coins,
                 cardId: user.cardId,
                 chipId: user.chipId,
-                themeId: user.themeId,
+                tableId: user.themeId,
                 inventory: userInventory.map((item) => {
                     return {
                         productId: item.productId,
@@ -59,16 +59,17 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            let body: { password?: string; cardId?: number; chipId?: number; themeId?: number };
+            let body: { password?: string; cardId?: number; chipId?: number; tableId?: number; themeId?: number };
             try {
                 body = await c.req.json();
             } catch {
                 return c.json({ error: "Invalid request body" }, 400);
             }
 
-            const { password, cardId, chipId, themeId } = body;
+            const { password, cardId, chipId, tableId, themeId } = body;
+            const resolvedTableId = tableId ?? themeId;
 
-            if (!password && cardId === undefined && chipId === undefined && themeId === undefined) {
+            if (!password && cardId === undefined && chipId === undefined && resolvedTableId === undefined) {
                 return c.json({ error: "Missing fields to update" }, 400);
             }
 
@@ -79,11 +80,11 @@ export default class UserRoute implements RouteInterface {
             if (cardId !== undefined) {
                 await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
             }
-            if (chipId) {
-                await UserModel.updateUser(user.id, "chipId", chipId);
+            if (chipId !== undefined) {
+                await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
             }
-            if (themeId) {
-                await UserModel.updateUser(user.id, "themeId", themeId);
+            if (resolvedTableId !== undefined) {
+                await UserModel.updateUser(user.id, "themeId", resolvedTableId === 0 ? null : resolvedTableId);
             }
 
             return c.json({ ok: true });

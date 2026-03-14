@@ -75,6 +75,7 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
+  const [cardSkin, setCardSkin] = useState<string>("Default");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -318,12 +319,12 @@ export default function Dealer() {
               {gameStatus !== "betting" &&
                 dealerHand.map((card, i) => (
                   <div key={i} className={`${styles.cardFrame} ${styles.card} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()}>
-                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
               {gameStatus === "playing" && (
                 <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
-                  <Image src={getCardBackImage(1)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
+                  <Image src={getCardBackImage(cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
                 </div>
               )}
             </div>
@@ -345,7 +346,7 @@ export default function Dealer() {
               {gameStatus !== "betting" &&
                 playerHand.map((card, i) => (
                   <div key={i} className={`${styles.cardFrame} ${styles.card}`.trim()}>
-                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
             </div>

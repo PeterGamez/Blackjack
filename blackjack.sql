@@ -159,6 +159,47 @@ CREATE TABLE `userInventory` (
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product`
+--
+
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(500) DEFAULT NULL,
+  `tokens` int(11) NOT NULL DEFAULT 0,
+  `coins` int(11) NOT NULL DEFAULT 0,
+  `type` enum('card','chip','theme') NOT NULL DEFAULT 'card',
+  `isRecommend` tinyint(1) NOT NULL DEFAULT 0,
+  `isActive` tinyint(1) NOT NULL DEFAULT 1,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `product`
+--
+
+INSERT INTO `product` (`id`, `name`, `description`, `image`, `tokens`, `coins`, `type`, `isRecommend`, `isActive`, `createdAt`, `updatedAt`) VALUES
+(1, 'Test', 'A test card skin.', '/cards/test/back01.png', 0, 500, 'card', 1, 1, current_timestamp(), current_timestamp());
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userInventory`
+--
+
+CREATE TABLE `userInventory` (
+  `id` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `productId` int(11) NOT NULL,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -212,6 +253,20 @@ ALTER TABLE `userInventory`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `userInventory`
+--
+ALTER TABLE `userInventory`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `userId` (`userId`),
+  ADD KEY `productId` (`productId`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -256,6 +311,18 @@ ALTER TABLE `product`
 --
 ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `userInventory`
+--
+ALTER TABLE `userInventory`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `userInventory`

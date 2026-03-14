@@ -5,5 +5,8 @@ export interface UserInterface {
   role: string;
   tokens: number;
   coins: number;
-  inventory: string[];
+  cardId: number | null;
+  chipId: number | null;
+  themeId: number | null;
+  inventory: { productId: number; type: string }[];
 }

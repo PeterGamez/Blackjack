@@ -3,21 +3,27 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import UserService from "../../lib/UserService";
 import ProfileAvatar from "./ProfileAvatar";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const router = useRouter();
- 
+
   const [username, setUsername] = useState<string>(null);
   const [coins, setCoins] = useState(0);
   const [tokens, setTokens] = useState(0);
 
   useEffect(() => {
-    setUsername(sessionStorage.getItem("cached_username"));
-    setCoins(parseInt(sessionStorage.getItem("cached_coins") || "0"));
-    setTokens(parseInt(sessionStorage.getItem("cached_tokens") || "0"));
+    const readCache = () => {
+      setUsername(sessionStorage.getItem("cached_username"));
+      setCoins(parseInt(sessionStorage.getItem("cached_coins") || "0"));
+      setTokens(parseInt(sessionStorage.getItem("cached_tokens") || "0"));
+    };
+
+    readCache();
+
+    const interval = setInterval(readCache, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

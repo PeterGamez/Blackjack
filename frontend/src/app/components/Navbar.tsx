@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import LocalStorage from "../../lib/LocalStorage";
+import LocalStorage from "@lib/LocalStorage";
+
 import styles from "./Navbar.module.css";
 import ProfileAvatar from "./ProfileAvatar";
 

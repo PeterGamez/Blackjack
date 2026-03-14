@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import UserService from "../../lib/UserService";
+import UserService from "@lib/UserService";
+
 import styles from "./page.module.css";
 
 function EyeIcon({ closed }: { closed: boolean }) {

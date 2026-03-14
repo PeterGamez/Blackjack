@@ -1,14 +1,16 @@
 "use client";
 
-import config from "@/src/config";
-import LocalStorage from "@/src/lib/LocalStorage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-import UserService from "../../../../lib/UserService";
-import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "../../../../lib/cardUtils";
+import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
+import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "@lib/cardUtils";
+
+import config from "@/config";
+
 import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 

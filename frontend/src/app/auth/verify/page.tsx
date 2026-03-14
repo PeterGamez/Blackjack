@@ -3,7 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-import config from "../../../config";
+import config from "@/config";
+
 import styles from "./page.module.css";
 
 function VerifyContent() {

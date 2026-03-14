@@ -1,4 +1,5 @@
-import { getAvatarColorIndex } from "../../lib/colorUtils";
+import { getAvatarColorIndex } from "@lib/colorUtils";
+
 import styles from "./ProfileAvatar.module.css";
 
 type ProfileAvatarProps = {

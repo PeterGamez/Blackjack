@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import UserService from "../../lib/UserService";
+import UserService from "@lib/UserService";
+
 import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 

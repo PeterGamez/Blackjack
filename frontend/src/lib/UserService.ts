@@ -1,5 +1,7 @@
-import config from "../config";
-import { UserInterface } from "../interfaces/API/UserInterface";
+import { UserInterface } from "@interfaces/API/UserInterface";
+
+import config from "@/config";
+
 import LocalStorage from "./LocalStorage";
 
 export default class UserService {

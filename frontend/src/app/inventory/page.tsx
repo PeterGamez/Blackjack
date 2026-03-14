@@ -4,13 +4,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 
-import config from "../../config";
-import LocalStorage from "../../lib/LocalStorage";
-import UserService from "../../lib/UserService";
-import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "../../lib/cardUtils";
+import { ProductInterface } from "@interfaces/API/ProductInterface";
+
+import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
+import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "@lib/cardUtils";
+
+import config from "@/config";
+
 import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
-import { ProductInterface } from "@/src/interfaces/API/ProductInterface";
 
 interface SkinItem {
   path: string; // folder name used in /cards/{id}/
@@ -128,36 +131,36 @@ export default function InventoryPage() {
     };
   }, [resetToDefaultSkin, router]);
 
-  const selectSkin = useCallback(async (skinId: string, productId?: number) => {
-    if (selectedCardSkin === skinId) {
-      return;
-    }
-
-    const previousSkin = selectedCardSkin;
-    setSelectedCardSkin(skinId);
-    LocalStorage.setItem("selectedCardSkin", skinId);
-    const token = LocalStorage.getItem("accessToken");
-    try {
-      const res = await fetch(`${config.apiUrl}/user/me`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ cardId: productId ?? 0 }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update selected skin");
+  const selectSkin = useCallback(
+    async (skinId: string, productId?: number) => {
+      if (selectedCardSkin === skinId) {
+        return;
       }
-    } catch {
-      setSelectedCardSkin(previousSkin);
-      LocalStorage.setItem("selectedCardSkin", previousSkin);
-    }
-  }, [selectedCardSkin]);
+
+      const previousSkin = selectedCardSkin;
+      setSelectedCardSkin(skinId);
+      LocalStorage.setItem("selectedCardSkin", skinId);
+      const token = LocalStorage.getItem("accessToken");
+      try {
+        const res = await fetch(`${config.apiUrl}/user/me`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ cardId: productId ?? 0 }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to update selected skin");
+        }
+      } catch {
+        setSelectedCardSkin(previousSkin);
+        LocalStorage.setItem("selectedCardSkin", previousSkin);
+      }
+    },
+    [selectedCardSkin]
+  );
 
   const activeHover = hovered || activeTab;
-  const displayedSkins: SkinItem[] = useMemo(
-    () => (activeTab === "card" ? [...BUILT_IN_SKINS.card, ...ownedSkins] : BUILT_IN_SKINS[activeTab]),
-    [activeTab, ownedSkins]
-  );
+  const displayedSkins: SkinItem[] = useMemo(() => (activeTab === "card" ? [...BUILT_IN_SKINS.card, ...ownedSkins] : BUILT_IN_SKINS[activeTab]), [activeTab, ownedSkins]);
 
   return (
     <div className={styles.container}>
@@ -190,24 +193,10 @@ export default function InventoryPage() {
                   <div className={styles.skinPreview}>
                     <div style={CARD_STACK_STYLE}>
                       <div style={CARD_BACK_WRAPPER_STYLE}>
-                        <Image
-                          src={getCardBackImage(skin.path)}
-                          alt="back"
-                          width={75}
-                          height={110}
-                          unoptimized
-                          style={CARD_IMAGE_STYLE}
-                        />
+                        <Image src={getCardBackImage(skin.path)} alt="back" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                       </div>
                       <div style={CARD_FRONT_WRAPPER_STYLE}>
-                        <Image
-                          src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.path)}
-                          alt="king"
-                          width={75}
-                          height={110}
-                          unoptimized
-                          style={CARD_IMAGE_STYLE}
-                        />
+                        <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                       </div>
                     </div>
                   </div>

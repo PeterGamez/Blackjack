@@ -2,13 +2,16 @@
 
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
-import config from "../../config";
-import LocalStorage from "../../lib/LocalStorage";
-import UserService from "../../lib/UserService";
-import { getCardBackImage, getCardImagePath } from "../../lib/cardUtils";
-import { ProductInterface } from "../../interfaces/API/ProductInterface";
+import { ProductInterface } from "@interfaces/API/ProductInterface";
+
+import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
+import { getCardBackImage, getCardImagePath } from "@lib/cardUtils";
+
+import config from "@/config";
+
 import Navbar from "../components/Navbar";
 import styles from "./shop.module.css";
 
@@ -31,7 +34,7 @@ const CARD_PREVIEW_STYLE = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
 };
 
-export default function StorePage() {
+function StorePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState<ShopTab>("recommend");
@@ -159,12 +162,7 @@ export default function StorePage() {
       <div className={styles.main}>
         <div className={styles.sidebar}>
           {TAB_ORDER.map((tab) => (
-            <button
-              key={tab}
-              className={active === tab ? styles.active : ""}
-              onMouseEnter={() => setHovered(tab)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => setSelected(tab)}>
+            <button key={tab} className={active === tab ? styles.active : ""} onMouseEnter={() => setHovered(tab)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected(tab)}>
               {TAB_LABELS[tab]}
             </button>
           ))}
@@ -192,14 +190,7 @@ export default function StorePage() {
                         </div>
                       </div>
                     ) : p.image ? (
-                      <Image
-                        src={p.image}
-                        alt={p.name}
-                        width={100}
-                        height={100}
-                        unoptimized
-                        style={{ objectFit: "contain", maxWidth: "80%", maxHeight: "80%" }}
-                      />
+                      <Image src={p.image} alt={p.name} width={100} height={100} unoptimized style={{ objectFit: "contain", maxWidth: "80%", maxHeight: "80%" }} />
                     ) : (
                       <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : "Theme"}</strong>
                     )}
@@ -238,5 +229,13 @@ export default function StorePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StorePage() {
+  return (
+    <Suspense fallback={null}>
+      <StorePageContent />
+    </Suspense>
   );
 }

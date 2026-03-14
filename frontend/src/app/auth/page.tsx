@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -92,7 +93,9 @@ export default function AuthPage() {
       </button>
 
       <div className={`${styles.shell} ${tab === "register" ? styles.shellRegister : styles.shellLogin}`}>
-        <div className={styles.avatar} />
+        <div className={styles.logoWrap}>
+          <Image src="/logo.png" alt="Blackjack Logo" width={210} height={210} priority className={styles.logoImage} />
+        </div>
 
         <div className={styles.tabs}>
           <div className={`${styles.tabIndicator} ${tab === "register" ? styles.tabIndicatorRegister : ""}`} />

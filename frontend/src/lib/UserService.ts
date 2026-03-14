@@ -10,7 +10,7 @@ export default class UserService {
     LocalStorage.setItem("tokens", data.tokens.toString());
   }
 
-  public static async login(username: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
+  public static async login(username: string, password: string): Promise<void> {
     const res = await fetch(`${config.apiUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -21,8 +21,8 @@ export default class UserService {
     LocalStorage.setItem("accessToken", data.accessToken);
     LocalStorage.setItem("refreshToken", data.refreshToken);
 
-    this.setUser(data.user);
-    return data;
+    const user = await this.getUser();
+    this.setUser(user);
   }
 
   public static logout() {

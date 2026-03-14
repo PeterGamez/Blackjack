@@ -1,4 +1,4 @@
-type LocalKey = "refreshToken"
+type LocalKey = "accessToken" | "refreshToken" | "userId" | "username" | "coins" | "tokens" | "selectedCardSkin";
 
 export default class LocalStorage {
   private static isBrowser() {

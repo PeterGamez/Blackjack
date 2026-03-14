@@ -1,5 +1,6 @@
 "use client";
 
+import LocalStorage from "@/src/lib/LocalStorage";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -7,7 +8,6 @@ import UserService from "../../lib/UserService";
 import Navbar from "../components/Navbar";
 import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
-import SessionStorage from "@/src/lib/SessionStorage";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -23,11 +23,10 @@ export default function ProfilePage() {
     UserService.getUser().then((data) => {
       if (data) {
         setUser(data);
-        SessionStorage.setItem("coins", data.coins.toString());
-        SessionStorage.setItem("tokens", data.tokens.toString());
+        LocalStorage.setItem("coins", data.coins.toString());
+        LocalStorage.setItem("tokens", data.tokens.toString());
       }
     });
-
   }, []);
 
   const handleLogout = () => {

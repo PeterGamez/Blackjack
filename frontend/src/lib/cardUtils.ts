@@ -1,4 +1,4 @@
-import SessionStorage from "./SessionStorage";
+import LocalStorage from "./LocalStorage";
 
 interface Card {
   suit: string;
@@ -33,5 +33,5 @@ export const getCardBackImage = (skin: string = "Default"): string => {
 
 export const getSelectedSkin = (): string => {
   if (typeof window === "undefined") return "Default";
-  return SessionStorage.getItem("selectedCardSkin") || "Default";
+  return LocalStorage.getItem("selectedCardSkin") || "Default";
 };

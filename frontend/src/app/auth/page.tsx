@@ -109,7 +109,7 @@ export default function AuthPage() {
               <div className={styles.field}>
                 <label className={styles.fieldLabelLarge}>Username</label>
                 <div className={styles.inputWrap}>
-                  <input autoFocus type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required className={styles.input}/>
+                  <input autoFocus type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required className={styles.input} />
                 </div>
               </div>
 

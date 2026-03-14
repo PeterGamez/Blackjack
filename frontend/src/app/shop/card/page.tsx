@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import config from "../../../config";
-import Navbar from "../../components/Navbar";
-import { getCardBackImage, getCardImagePath } from "../../../lib/cardUtils";
-import SessionStorage from "../../../lib/SessionStorage";
+import LocalStorage from "../../../lib/LocalStorage";
 import UserService from "../../../lib/UserService";
+import { getCardBackImage, getCardImagePath } from "../../../lib/cardUtils";
+import Navbar from "../../components/Navbar";
 import styles from "../test.module.css";
 
 interface ApiProduct {
@@ -40,13 +40,16 @@ export default function CardShopPage() {
   useEffect(() => {
     const load = async () => {
       const data = await UserService.getUser();
-      if (!data) { router.push("/auth"); return; }
+      if (!data) {
+        router.push("/auth");
+        return;
+      }
       if (typeof data.coins === "number") setCoins(data.coins);
 
       const inventorySet = new Set<number>((data.inventory ?? []).map(Number));
 
       try {
-        const token = SessionStorage.getItem("accessToken");
+        const token = LocalStorage.getItem("accessToken");
         const res = await fetch(`${config.apiUrl}/shop/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -65,7 +68,7 @@ export default function CardShopPage() {
     setBuying(p.id);
     setMessage(null);
     try {
-      const token = SessionStorage.getItem("accessToken");
+      const token = LocalStorage.getItem("accessToken");
       const res = await fetch(`${config.apiUrl}/shop/buy`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -75,7 +78,7 @@ export default function CardShopPage() {
       if (res.ok) {
         setOwned((prev) => new Set([...prev, p.id]));
         setCoins((prev) => prev - p.coins);
-        SessionStorage.setItem("coins", (coins - p.coins).toString());
+        LocalStorage.setItem("coins", (coins - p.coins).toString());
         setMessage({ id: p.id, text: "Purchased!", ok: true });
       } else {
         setMessage({ id: p.id, text: data.message || "Purchase failed", ok: false });
@@ -90,42 +93,60 @@ export default function CardShopPage() {
   return (
     <div className={styles.container}>
       <Navbar />
-      <button onClick={() => router.push("/")} className={styles.backButton}>← Lobby</button>
-      <div className={styles.Title}><h2>Shop</h2></div>
+      <button onClick={() => router.push("/")} className={styles.backButton}>
+        ← Lobby
+      </button>
+      <div className={styles.Title}>
+        <h2>Shop</h2>
+      </div>
 
       <div className={styles.main}>
         <div className={styles.sidebar}>
           <button
             className={active === "recommend" ? styles.active : ""}
-            onMouseEnter={() => setHovered("recommend")} onMouseLeave={() => setHovered(null)}
-            onClick={() => { setSelected("recommend"); router.push("/shop"); }}>
+            onMouseEnter={() => setHovered("recommend")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => {
+              setSelected("recommend");
+              router.push("/shop");
+            }}>
             Recommend
           </button>
           <button
             className={active === "theme" ? styles.active : ""}
-            onMouseEnter={() => setHovered("theme")} onMouseLeave={() => setHovered(null)}
-            onClick={() => { setSelected("theme"); router.push("/shop/theme"); }}>
+            onMouseEnter={() => setHovered("theme")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => {
+              setSelected("theme");
+              router.push("/shop/theme");
+            }}>
             Theme
           </button>
           <button
             className={active === "card" ? styles.active : ""}
-            onMouseEnter={() => setHovered("card")} onMouseLeave={() => setHovered(null)}
-            onClick={() => { setSelected("card"); router.push("/shop/card"); }}>
+            onMouseEnter={() => setHovered("card")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => {
+              setSelected("card");
+              router.push("/shop/card");
+            }}>
             Card
           </button>
           <button
             className={active === "chips" ? styles.active : ""}
-            onMouseEnter={() => setHovered("chips")} onMouseLeave={() => setHovered(null)}
-            onClick={() => { setSelected("chips"); router.push("/shop/chips"); }}>
+            onMouseEnter={() => setHovered("chips")}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => {
+              setSelected("chips");
+              router.push("/shop/chips");
+            }}>
             Chips
           </button>
         </div>
 
         <div className={styles.content}>
           {products.length === 0 ? (
-            <div style={{ gridColumn: "1/-1", color: "#fff", opacity: 0.6, fontSize: 18, padding: "60px 0", textAlign: "center" }}>
-              No card skins available.
-            </div>
+            <div style={{ gridColumn: "1/-1", color: "#fff", opacity: 0.6, fontSize: 18, padding: "60px 0", textAlign: "center" }}>No card skins available.</div>
           ) : (
             products.map((p) => {
               const isOwned = owned.has(p.id);
@@ -173,11 +194,7 @@ export default function CardShopPage() {
                           }}>
                           {isLoading ? "..." : "Buy"}
                         </button>
-                        {msg && (
-                          <span style={{ fontSize: 12, color: msg.ok ? "#2a7a2a" : "#a00", marginTop: 2 }}>
-                            {msg.text}
-                          </span>
-                        )}
+                        {msg && <span style={{ fontSize: 12, color: msg.ok ? "#2a7a2a" : "#a00", marginTop: 2 }}>{msg.text}</span>}
                       </div>
                     )}
                   </div>

@@ -61,14 +61,14 @@ export default class UserRoute implements RouteInterface {
 
             let body: { password?: string; cardId?: number; chipId?: number; themeId?: number };
             try {
-                body = await c.req.parseBody();
+                body = await c.req.json();
             } catch {
                 return c.json({ error: "Invalid request body" }, 400);
             }
 
             const { password, cardId, chipId, themeId } = body;
 
-            if (!password && !cardId && !chipId && !themeId) {
+            if (!password && cardId === undefined && chipId === undefined && themeId === undefined) {
                 return c.json({ error: "Missing fields to update" }, 400);
             }
 
@@ -76,8 +76,8 @@ export default class UserRoute implements RouteInterface {
                 const hashedPassword = await this.server.Password.hash(password);
                 await UserModel.updateUser(user.id, "password", hashedPassword);
             }
-            if (cardId) {
-                await UserModel.updateUser(user.id, "cardId", cardId);
+            if (cardId !== undefined) {
+                await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
             }
             if (chipId) {
                 await UserModel.updateUser(user.id, "chipId", chipId);

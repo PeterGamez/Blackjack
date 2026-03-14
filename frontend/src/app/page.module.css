@@ -130,6 +130,10 @@
   font-weight: 700;
 }
 
+.coinBadge {
+  font-size: 20px;
+}
+
 .placeholderWrap {
   padding-left: 6px;
 }

@@ -9,7 +9,8 @@ import config from "../../../../config";
 import SessionCache from "../../../../lib/SessionCache";
 import UserService from "../../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
-import { getAvatarColor } from "../../../../lib/colorUtils";
+import ProfileAvatar from "../../../components/ProfileAvatar";
+import styles from "./page.module.css";
 
 interface Card {
   suit: string;
@@ -59,36 +60,6 @@ const CHIP_IMAGES: Record<number, string> = {
   5: "/chips/chip5.png",
   1: "/chips/chip1.png",
 };
-
-const styles = `
-  @keyframes cardSlideIn {
-    from { opacity: 0; transform: translateY(-40px) scale(0.85); }
-    to   { opacity: 1; transform: translateY(0)   scale(1);    }
-  }
-  @keyframes cardFlip {
-    0%   { transform: rotateY(0deg)  scale(1);   }
-    50%  { transform: rotateY(90deg) scale(1.08); }
-    100% { transform: rotateY(0deg)  scale(1);   }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to   { opacity: 1; transform: scale(1);   }
-  }
-  .card      { animation: cardSlideIn 0.45s ease-out; }
-  .card-flip { animation: cardFlip 0.6s ease-in-out; }
-  .card-back { animation: cardSlideIn 0.45s ease-out; }
-  .result-badge { animation: fadeIn 0.4s ease-out; }
-
-  .chip-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.15s;
-    padding: 0;
-  }
-  .chip-btn:hover { transform: translateY(-6px) scale(1.12); }
-  .chip-btn:active { transform: scale(0.95); }
-`;
 
 export default function Dealer() {
   const router = useRouter();
@@ -316,131 +287,42 @@ export default function Dealer() {
   const playerValue = calculateHandValue(playerHand);
   const dealerValue = calculateHandValue(dealerHand);
   const chipStacks = getChipStacks(bet);
+  const resultClassName = result.includes("win") ? styles.resultWin : result.includes("Draw") ? styles.resultDraw : styles.resultLose;
 
   return (
-    <div style={{ background: "#111827", minHeight: "100vh", color: "white", fontFamily: "'Inter', 'Segoe UI', sans-serif", overflow: "hidden" }}>
-      <style>{styles}</style>
-
-      {/* ─── Header ─── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "14px 24px",
-        }}>
-        {/* Avatar + username */}
+    <div className={styles.page}>
+      <div className={styles.header}>
         <div
           onClick={() => {
             if (socketRef.current && gameId) socketRef.current.emit("game:leave", { gameId, userId });
             router.push("/play");
           }}
-          style={{ display: "flex", alignItems: "center", gap: "12px", background: "#1f2937", borderRadius: "50px", padding: "6px 18px 6px 6px", cursor: "pointer" }}>
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              background: getAvatarColor(username),
-              flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 700,
-              fontSize: "16px",
-              color: "white",
-              userSelect: "none",
-            }}>
-            {username ? username[0].toUpperCase() : "?"}
-          </div>
-          <span style={{ fontWeight: 600, fontSize: "15px" }}>{username}</span>
+          className={styles.userButton}>
+          <ProfileAvatar username={username} className={styles.userAvatar} />
+          <span className={styles.userName}>{username}</span>
         </div>
 
-        {/* Balances */}
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          {/* Coins */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#1f2937", borderRadius: "50px", padding: "8px 20px" }}>
-            <div
-              style={{
-                width: "22px",
-                height: "22px",
-                borderRadius: "50%",
-                background: "#f59e0b",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#78350f",
-              }}>
-              C
-            </div>
-            <span style={{ fontWeight: 700, fontSize: "15px" }}>{playerChips.toLocaleString()}</span>
+        <div className={styles.balances}>
+          <div className={`${styles.balanceCard} ${styles.coinsCard}`}>
+            <div className={`${styles.balanceBadge} ${styles.coinBadge}`}>C</div>
+            <span className={styles.balanceValue}>{playerChips.toLocaleString()}</span>
           </div>
-          {/* Tokens */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#374151", borderRadius: "50px", padding: "8px 16px" }}>
-            <div
-              style={{
-                width: "22px",
-                height: "22px",
-                borderRadius: "50%",
-                background: "#6366f1",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "white",
-              }}>
-              T
-            </div>
-            <span style={{ fontWeight: 700, fontSize: "15px" }}>0</span>
-            <span style={{ fontSize: "18px", color: "#9ca3af", marginLeft: "2px", cursor: "pointer" }}>+</span>
+          <div className={`${styles.balanceCard} ${styles.tokensCard}`}>
+            <div className={`${styles.balanceBadge} ${styles.tokenBadge}`}>T</div>
+            <span className={styles.balanceValue}>0</span>
+            <span className={styles.balancePlus}>+</span>
           </div>
         </div>
       </div>
 
-      {/* ─── Main Game Area ─── */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "10px" }}>
-        {/* ── Semicircular Table ── */}
-        <div style={{ position: "relative", width: "820px", maxWidth: "98vw" }}>
-          {/* Table shape */}
-          <div
-            style={{
-              width: "820px",
-              maxWidth: "98vw",
-              height: "460px",
-              background: "#c8922a",
-              borderRadius: "0 0 430px 430px / 0 0 460px 460px",
-              boxShadow: "0 0 0 10px #e8b84b, 0 8px 40px rgba(0,0,0,0.6)",
-              position: "relative",
-              overflow: "hidden",
-            }}>
-            {/* Inner felt shadow */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "inherit",
-                boxShadow: "inset 0 -30px 60px rgba(0,0,0,0.15)",
-                pointerEvents: "none",
-              }}
-            />
+      <div className={styles.main}>
+        <div className={styles.tableWrap}>
+          <div className={styles.table}>
+            <div className={styles.innerShadow} />
 
-            {/* ── Chip Stack (right side) ── */}
             {gameStatus !== "betting" && (
-              <div
-                style={{
-                  position: "absolute",
-                  right: "60px",
-                  top: "50px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "0",
-                }}>
-                {/* stacked chips visual */}
-                <div style={{ position: "relative", width: "90px", height: "140px" }}>
+              <div className={styles.chipStackPanel}>
+                <div className={styles.chipStackVisual}>
                   {chipStacks.map((stack, si) =>
                     Array.from({ length: Math.min(stack.count, 4) }).map((_, ci) => (
                       <Image
@@ -450,298 +332,96 @@ export default function Dealer() {
                         width={60}
                         height={60}
                         unoptimized
-                        style={{
-                          position: "absolute",
-                          bottom: `${si * 20 + ci * 5}px`,
-                          left: `${si % 2 === 0 ? 0 : 20}px`,
-                          width: "60px",
-                          height: "60px",
-                          objectFit: "contain",
-                          filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.4))",
-                        }}
+                        className={`${styles.chipImage} ${si % 2 === 0 ? styles.stackEven : styles.stackOdd} ${styles[`stack${Math.min(si, 6)}` as keyof typeof styles]} ${styles[`chip${Math.min(ci, 3)}` as keyof typeof styles]}`}
                       />
                     ))
                   )}
                 </div>
-                <span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(0,0,0,0.6)", marginTop: "4px" }}>Bet: {bet}</span>
+                <span className={styles.chipLabel}>Bet: {bet}</span>
               </div>
             )}
 
-            {/* ── Dealer Hand ── */}
-            <div
-              style={{
-                position: "absolute",
-                top: "30px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                gap: "10px",
-                alignItems: "flex-start",
-                justifyContent: "center",
-              }}>
+            <div className={styles.dealerRow}>
               {gameStatus !== "betting" &&
                 dealerHand.map((card, i) => (
-                  <div key={i} className={gameStatus === "game-over" ? "card card-flip" : "card"} style={{ width: "85px", height: "125px" }}>
-                    <Image
-                      src={getCardImagePath(card)}
-                      alt={`${card.rank}${card.suit}`}
-                      width={85}
-                      height={125}
-                      unoptimized
-                      style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
-                    />
+                  <div key={i} className={`${styles.cardFrame} ${styles.card} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()}>
+                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
               {gameStatus === "playing" && (
-                <div className="card-back" style={{ width: "85px", height: "125px" }}>
-                  <Image
-                    src={getCardBackImage(1)}
-                    alt="Card back"
-                    width={85}
-                    height={125}
-                    unoptimized
-                    style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
-                  />
+                <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
+                  <Image src={getCardBackImage(1)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
                 </div>
               )}
             </div>
 
-            {/* ── Dealer score badge + timer ── */}
             {gameStatus !== "betting" && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "168px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "6px",
-                }}>
-                <div
-                  style={{
-                    width: "46px",
-                    height: "46px",
-                    borderRadius: "50%",
-                    background: "rgba(100,100,100,0.75)",
-                    backdropFilter: "blur(4px)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 800,
-                    fontSize: "17px",
-                    color: "white",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
-                  }}>
-                  {gameStatus === "playing" ? dealerHand.reduce((acc, c) => acc + c.value, 0) : dealerValue}
-                </div>
-                {gameStatus === "playing" && <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(0,0,0,0.6)" }}>{timer} s</span>}
+              <div className={`${styles.scoreWrap} ${styles.dealerScoreWrap}`}>
+                <div className={styles.scoreBadge}>{gameStatus === "playing" ? dealerHand.reduce((acc, c) => acc + c.value, 0) : dealerValue}</div>
+                {gameStatus === "playing" && <span className={styles.scoreTimer}>{timer} s</span>}
               </div>
             )}
 
-            {/* ── Player score badge ── */}
             {gameStatus !== "betting" && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "240px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                }}>
-                <div
-                  style={{
-                    width: "46px",
-                    height: "46px",
-                    borderRadius: "50%",
-                    background: "rgba(100,100,100,0.75)",
-                    backdropFilter: "blur(4px)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 800,
-                    fontSize: "17px",
-                    color: "white",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
-                  }}>
-                  {playerValue}
-                </div>
+              <div className={`${styles.scoreWrap} ${styles.playerScoreWrap}`}>
+                <div className={styles.scoreBadge}>{playerValue}</div>
               </div>
             )}
 
-            {/* ── Player Hand ── */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: "50px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                gap: "10px",
-                alignItems: "flex-start",
-                justifyContent: "center",
-              }}>
+            <div className={styles.playerRow}>
               {gameStatus !== "betting" &&
                 playerHand.map((card, i) => (
-                  <div key={i} className="card" style={{ width: "85px", height: "125px" }}>
-                    <Image
-                      src={getCardImagePath(card)}
-                      alt={`${card.rank}${card.suit}`}
-                      width={85}
-                      height={125}
-                      unoptimized
-                      style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "fill", boxShadow: "0 4px 14px rgba(0,0,0,0.45)" }}
-                    />
+                  <div key={i} className={`${styles.cardFrame} ${styles.card}`.trim()}>
+                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
             </div>
 
-            {/* ── Betting phase overlay on table ── */}
             {gameStatus === "betting" && (
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "16px",
-                  borderRadius: "inherit",
-                }}>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: "22px", color: "rgba(0,0,0,0.55)", letterSpacing: "1px" }}>PLACE YOUR BET</p>
-                <div
-                  style={{
-                    background: "rgba(0,0,0,0.2)",
-                    borderRadius: "12px",
-                    padding: "10px 24px",
-                    fontWeight: 800,
-                    fontSize: "28px",
-                    color: "rgba(0,0,0,0.7)",
-                    minWidth: "120px",
-                    textAlign: "center",
-                  }}>
-                  {pendingBet > 0 ? pendingBet.toLocaleString() : "—"}
-                </div>
-                {/* Chips row */}
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+              <div className={styles.bettingOverlay}>
+                <p className={styles.bettingTitle}>PLACE YOUR BET</p>
+                <div className={styles.pendingBet}>{pendingBet > 0 ? pendingBet.toLocaleString() : "—"}</div>
+                <div className={styles.chipRow}>
                   {CHIP_VALUES.map((v) => (
-                    <button key={v} className="chip-btn" onClick={() => addChipToBet(v)} title={`+${v}`}>
-                      <Image src={CHIP_IMAGES[v]} alt={`${v}`} width={52} height={52} unoptimized style={{ width: "52px", height: "52px", objectFit: "contain" }} />
+                    <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
+                      <Image src={CHIP_IMAGES[v]} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
                     </button>
                   ))}
                 </div>
-                {message && <p style={{ margin: 0, color: "#dc2626", fontSize: "13px", fontWeight: 600 }}>{message}</p>}
+                {message && <p className={styles.inlineError}>{message}</p>}
               </div>
             )}
 
-            {/* ── Result badge ── */}
-            {result && (
-              <div
-                className="result-badge"
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  background: result.includes("win") ? "rgba(16,185,129,0.92)" : result.includes("Draw") ? "rgba(245,158,11,0.92)" : "rgba(239,68,68,0.92)",
-                  borderRadius: "16px",
-                  padding: "18px 40px",
-                  fontWeight: 800,
-                  fontSize: "22px",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-                  whiteSpace: "nowrap",
-                }}>
-                {result}
-              </div>
-            )}
+            {result && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
           </div>
         </div>
 
-        {/* ─── Controls below the table ─── */}
-        <div style={{ marginTop: "28px", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
-          {/* Betting controls */}
+        <div className={styles.controls}>
           {gameStatus === "betting" && (
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <button
-                onClick={clearBet}
-                style={{
-                  padding: "12px 24px",
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  background: "#374151",
-                  border: "none",
-                  color: "#d1d5db",
-                  cursor: "pointer",
-                  borderRadius: "10px",
-                  transition: "opacity 0.2s",
-                }}>
+            <div className={styles.controlsRow}>
+              <button onClick={clearBet} className={`${styles.controlButton} ${styles.clearButton}`.trim()}>
                 Clear
               </button>
               <button
                 onClick={() => startGame(pendingBet)}
                 disabled={isLoading || pendingBet <= 0}
-                style={{
-                  padding: "12px 44px",
-                  fontSize: "16px",
-                  fontWeight: 800,
-                  background: pendingBet > 0 ? "#10b981" : "#374151",
-                  border: "none",
-                  color: "white",
-                  cursor: pendingBet > 0 ? "pointer" : "not-allowed",
-                  borderRadius: "10px",
-                  opacity: isLoading ? 0.6 : 1,
-                  transition: "background 0.2s, transform 0.1s",
-                  boxShadow: pendingBet > 0 ? "0 0 20px rgba(16,185,129,0.4)" : "none",
-                }}>
+                className={`${styles.controlButton} ${styles.dealButton} ${pendingBet > 0 ? styles.dealButtonReady : styles.dealButtonIdle}`.trim()}>
                 {isLoading ? "Dealing…" : "DEAL"}
               </button>
             </div>
           )}
 
-          {/* Playing controls */}
           {gameStatus === "playing" && (
-            <div style={{ display: "flex", gap: "14px" }}>
-              <button
-                onClick={hit}
-                disabled={isLoading}
-                style={{
-                  padding: "14px 44px",
-                  fontSize: "17px",
-                  fontWeight: 800,
-                  background: "#3b82f6",
-                  border: "none",
-                  color: "white",
-                  cursor: "pointer",
-                  borderRadius: "12px",
-                  opacity: isLoading ? 0.5 : 1,
-                  boxShadow: "0 0 20px rgba(59,130,246,0.4)",
-                  transition: "transform 0.1s",
-                }}>
+            <div className={`${styles.controlsRow} ${styles.playingRow}`.trim()}>
+              <button onClick={hit} disabled={isLoading} className={`${styles.controlButton} ${styles.hitButton}`.trim()}>
                 HIT
               </button>
-              <button
-                onClick={stand}
-                disabled={isLoading}
-                style={{
-                  padding: "14px 44px",
-                  fontSize: "17px",
-                  fontWeight: 800,
-                  background: "#f97316",
-                  border: "none",
-                  color: "white",
-                  cursor: "pointer",
-                  borderRadius: "12px",
-                  opacity: isLoading ? 0.5 : 1,
-                  boxShadow: "0 0 20px rgba(249,115,22,0.4)",
-                  transition: "transform 0.1s",
-                }}>
+              <button onClick={stand} disabled={isLoading} className={`${styles.controlButton} ${styles.standButton}`.trim()}>
                 STAND
               </button>
             </div>
           )}
 
-          {/* Play Again */}
           {gameStatus === "game-over" && (
             <button
               onClick={() => {
@@ -753,22 +433,12 @@ export default function Dealer() {
                 setPendingBet(0);
               }}
               disabled={playerChips <= 0}
-              style={{
-                padding: "14px 48px",
-                fontSize: "17px",
-                fontWeight: 800,
-                background: "#10b981",
-                border: "none",
-                color: "white",
-                cursor: "pointer",
-                borderRadius: "12px",
-                boxShadow: "0 0 24px rgba(16,185,129,0.45)",
-              }}>
+              className={`${styles.controlButton} ${styles.playAgainButton}`.trim()}>
               {playerChips <= 0 ? "Out of chips!" : "Play Again"}
             </button>
           )}
 
-          {message && gameStatus !== "betting" && <p style={{ margin: 0, color: "#f87171", fontWeight: 600, fontSize: "14px" }}>{message}</p>}
+          {message && gameStatus !== "betting" && <p className={styles.bottomMessage}>{message}</p>}
         </div>
       </div>
     </div>

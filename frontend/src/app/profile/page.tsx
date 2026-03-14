@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserService from "../../lib/UserService";
+import styles from "./page.module.css";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,17 +23,8 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div style={{ textAlign: "center", marginTop: "100px" }}>
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          style={{
-            marginBottom: "20px",
-            padding: "6px 12px",
-            background: "#ccc",
-            border: "none",
-            cursor: "pointer",
-          }}>
+      <div className={styles.emptyState}>
+        <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
           ← Back
         </button>
         <p>No profile data. Please login first.</p>
@@ -42,18 +34,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div style={{ padding: "40px", maxWidth: "400px", margin: "100px auto", background: "white", border: "1px solid #ccc" }}>
-      <button
-        type="button"
-        onClick={() => router.back()}
-        style={{
-          alignSelf: "flex-start",
-          marginBottom: "20px",
-          padding: "6px 12px",
-          background: "#ccc",
-          border: "none",
-          cursor: "pointer",
-        }}>
+    <div className={styles.panel}>
+      <button type="button" onClick={() => router.back()} className={`${styles.backButton} ${styles.backButtonAligned}`}>
         ← Back
       </button>
       <h2>Profile</h2>
@@ -66,7 +48,7 @@ export default function ProfilePage() {
       <p>
         <strong>Role:</strong> {user.role}
       </p>
-      <button onClick={handleLogout} style={{ marginTop: "20px", padding: "10px 20px", background: "#f44336", color: "white", border: "none", cursor: "pointer" }}>
+      <button onClick={handleLogout} className={styles.logoutButton}>
         Logout
       </button>
     </div>

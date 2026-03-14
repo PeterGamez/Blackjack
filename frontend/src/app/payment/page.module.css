@@ -1,0 +1,269 @@
+.page {
+  background: #e9edf3;
+  min-height: 150vh;
+  padding-top: 200px;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3rem;
+  background: rgba(30, 36, 48, 0.95);
+  height: 183px;
+  z-index: 100;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  border-radius: 20px;
+  padding: 8px 24px 8px 0;
+  height: 64px;
+}
+
+.userAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #5c6b8a;
+  margin-left: -20px;
+  margin-right: 12px;
+}
+
+.userName {
+  color: #e6eaf2;
+  font-size: 18px;
+}
+
+.balanceRow {
+  display: flex;
+  gap: 24px;
+}
+
+.balanceCard {
+  height: 64px;
+  min-width: 200px;
+  border-radius: 20px;
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  color: #e6eaf2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+}
+
+.tokenBadge {
+  width: 30px;
+  height: 30px;
+  background: #b28bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.balancePlus {
+  margin-left: auto;
+  font-size: 24px;
+}
+
+.backButton {
+  position: absolute;
+  top: 210px;
+  left: 40px;
+  padding: 10px 18px;
+  background: #e3b75c;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 26px;
+  position: relative;
+  top: 50px;
+}
+
+.panel {
+  max-width: 900px;
+  margin: 120px auto;
+  background: #7b8caf;
+  border-radius: 18px;
+  padding: 50px;
+  display: flex;
+  justify-content: space-between;
+  transform: scale(1.25);
+  transform-origin: top center;
+}
+
+.summarySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summaryCard {
+  width: 240px;
+  background: #e5e7ec;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.summaryHeader {
+  background: #e3b75c;
+  padding: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.summaryBody {
+  padding: 20px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.summaryRowSpaced {
+  margin-top: 10px;
+}
+
+.summaryDivider {
+  margin: 15px 0;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.confirmButton {
+  margin-top: 25px;
+  background: linear-gradient(90deg, #f6d07a, #e3b75c);
+  border: none;
+  padding: 12px 34px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.methods {
+  width: 380px;
+}
+
+.methodCard {
+  border: 2px solid #2c3344;
+  padding: 20px;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.25s ease;
+}
+
+.methodCard + .methodCard {
+  margin-top: 20px;
+}
+
+.methodCardActive {
+  background: #8fa1c5;
+}
+
+.methodHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.methodHeaderSimple {
+  display: flex;
+  gap: 10px;
+}
+
+.methodText {
+  width: 100%;
+}
+
+.methodHint {
+  font-size: 12px;
+}
+
+.qrBody {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+.qrBodyOpen {
+  max-height: 250px;
+  opacity: 1;
+}
+
+.qrInner {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 28px;
+}
+
+.qrPreview {
+  width: 120px;
+  height: 120px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadButton {
+  margin-top: 15px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #2c3344;
+  background: #6c7fa3;
+  color: #fff;
+  cursor: pointer;
+}
+
+.linkBody {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+.linkBodyOpen {
+  max-height: 120px;
+  opacity: 1;
+}
+
+.linkInput {
+  margin-top: 12px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #2c3344;
+  outline: none;
+  box-shadow: none;
+  background: #8fa1c5;
+  color: #000;
+}
+
+.radio {
+  margin-top: 4px;
+}

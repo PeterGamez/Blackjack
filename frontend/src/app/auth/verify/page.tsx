@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import config from "../../../config";
+import styles from "./page.module.css";
 
 function VerifyContent() {
   const router = useRouter();
@@ -47,26 +48,10 @@ function VerifyContent() {
   }, [searchParams, router]);
 
   return (
-    <div
-      style={{
-        width: "400px",
-        padding: "30px",
-        border: "1px solid #ddd",
-        background: "white",
-        textAlign: "center",
-      }}>
-      {loading ? <p>Verifying your email...</p> : error ? <p style={{ color: "red" }}>{error}</p> : <p style={{ color: "green" }}>{message}</p>}
+    <div className={styles.card}>
+      {loading ? <p>Verifying your email...</p> : error ? <p className={styles.error}>{error}</p> : <p className={styles.success}>{message}</p>}
       {!loading && (
-        <button
-          onClick={() => router.push("/auth")}
-          style={{
-            marginTop: "16px",
-            padding: "10px 20px",
-            background: "#4da6ff",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}>
+        <button onClick={() => router.push("/auth")} className={styles.button}>
           Go to Login
         </button>
       )}
@@ -76,14 +61,7 @@ function VerifyContent() {
 
 export default function VerifyPage() {
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f4f4f4",
-      }}>
+    <div className={styles.page}>
       <Suspense fallback={<p>Loading...</p>}>
         <VerifyContent />
       </Suspense>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import SessionCache from "../../../lib/SessionCache";
 import UserService from "../../../lib/UserService";
-import { getAvatarColor } from "../../../lib/colorUtils";
+import ProfileAvatar from "../../components/ProfileAvatar";
 import styles from "../shop.module.css";
 
 export default function StorePage() {
@@ -46,9 +46,7 @@ export default function StorePage() {
       <div className={styles.topBar}>
         {/* Profile Section */}
         <div className={styles.profileSection}>
-          <div className={styles.profileAvatar} style={{ background: username ? getAvatarColor(username) : "#5c6b8a" }}>
-            {username ? username[0].toUpperCase() : "?"}
-          </div>
+          <ProfileAvatar username={username} className={styles.profileAvatar} />
           <span className={styles.username}>{username}</span>
         </div>
 

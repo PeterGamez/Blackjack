@@ -10,10 +10,10 @@ type ComingSoonPageProps = {
   message: string;
   backPath: string;
   backLabel: string;
-  background?: string;
+  variant?: "default" | "cool";
 };
 
-export default function ComingSoonPage({ message, backPath, backLabel, background }: ComingSoonPageProps) {
+export default function ComingSoonPage({ message, backPath, backLabel, variant = "default" }: ComingSoonPageProps) {
   const router = useRouter();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function ComingSoonPage({ message, backPath, backLabel, backgroun
   }, [router]);
 
   return (
-    <div className={styles.container} style={background ? { background } : undefined}>
+    <div className={`${styles.container} ${variant === "cool" ? styles.cool : ""}`.trim()}>
       <h1 className={styles.title}>Coming soon</h1>
       <p className={styles.message}>{message}</p>
       <button onClick={() => router.push(backPath)} className={styles.backButton}>

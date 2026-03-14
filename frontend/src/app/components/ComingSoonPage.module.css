@@ -8,6 +8,10 @@
   gap: 20px;
 }
 
+.cool {
+  background: #f4f4f4;
+}
+
 .title {
   font-size: 32px;
   color: #333;

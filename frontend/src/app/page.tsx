@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import SessionCache from "../lib/SessionCache";
 import UserService from "../lib/UserService";
-import { getAvatarColor } from "../lib/colorUtils";
+import ProfileAvatar from "./components/ProfileAvatar";
 import styles from "./page.module.css";
 
 const menuItems = [
@@ -48,7 +48,6 @@ export default function Home() {
     SessionCache.persistCachedProfile({ username, coins, tokens });
   }, [username, coins, tokens]);
 
-  const avatarColor = useMemo(() => (username ? getAvatarColor(username) : "#5c6b8a"), [username]);
   const coinsLabel = useMemo(() => coins.toLocaleString(), [coins]);
   const tokensLabel = useMemo(() => tokens.toLocaleString(), [tokens]);
 
@@ -63,15 +62,13 @@ export default function Home() {
       <div className={styles.content}>
         <div className={styles.topBar}>
           <div onClick={() => router.push(username ? "/profile" : "/auth")} className={styles.profileCard}>
-            <div className={styles.avatar} style={{ background: avatarColor }}>
-              {username ? username[0].toUpperCase() : "?"}
-            </div>
+            <ProfileAvatar username={username} className={styles.avatar} />
             <div className={styles.username}>{username || "username"}</div>
           </div>
 
           <div className={styles.balanceWrap}>
             <div className={styles.statCard}>
-              <span style={{ fontSize: "20px" }}>🪙</span>
+              <span className={styles.coinBadge}>🪙</span>
               {coinsLabel}
             </div>
 

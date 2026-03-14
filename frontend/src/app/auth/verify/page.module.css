@@ -1,0 +1,32 @@
+.page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4f4f4;
+}
+
+.card {
+  width: 400px;
+  padding: 30px;
+  border: 1px solid #ddd;
+  background: #ffffff;
+  text-align: center;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+.button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #4da6ff;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}

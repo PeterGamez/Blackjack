@@ -43,5 +43,4 @@ export default class PaymentModel {
             connection.release();
         }
     }
-    
 }

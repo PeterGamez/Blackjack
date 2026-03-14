@@ -15,16 +15,18 @@ export default class ProductModel {
         const sql = `INSERT INTO ${this.table} (name, description, image, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute<ResultSetHeader>(sql, [
-                product.name,
-                product.description,
-                product.image,
-                product.tokens,
-                product.coins,
-                product.type,
-                product.isRecommend,
-                product.isActive,
-            ]);
+            await connection.execute<ResultSetHeader>(sql, [product.name, product.description, product.image, product.tokens, product.coins, product.type, product.isRecommend, product.isActive]);
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async selectAllProducts(): Promise<ProductInterface[]> {
+        const sql = `SELECT * FROM ${this.table}`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql);
+            return rows as ProductInterface[];
         } finally {
             connection.release();
         }

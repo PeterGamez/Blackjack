@@ -1,19 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import SessionCache from "../../../lib/SessionCache";
-import UserService from "../../../lib/UserService";
-import ProfileAvatar from "../../components/ProfileAvatar";
+import Navbar from "../../components/Navbar";
 import styles from "../test.module.css";
 
 export default function StorePage() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
   const [selected, setSelected] = useState("theme");
   const [hovered, setHovered] = useState<string | null>(null);
   const active = hovered || selected;
@@ -28,54 +22,9 @@ export default function StorePage() {
     { name: "Name", price: "price" },
   ];
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await UserService.getUser();
-        if (!data) return;
-        setUsername(data.username || "");
-        if (typeof data.coins === "number") {
-          setCoins(data.coins);
-        }
-        if (typeof data.tokens === "number") {
-          setTokens(data.tokens);
-        }
-      } catch (err) {
-        console.error("failed to load profile", err);
-      }
-    };
-
-    void loadProfile();
-  }, []);
-
   return (
     <div className={styles.container}>
-      {/* Top Bar with User Info */}
-      <div className={styles.topBar}>
-        {/* Profile Section */}
-        <div className={styles.profileSection}>
-          <ProfileAvatar username={username} className={styles.profileAvatar} />
-          <span className={styles.username}>{username}</span>
-        </div>
-
-        {/* Right: Coins and Tokens */}
-        <div className={styles.resourcesSection}>
-          {/* Coins */}
-          <div className={styles.resourceBox}>
-            <span className={styles.coinIcon}>🪙</span>
-            <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
-          </div>
-
-          {/* Tokens */}
-          <div className={styles.resourceBox}>
-            <div className={styles.tokenIcon}>
-              <span className={styles.tokenLetter}>T</span>
-            </div>
-            <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
-            <button className={styles.plusButton}>+</button>
-          </div>
-        </div>
-      </div>
+      <Navbar />
       {/* Back Button */}
       <button onClick={() => router.push("/")} className={styles.backButton}>
         ← Lobby

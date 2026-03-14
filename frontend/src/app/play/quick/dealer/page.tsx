@@ -6,11 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import config from "../../../../config";
-import LocalStorage from "../../../../lib/LocalStorage";
-import SessionCache from "../../../../lib/SessionCache";
 import UserService from "../../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
-import ProfileAvatar from "../../../components/ProfileAvatar";
+import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 
 interface Card {
@@ -76,7 +74,6 @@ export default function Dealer() {
   const [gameId, setGameId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
-  const [username, setUsername] = useState<string>("username");
   const [timer, setTimer] = useState<number>(10);
   const [cardSkin, setCardSkin] = useState<string>("Default");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -131,24 +128,21 @@ export default function Dealer() {
 
   useEffect(() => {
     (async () => {
-      const cachedProfile = SessionCache.getCachedProfileSnapshot();
-      const userData = await UserService.getUser();
-      if (!userData) {
+      const user = await UserService.getUser();
+      if (!user) {
         router.push("/auth");
         return;
       }
 
-      setUserId(userData.id);
-      setUsername(userData.username || "username");
-      setPlayerChips(userData.coins ?? cachedProfile.coins);
-      setCardSkin(LocalStorage.getItem("selectedCardSkin") ?? "Default");
-      sessionStorage.setItem("userId", userData.id.toString());
+      setUserId(user.id);
+      setPlayerChips(user.coins);
 
-      const token = sessionStorage.getItem("accessToken");
+      sessionStorage.setItem("cached_coins", user.coins.toString());
+
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,
-        auth: { token },
+        auth: { token: sessionStorage.getItem("accessToken") },
       });
 
       socket.on("connect", () => console.log("Socket connected"));
@@ -174,7 +168,7 @@ export default function Dealer() {
           setDealerHand(data.dealerHand);
           const msg = data.result === "win" ? "You win! 🎉" : data.result === "draw" ? "Draw!" : "Dealer wins";
           setResult(msg);
-          const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : cachedProfile.coins;
+          const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : playerChips;
           setPlayerChips(nextChips);
           sessionStorage.setItem("cached_coins", nextChips.toString());
           setGameStatus("game-over");
@@ -294,30 +288,7 @@ export default function Dealer() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div
-          onClick={() => {
-            if (socketRef.current && gameId) socketRef.current.emit("game:leave", { gameId, userId });
-            router.push("/play");
-          }}
-          className={styles.userButton}>
-          <ProfileAvatar username={username} className={styles.userAvatar} />
-          <span className={styles.userName}>{username}</span>
-        </div>
-
-        <div className={styles.balances}>
-          <div className={`${styles.balanceCard} ${styles.coinsCard}`}>
-            <div className={`${styles.balanceBadge} ${styles.coinBadge}`}>C</div>
-            <span className={styles.balanceValue}>{playerChips.toLocaleString()}</span>
-          </div>
-          <div className={`${styles.balanceCard} ${styles.tokensCard}`}>
-            <div className={`${styles.balanceBadge} ${styles.tokenBadge}`}>T</div>
-            <span className={styles.balanceValue}>0</span>
-            <span className={styles.balancePlus}>+</span>
-          </div>
-        </div>
-      </div>
-
+      <Navbar />
       <div className={styles.main}>
         <div className={styles.tableWrap}>
           <div className={styles.table}>

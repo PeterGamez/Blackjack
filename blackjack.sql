@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 11, 2026 at 09:01 AM
+-- Generation Time: Mar 14, 2026 at 07:08 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
 -- PHP Version: 8.2.30
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `blackjack`
+-- Database: `blackjack_dev`
 --
 
 -- --------------------------------------------------------
@@ -61,12 +61,15 @@ CREATE TABLE `codeHistory` (
 
 CREATE TABLE `gameHistory` (
   `id` int(11) NOT NULL,
-  `userId1` int(11) NOT NULL DEFAULT 0,
-  `userId2` int(11) NOT NULL DEFAULT 0,
-  `result` varchar(255) NOT NULL,
-  `mode` varchar(255) NOT NULL,
-  `bet` int(11) NOT NULL DEFAULT 0,
-  `reward` int(11) NOT NULL DEFAULT 0,
+  `playerId` int(11) NOT NULL DEFAULT 0,
+  `dealerId` int(11) NOT NULL DEFAULT 0,
+  `mode` varchar(10) NOT NULL,
+  `bet` int(11) NOT NULL,
+  `playerScore` int(11) NOT NULL DEFAULT 0,
+  `dealerScore` int(11) NOT NULL DEFAULT 0,
+  `result` varchar(10) NOT NULL,
+  `playerPayout` int(11) NOT NULL,
+  `dealerPayout` int(11) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -79,11 +82,10 @@ CREATE TABLE `gameHistory` (
 
 CREATE TABLE `package` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `price` int(11) NOT NULL,
   `tokens` int(11) NOT NULL,
-  `isActive` tinyint(1) NOT NULL,
+  `isActive` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -98,8 +100,28 @@ CREATE TABLE `payment` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL DEFAULT 0,
   `receiptRef` varchar(255) NOT NULL,
+  `type` varchar(10) NOT NULL,
   `amount` int(11) NOT NULL DEFAULT 0,
-  `currencyType` varchar(255) NOT NULL,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product`
+--
+
+CREATE TABLE `product` (
+  `id` int(5) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `tokens` int(11) NOT NULL,
+  `coins` int(11) NOT NULL,
+  `type` varchar(10) NOT NULL,
+  `isRecommend` tinyint(1) NOT NULL,
+  `isActive` tinyint(1) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -126,13 +148,13 @@ CREATE TABLE `user` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `userSkin`
+-- Table structure for table `userInventory`
 --
 
-CREATE TABLE `userSkin` (
+CREATE TABLE `userInventory` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL DEFAULT 0,
-  `skinId` int(11) NOT NULL DEFAULT 0,
+  `productId` int(11) NOT NULL DEFAULT 0,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -213,15 +235,21 @@ ALTER TABLE `payment`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `userSkin`
+-- Indexes for table `userInventory`
 --
-ALTER TABLE `userSkin`
+ALTER TABLE `userInventory`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -261,10 +289,22 @@ ALTER TABLE `gameHistory`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `package`
+--
+ALTER TABLE `package`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `payment`
 --
 ALTER TABLE `payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
@@ -273,9 +313,9 @@ ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `userSkin`
+-- AUTO_INCREMENT for table `userInventory`
 --
-ALTER TABLE `userSkin`
+ALTER TABLE `userInventory`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

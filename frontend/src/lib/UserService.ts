@@ -14,6 +14,11 @@ export default class UserService {
     if (!res.ok) throw new Error(data.error || "Login failed");
     SessionStorage.setItem("accessToken", data.accessToken);
     LocalStorage.setItem("refreshToken", data.refreshToken);
+
+    SessionStorage.setItem("cached_userId", data.user.id.toString());
+    SessionStorage.setItem("cached_username", data.user.username);
+    SessionStorage.setItem("cached_coins", data.user.coins.toString());
+    SessionStorage.setItem("cached_tokens", data.user.tokens.toString());
     return data;
   }
 
@@ -21,6 +26,7 @@ export default class UserService {
     SessionStorage.removeItem("accessToken");
     LocalStorage.removeItem("refreshToken");
 
+    SessionStorage.removeItem("cached_userId");
     SessionStorage.removeItem("cached_username");
     SessionStorage.removeItem("cached_coins");
     SessionStorage.removeItem("cached_tokens");
@@ -36,7 +42,7 @@ export default class UserService {
     if (!res.ok) throw new Error(data.error || "Register failed");
   }
 
-  public static async getUser(): Promise<UserInterface | null> {
+  public static async getUser(): Promise<UserInterface> {
     let token = SessionStorage.getItem("accessToken");
 
     if (!token) {

@@ -2,10 +2,12 @@ import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
 import type Server from "../Server";
-import type { CodeInterface } from "../interfaces/Database";
+import type { CodeInterface, ProductInterface } from "../interfaces/Database";
 import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
+import PackageModel from "../models/PackageModel";
 import PaymentModel from "../models/PaymentModel";
+import ProductModel from "../models/ProductModel";
 import UserModel from "../models/UserModel";
 
 export default class AdminRoute implements RouteInterface {
@@ -117,6 +119,89 @@ export default class AdminRoute implements RouteInterface {
             }));
 
             return c.json(response);
+        });
+
+        this.app.get("/packages", async (c) => {
+            const packages = await PackageModel.selectAllPackages();
+
+            const response = packages.map((pkg) => ({
+                id: pkg.id,
+                image: pkg.image,
+                price: pkg.price,
+                tokens: pkg.tokens,
+                isActive: pkg.isActive,
+                updatedAt: pkg.updatedAt,
+            }));
+
+            return c.json(response);
+        });
+
+        this.app.post("/package", async (c) => {
+            try {
+                let body: { image: string; price: number; tokens: number; isActive: boolean };
+                try {
+                    body = await c.req.json<typeof body>();
+                } catch {
+                    return c.json({ error: "Invalid or missing JSON body" }, 400);
+                }
+
+                const { image, price, tokens, isActive } = body;
+
+                if (!image || !price || !tokens || typeof isActive !== "boolean") {
+                    return c.json({ error: "Missing required fields" }, 400);
+                }
+
+                const newPackageId = await PackageModel.createPackage(image, price, tokens, isActive);
+
+                return c.json({ message: "Package created successfully", packageId: newPackageId });
+            } catch (error) {
+                this.server.error("AdminRoute", `Failed to create package:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
+        });
+
+        this.app.get("/products", async (c) => {
+            const products = await ProductModel.selectAllProducts();
+
+            const response = products.map((product) => ({
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                image: product.image,
+                tokens: product.tokens,
+                coins: product.coins,
+                type: product.type,
+                isRecommend: product.isRecommend,
+                isActive: product.isActive,
+                updatedAt: product.updatedAt,
+            }));
+
+            return c.json(response);
+        });
+
+        this.app.post("/product", async (c) => {
+            try {
+                let body: { name: string; description: string; image: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
+                try {
+                    body = await c.req.json<typeof body>();
+                } catch {
+                    return c.json({ error: "Invalid or missing JSON body" }, 400);
+                }
+                const { name, description, image, tokens, coins, type, isRecommend, isActive } = body;
+
+                if (!name || !description || !image || !tokens || !coins || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
+                    return c.json({ error: "Missing required fields" }, 400);
+                }
+
+                await ProductModel.insertProduct(body);
+
+                return c.json({ message: "Product created successfully" });
+            } catch (error) {
+                this.server.error("AdminRoute", `Failed to create product:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
         });
     }
 

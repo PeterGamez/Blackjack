@@ -8,4 +8,7 @@ export interface UserInterface extends InterfaceBase {
     tokens: number;
     coins: number;
     isVerified: boolean;
+    cardId: number;
+    chipId: number;
+    themeId: number;
 }

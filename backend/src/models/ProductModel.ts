@@ -11,6 +11,10 @@ export default class ProductModel {
         this.DB = DB;
     }
 
+    public static getTable(): string {
+        return this.table;
+    }
+
     public static async insertProduct(product: Omit<ProductInterface, "id" | "createdAt" | "updatedAt">): Promise<void> {
         const sql = `INSERT INTO ${this.table} (name, description, image, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();

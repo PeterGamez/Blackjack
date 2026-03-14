@@ -1,11 +1,11 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 
-export default function PaymentPage() {
+function PaymentContent() {
 
 const router = useRouter()
 const searchParams = useSearchParams()
@@ -20,9 +20,9 @@ const [tokensBalance,setTokensBalance] = useState(0)
 
 useEffect(()=>{
 
-const cachedUsername = localStorage.getItem("cached_username")
-const cachedCoins = localStorage.getItem("cached_coins")
-const cachedTokens = localStorage.getItem("cached_tokens")
+const cachedUsername = sessionStorage.getItem("cached_username")
+const cachedCoins = sessionStorage.getItem("cached_coins")
+const cachedTokens = sessionStorage.getItem("cached_tokens")
 
 if(cachedUsername) setUsername(cachedUsername)
 if(cachedCoins) setCoins(Number(cachedCoins))
@@ -408,3 +408,10 @@ color:"#000"
 )
 }
 
+export default function PaymentPage() {
+  return (
+    <Suspense>
+      <PaymentContent />
+    </Suspense>
+  )
+}

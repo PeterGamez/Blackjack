@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 14, 2026 at 07:08 AM
+-- Generation Time: Mar 14, 2026 at 10:49 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
 -- PHP Version: 8.2.30
 
@@ -141,6 +141,9 @@ CREATE TABLE `user` (
   `tokens` int(11) NOT NULL DEFAULT 0,
   `coins` int(11) NOT NULL DEFAULT 1000,
   `isVerified` tinyint(1) NOT NULL DEFAULT 0,
+  `cardId` int(11) DEFAULT NULL,
+  `chipId` int(11) DEFAULT NULL,
+  `themeId` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -155,47 +158,6 @@ CREATE TABLE `userInventory` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL DEFAULT 0,
   `productId` int(11) NOT NULL DEFAULT 0,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `product`
---
-
-CREATE TABLE `product` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `image` varchar(500) DEFAULT NULL,
-  `tokens` int(11) NOT NULL DEFAULT 0,
-  `coins` int(11) NOT NULL DEFAULT 0,
-  `type` enum('card','chip','theme') NOT NULL DEFAULT 'card',
-  `isRecommend` tinyint(1) NOT NULL DEFAULT 0,
-  `isActive` tinyint(1) NOT NULL DEFAULT 1,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `product`
---
-
-INSERT INTO `product` (`id`, `name`, `description`, `image`, `tokens`, `coins`, `type`, `isRecommend`, `isActive`, `createdAt`, `updatedAt`) VALUES
-(1, 'Test', 'A test card skin.', '/cards/test/back01.png', 0, 500, 'card', 1, 1, current_timestamp(), current_timestamp());
-
--- --------------------------------------------------------
-
---
--- Table structure for table `userInventory`
---
-
-CREATE TABLE `userInventory` (
-  `id` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
-  `productId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -253,20 +215,6 @@ ALTER TABLE `userInventory`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `product`
---
-ALTER TABLE `product`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `userInventory`
---
-ALTER TABLE `userInventory`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `userId` (`userId`),
-  ADD KEY `productId` (`productId`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -311,18 +259,6 @@ ALTER TABLE `product`
 --
 ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `userInventory`
---
-ALTER TABLE `userInventory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `product`
---
-ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `userInventory`

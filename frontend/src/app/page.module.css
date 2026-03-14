@@ -1,0 +1,246 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #1e2430;
+}
+
+.bgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.bgOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 14, 20, 0.5) 0%, rgba(10, 14, 20, 0.75) 100%);
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 60px 56px;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  gap: 32px;
+}
+
+.profileCard {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0;
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  border-radius: 20px;
+  padding: 8px 24px 8px 0;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #5c6b8a;
+  z-index: 2;
+  margin-left: -20px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.username {
+  color: #e6eaf2;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.balanceWrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-right: 0;
+}
+
+.statCard {
+  height: 64px;
+  min-width: 220px;
+  border-radius: 20px;
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  color: #e6eaf2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  font-size: 18px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.statCard:hover {
+  background: rgba(92, 107, 138, 0.8);
+  transform: translateY(-2px);
+}
+
+.tokenIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #b28bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.plus {
+  font-size: 28px;
+  line-height: 1;
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.placeholderWrap {
+  padding-left: 6px;
+}
+
+.placeholder {
+  width: 270px;
+  height: 420px;
+  border-radius: 14px;
+  background: #d9d9d9;
+}
+
+.menuRow {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2px;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.menuButton {
+  width: 250px;
+  height: 64px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  transform: skewX(-45deg);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  margin-left: -6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.menuButton:hover {
+  transform: skewX(-45deg) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.menuLabel {
+  display: inline-block;
+  transform: skewX(45deg);
+}
+
+.menuButtonShop {
+  background: linear-gradient(90deg, #c99a3f 0%, #e6b85c 50%, #f2c879 100%);
+}
+
+.menuButtonInventory {
+  background: #f2c879;
+}
+
+.menuButtonGambling {
+  background: linear-gradient(90deg, #f2c879 0%, #e6b85c 50%, #c99a3f 100%);
+}
+
+.menuButtonCreate {
+  background: #c99a3f;
+}
+
+.menuButtonPlay {
+  background: linear-gradient(90deg, #c99a3f 0%, #e6b85c 50%, #f2c879 100%);
+}
+
+@media (max-width: 1024px) {
+  .content {
+    padding: 20px 24px 40px;
+  }
+
+  .topBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .balanceWrap {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .statCard {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .placeholder {
+    width: min(270px, 70vw);
+    height: min(420px, 50vh);
+  }
+
+  .menuButton {
+    width: clamp(170px, 40vw, 240px);
+    margin-left: 0;
+  }
+
+  .menuRow {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .profileCard {
+    width: 100%;
+  }
+
+  .balanceWrap {
+    flex-direction: column;
+  }
+
+  .menuButton {
+    width: 100%;
+    max-width: 320px;
+  }
+}

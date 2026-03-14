@@ -3,7 +3,6 @@ import type { BlankEnv, BlankSchema } from "hono/types";
 
 import type Server from "../Server";
 import type { CodeInterface, ProductInterface } from "../interfaces/Database";
-import { OmitDatabase } from "../interfaces/Omit";
 import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PackageModel from "../models/PackageModel";

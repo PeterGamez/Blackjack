@@ -41,7 +41,7 @@ export const getChipSkin = (): string => {
   return LocalStorage.getItem("chipSkin") || "default";
 };
 
-export const getTableImage =(skin: string = "default"): string => {
+export const getTableImage = (skin: string = "default"): string => {
   return `/tables/${skin}/table.png`;
 };
 

@@ -183,15 +183,15 @@ export default class AdminRoute implements RouteInterface {
 
         this.app.post("/product", async (c) => {
             try {
-                let body: { name: string; description: string; image: string; path:string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
+                let body: { name: string; description: string; image: string; path: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
                 try {
                     body = await c.req.json<typeof body>();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
-                const { name, description, image, tokens, coins, type, isRecommend, isActive } = body;
+                const { name, description, image, path, tokens, coins, type, isRecommend, isActive } = body;
 
-                if (!name || !description || !image || !tokens || !coins || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
+                if (!name || !description || !image || !path || !tokens || !coins || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 

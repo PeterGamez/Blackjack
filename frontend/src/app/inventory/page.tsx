@@ -247,7 +247,10 @@ export default function InventoryPage() {
             displayedSkins.map((skin) => {
               const isEquipped = selectedSkins[activeTab] === skin.path;
               return (
-                <div key={`${activeTab}-${skin.productId}-${skin.path}`} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => void selectSkin(activeTab, skin.path, skin.productId)}>
+                <div
+                  key={`${activeTab}-${skin.productId}-${skin.path}`}
+                  className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()}
+                  onClick={() => void selectSkin(activeTab, skin.path, skin.productId)}>
                   <div className={styles.skinPreview}>
                     {activeTab === "card" ? (
                       <div style={CARD_STACK_STYLE}>

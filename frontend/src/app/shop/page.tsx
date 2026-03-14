@@ -11,10 +11,10 @@ import UserService from "@lib/UserService";
 import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
 
 import config from "@/config";
+import ShopService from "@/lib/ShopService";
 
 import Navbar from "../components/Navbar";
 import styles from "./shop.module.css";
-import ShopService from "@/lib/ShopService";
 
 type ShopTab = "recommend" | "table" | "card" | "chip";
 

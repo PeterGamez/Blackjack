@@ -19,7 +19,17 @@ export default class ProductModel {
         const sql = `INSERT INTO ${this.table} (name, description, image, path, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute<ResultSetHeader>(sql, [product.name, product.description, product.image, product.path, product.tokens, product.coins, product.type, product.isRecommend, product.isActive]);
+            await connection.execute<ResultSetHeader>(sql, [
+                product.name,
+                product.description,
+                product.image,
+                product.path,
+                product.tokens,
+                product.coins,
+                product.type,
+                product.isRecommend,
+                product.isActive,
+            ]);
         } finally {
             connection.release();
         }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
+import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 interface Package {
@@ -23,60 +23,16 @@ const PACKAGES: Package[] = [
 
 export default function TopupPage() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  // tabs removed, always show packages
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await UserService.getUser();
-        if (!data) {
-          router.replace("/auth");
-          return;
-        }
-        setUsername(data.username || "");
-        if (typeof data.coins === "number") {
-          setCoins(data.coins);
-        }
-        if (typeof data.tokens === "number") {
-          setTokens(data.tokens);
-        }
-      } catch (err) {
-        console.error("failed to load profile", err);
-      }
-    };
-
-    void loadProfile();
+    UserService.getUser().then((data) => {
+      if (!data) router.replace("/auth");
+    });
   }, [router]);
-
-  useEffect(() => {
-    SessionCache.persistCachedProfile({ username, coins, tokens });
-  }, [username, coins, tokens]);
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div onClick={() => router.push(username ? "/profile" : "/auth")} className={styles.userCard}>
-          <div className={styles.userAvatar} />
-          <div className={styles.userName}>{username || "username"}</div>
-        </div>
-
-        <div className={styles.balanceRow}>
-          <div className={styles.balanceCard} onClick={() => router.push("/topup")}>
-            <span className={styles.coinBadge}>🪙</span>
-            {coins.toLocaleString()}
-          </div>
-
-          <div className={styles.balanceCard} onClick={() => router.push("/topup")}>
-            <div className={styles.tokenIcon}>T</div>
-            {tokens.toLocaleString()}
-            <span className={styles.plus}>+</span>
-          </div>
-        </div>
-      </div>
+      <Navbar />
 
       <button onClick={() => router.push("/")} className={styles.backButton}>
         ← Lobby

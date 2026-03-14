@@ -1,0 +1,160 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  --side-offset: 56px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3rem;
+  background: transparent;
+  z-index: 100;
+  gap: 2rem;
+  height: 183px;
+  box-sizing: border-box;
+}
+
+/* Profile Section */
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 0 0 auto;
+  margin-left: var(--side-offset);
+  background: rgba(92, 107, 138, 0.6);
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem 0.75rem 0;
+  height: clamp(54px, 7vw, 70px);
+}
+
+.profileAvatar {
+  width: clamp(60px, 9vw, 88px);
+  height: clamp(60px, 9vw, 88px);
+  border-radius: 50%;
+  background: #5c6b8a;
+  border: 3px solid #5c6b8a;
+  flex-shrink: 0;
+  margin-left: -20px;
+  margin-right: 0.75rem;
+  margin-top: -20px;
+  margin-bottom: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 700;
+  color: #ffffff;
+  user-select: none;
+}
+
+.username {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: #e6eaf2;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+/* Resources Section */
+.resourcesSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-right: var(--side-offset);
+}
+
+.resourceBox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(92, 107, 138, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(92, 107, 138, 0.8);
+  min-width: 220px;
+  width: 220px;
+  transition: all 0.3s ease;
+  justify-content: flex-start;
+}
+
+.resourceBox:hover {
+  background: rgba(92, 107, 138, 0.8);
+  transform: translateY(-2px);
+}
+
+.coinIcon {
+  width: 45px;
+  height: 45px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tokenIcon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(59.54deg, #8f86aa 7.63%, #7e7599 50%, #4f4766 92.37%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0px 3px 6px rgba(74, 67, 95, 0.007);
+  flex-shrink: 0;
+}
+
+.tokenLetter {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 800;
+  background: linear-gradient(179.64deg, #f2c879 0.31%, #e6b85c 50%, #c99a3f 99.69%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resourceValue {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #e6eaf2;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plusButton {
+  background: transparent;
+  border: none;
+  color: #e6eaf2;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.plusButton:hover {
+  color: #f2c879;
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 20px;
+    height: auto;
+    min-height: 80px;
+  }
+
+  .resourceBox {
+    min-width: 140px;
+    width: auto;
+  }
+}

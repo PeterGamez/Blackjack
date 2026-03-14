@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserService from "../../lib/UserService";
+import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 export default function ProfilePage() {
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className={styles.emptyState}>
+        <Navbar />
         <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
           ← Back
         </button>
@@ -35,6 +37,7 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.panel}>
+      <Navbar />
       <button type="button" onClick={() => router.back()} className={`${styles.backButton} ${styles.backButtonAligned}`}>
         ← Back
       </button>

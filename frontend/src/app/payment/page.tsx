@@ -4,12 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
-import SessionCache from "../../lib/SessionCache";
+import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 function PaymentContent() {
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -17,28 +15,10 @@ function PaymentContent() {
   const price = searchParams.get("price");
 
   const [method, setMethod] = useState("");
-  const [username] = useState(cachedProfile.username);
-  const [coins] = useState(cachedProfile.coins);
-  const [tokensBalance] = useState(cachedProfile.tokens);
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div onClick={() => router.push(username ? "/profile" : "/auth")} className={styles.userCard}>
-          <div className={styles.userAvatar} />
-          <div className={styles.userName}>{username || "username"}</div>
-        </div>
-
-        <div className={styles.balanceRow}>
-          <div className={styles.balanceCard}>🪙 {coins.toLocaleString()}</div>
-
-          <div className={styles.balanceCard}>
-            <div className={styles.tokenBadge}>T</div>
-            {tokensBalance.toLocaleString()}
-            <span className={styles.balancePlus}>+</span>
-          </div>
-        </div>
-      </div>
+      <Navbar />
 
       <button onClick={() => router.push("/topup")} className={styles.backButton}>
         ← LOBBY

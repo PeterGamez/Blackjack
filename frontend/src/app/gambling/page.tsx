@@ -3,47 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
-import ProfileAvatar from "../components/ProfileAvatar";
+import Navbar from "../components/Navbar";
 import styles from "./gambling.module.css";
 
 export default function Home() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
   const [hovered, setHovered] = useState<string | null>(null);
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await UserService.getUser();
-        if (!data) {
-          router.replace("/auth");
-          return;
-        }
-        setUsername(data.username || "");
-        if (typeof data.coins === "number") {
-          setCoins(data.coins);
-        }
-        if (typeof data.tokens === "number") {
-          setTokens(data.tokens);
-        }
-      } catch (err) {
-        console.error("failed to load profile", err);
-      }
-    };
-
-    void loadProfile();
+    UserService.getUser().then((data) => {
+      if (!data) router.replace("/auth");
+    });
   }, [router]);
-
-  // save to cache whenever username, coins, or tokens change
-  useEffect(() => {
-    SessionCache.persistCachedProfile({ username, coins, tokens });
-  }, [username, coins, tokens]);
 
   useEffect(() => {
     const updateStageScale = () => {
@@ -73,33 +46,8 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <Navbar />
       <div ref={stageRef} className={styles.stage}>
-        {/* Top Bar with User Info */}
-        <div className={styles.topBar}>
-          {/* Profile Section */}
-          <div className={styles.profileSection}>
-            <ProfileAvatar username={username} className={styles.profileAvatar} />
-            <span className={styles.username}>{username}</span>
-          </div>
-
-          {/* Right: Coins and Tokens */}
-          <div className={styles.resourcesSection}>
-            {/* Coins */}
-            <div className={styles.resourceBox}>
-              <span className={styles.coinIcon}>🪙</span>
-              <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
-            </div>
-
-            {/* Tokens */}
-            <div className={styles.resourceBox}>
-              <div className={styles.tokenIcon}>
-                <span className={styles.tokenLetter}>T</span>
-              </div>
-              <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
-              <button className={styles.plusButton}>+</button>
-            </div>
-          </div>
-        </div>
         {/* Back Button */}
         <button onClick={() => router.push("/")} className={styles.backButton}>
           ← Lobby

@@ -30,8 +30,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 28px 60px 56px;
+  padding: 183px 60px 56px;
 }
 
 .topBar {
@@ -135,6 +134,9 @@
 }
 
 .placeholderWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
   padding-left: 6px;
 }
 

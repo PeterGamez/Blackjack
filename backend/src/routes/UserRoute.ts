@@ -59,7 +59,7 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            let body: { password?: string, cardId?: number, chipId?: number, themeId?: number };
+            let body: { password?: string; cardId?: number; chipId?: number; themeId?: number };
             try {
                 body = await c.req.parseBody();
             } catch {

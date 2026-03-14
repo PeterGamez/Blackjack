@@ -1,13 +1,14 @@
 "use client";
 
+import config from "@/src/config";
+import LocalStorage from "@/src/lib/LocalStorage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-import config from "../../../../config";
 import UserService from "../../../../lib/UserService";
-import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
+import { getCardBackImage, getCardImagePath, getSelectedSkin } from "../../../../lib/cardUtils";
 import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 
@@ -69,13 +70,17 @@ export default function Dealer() {
   const [bet, setBet] = useState<number>(0);
   const [pendingBet, setPendingBet] = useState<number>(0);
   const [playerChips, setPlayerChips] = useState<number>(0);
+  const playerChipsRef = useRef<number>(0);
+  useEffect(() => {
+    playerChipsRef.current = playerChips;
+  }, [playerChips]);
   const [message, setMessage] = useState<string>("");
   const [result, setResult] = useState<string>("");
   const [gameId, setGameId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin, setCardSkin] = useState<string>("Default");
+  const [cardSkin] = useState<string>(getSelectedSkin);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -137,12 +142,12 @@ export default function Dealer() {
       setUserId(user.id);
       setPlayerChips(user.coins);
 
-      sessionStorage.setItem("cached_coins", user.coins.toString());
+      LocalStorage.setItem("coins", user.coins.toString());
 
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,
-        auth: { token: sessionStorage.getItem("accessToken") },
+        auth: { token: LocalStorage.getItem("accessToken") },
       });
 
       socket.on("connect", () => console.log("Socket connected"));
@@ -168,9 +173,9 @@ export default function Dealer() {
           setDealerHand(data.dealerHand);
           const msg = data.result === "win" ? "You win! 🎉" : data.result === "draw" ? "Draw!" : "Dealer wins";
           setResult(msg);
-          const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : playerChips;
+          const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : playerChipsRef.current;
           setPlayerChips(nextChips);
-          sessionStorage.setItem("cached_coins", nextChips.toString());
+          LocalStorage.setItem("coins", nextChips.toString());
           setGameStatus("game-over");
           setIsLoading(false);
         }
@@ -214,7 +219,7 @@ export default function Dealer() {
       setBet(ack.bet);
       const nextChips = typeof ack?.balance === "number" ? ack.balance : typeof ack?.coins === "number" ? ack.coins : playerChips;
       setPlayerChips(nextChips);
-      sessionStorage.setItem("cached_coins", nextChips.toString());
+      LocalStorage.setItem("coins", nextChips.toString());
       setMessage("");
 
       // Blackjack on initial deal — game is already over
@@ -253,7 +258,7 @@ export default function Dealer() {
         setResult(msg);
         const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips;
         setPlayerChips(nextChips);
-        sessionStorage.setItem("cached_coins", nextChips.toString());
+        LocalStorage.setItem("coins", nextChips.toString());
         setGameStatus("game-over");
       } else {
         startTimer();
@@ -291,6 +296,9 @@ export default function Dealer() {
       <Navbar />
       <div className={styles.main}>
         <div className={styles.tableWrap}>
+          <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
+            ← Back
+          </button>
           <div className={styles.table}>
             <div className={styles.innerShadow} />
 

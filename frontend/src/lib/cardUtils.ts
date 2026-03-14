@@ -1,3 +1,5 @@
+import LocalStorage from "./LocalStorage";
+
 interface Card {
   suit: string;
   rank: string;
@@ -31,5 +33,5 @@ export const getCardBackImage = (skin: string = "Default"): string => {
 
 export const getSelectedSkin = (): string => {
   if (typeof window === "undefined") return "Default";
-  return localStorage.getItem("selectedCardSkin") ?? "Default";
+  return LocalStorage.getItem("selectedCardSkin") || "Default";
 };

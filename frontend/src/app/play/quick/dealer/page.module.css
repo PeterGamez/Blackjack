@@ -96,12 +96,35 @@
   flex-direction: column;
   align-items: center;
   padding-top: 10px;
+  margin-top: 12rem;
 }
 
 .tableWrap {
   position: relative;
   width: 820px;
   max-width: 98vw;
+}
+
+.backButton {
+  position: absolute;
+  left: -100px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #93a3bb;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.backButton:hover {
+  color: #e6eaf2;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .table {

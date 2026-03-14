@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
-import Navbar from "./Navbar";
 import styles from "./ComingSoonPage.module.css";
+import Navbar from "./Navbar";
 
 type ComingSoonPageProps = {
   message: string;

@@ -6,18 +6,17 @@ import { useEffect, useState } from "react";
 
 import config from "../../config";
 import LocalStorage from "../../lib/LocalStorage";
-import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../lib/cardUtils";
-import ProfileAvatar from "../components/ProfileAvatar";
+import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 type TabType = "card" | "chips" | "theme";
 
 interface SkinItem {
-  id: string;       // folder name used in /cards/{id}/
+  id: string; // folder name used in /cards/{id}/
   name: string;
-  preview: string;  // image path for preview
+  preview: string; // image path for preview
   builtIn?: boolean;
 }
 
@@ -40,30 +39,23 @@ function toFolderName(name: string): string {
 
 export default function InventoryPage() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
   const [activeTab, setActiveTab] = useState<TabType>("card");
-  const [selectedCardSkin, setSelectedCardSkin] = useState<string>(
-    LocalStorage.getItem("selectedCardSkin") ?? "Default"
-  );
+  const [selectedCardSkin, setSelectedCardSkin] = useState<string>(LocalStorage.getItem("selectedCardSkin") ?? "Default");
   const [ownedSkins, setOwnedSkins] = useState<SkinItem[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const data = await UserService.getUser();
-      if (!data) { router.push("/auth"); return; }
-
-      setUsername(data.username || "");
-      if (typeof data.coins === "number") setCoins(data.coins);
-      if (typeof data.tokens === "number") setTokens(data.tokens);
+      if (!data) {
+        router.push("/auth");
+        return;
+      }
 
       if (!data.inventory?.length) return;
 
       try {
-        const token = sessionStorage.getItem("accessToken");
+        const token = LocalStorage.getItem("accessToken");
         const res = await fetch(`${config.apiUrl}/shop/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -91,45 +83,23 @@ export default function InventoryPage() {
   };
 
   const activeHover = hovered || activeTab;
-  const displayedSkins: SkinItem[] =
-    activeTab === "card"
-      ? [...BUILT_IN_SKINS.card, ...ownedSkins]
-      : BUILT_IN_SKINS[activeTab];
+  const displayedSkins: SkinItem[] = activeTab === "card" ? [...BUILT_IN_SKINS.card, ...ownedSkins] : BUILT_IN_SKINS[activeTab];
 
   return (
     <div className={styles.container}>
-      <div className={styles.topBar}>
-        <div className={styles.profileSection}>
-          <ProfileAvatar username={username} className={styles.profileAvatar} />
-          <span className={styles.username}>{username}</span>
-        </div>
-        <div className={styles.resourcesSection}>
-          <div className={styles.resourceBox}>
-            <span className={styles.coinIcon}>🪙</span>
-            <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
-          </div>
-          <div className={styles.resourceBox}>
-            <div className={styles.tokenIcon}>
-              <span className={styles.tokenLetter}>T</span>
-            </div>
-            <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
-          </div>
-        </div>
-      </div>
+      <Navbar />
 
-      <button onClick={() => router.push("/")} className={styles.backButton}>← Lobby</button>
-      <div className={styles.Title}><h2>Inventory</h2></div>
+      <button onClick={() => router.push("/")} className={styles.backButton}>
+        ← Lobby
+      </button>
+      <div className={styles.Title}>
+        <h2>Inventory</h2>
+      </div>
 
       <div className={styles.main}>
         <div className={styles.sidebar}>
           {(["card", "chips", "theme"] as TabType[]).map((tab) => (
-            <button
-              key={tab}
-              className={activeHover === tab ? styles.active : ""}
-              onMouseEnter={() => setHovered(tab)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => setActiveTab(tab)}
-            >
+            <button key={tab} className={activeHover === tab ? styles.active : ""} onMouseEnter={() => setHovered(tab)} onMouseLeave={() => setHovered(null)} onClick={() => setActiveTab(tab)}>
               {tab === "card" ? "Card Skins" : tab === "chips" ? "Chips" : "Theme"}
             </button>
           ))}
@@ -142,18 +112,28 @@ export default function InventoryPage() {
             displayedSkins.map((skin) => {
               const isEquipped = activeTab === "card" && selectedCardSkin === skin.id;
               return (
-                <div
-                  key={skin.id}
-                  className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()}
-                  onClick={() => activeTab === "card" && selectSkin(skin.id)}
-                >
+                <div key={skin.id} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => activeTab === "card" && selectSkin(skin.id)}>
                   <div className={styles.skinPreview}>
                     <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
-                        <Image src={getCardBackImage(skin.id)} alt="back" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
+                        <Image
+                          src={getCardBackImage(skin.id)}
+                          alt="back"
+                          width={75}
+                          height={110}
+                          unoptimized
+                          style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}
+                        />
                       </div>
                       <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                        <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.id)} alt="king" width={75} height={110} unoptimized style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }} />
+                        <Image
+                          src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.id)}
+                          alt="king"
+                          width={75}
+                          height={110}
+                          unoptimized
+                          style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}
+                        />
                       </div>
                     </div>
                   </div>

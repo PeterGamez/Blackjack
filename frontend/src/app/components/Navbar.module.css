@@ -34,7 +34,6 @@
   width: clamp(60px, 9vw, 88px);
   height: clamp(60px, 9vw, 88px);
   border-radius: 50%;
-  background: #5c6b8a;
   border: 3px solid #5c6b8a;
   flex-shrink: 0;
   margin-left: -20px;

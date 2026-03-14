@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import ProfileAvatar from "./ProfileAvatar";
+import LocalStorage from "../../lib/LocalStorage";
 import styles from "./Navbar.module.css";
+import ProfileAvatar from "./ProfileAvatar";
 
 export default function Navbar() {
   const router = useRouter();
@@ -15,9 +16,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const readCache = () => {
-      setUsername(sessionStorage.getItem("cached_username"));
-      setCoins(parseInt(sessionStorage.getItem("cached_coins") || "0"));
-      setTokens(parseInt(sessionStorage.getItem("cached_tokens") || "0"));
+      const _username = LocalStorage.getItem("username");
+      if (_username) {
+        setUsername(_username[0].toUpperCase() + _username.slice(1));
+        setCoins(parseInt(LocalStorage.getItem("coins")));
+        setTokens(parseInt(LocalStorage.getItem("tokens")));
+      }
     };
 
     readCache();
@@ -29,7 +33,7 @@ export default function Navbar() {
   return (
     <div className={styles.navbar}>
       {/* Profile Section */}
-      <div className={styles.profileSection} onClick={() => username ? router.push("/profile") : router.push("/auth")} style={{ cursor: "pointer" }}>
+      <div className={styles.profileSection} onClick={() => (username ? router.push("/profile") : router.push("/auth"))} style={{ cursor: "pointer" }}>
         <ProfileAvatar username={username} className={styles.profileAvatar} />
         <span className={styles.username}>{username || "Sign in"}</span>
       </div>
@@ -48,7 +52,9 @@ export default function Navbar() {
             <span className={styles.tokenLetter}>T</span>
           </div>
           <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
-          <button className={styles.plusButton} onClick={() => router.push("/topup")}>+</button>
+          <button className={styles.plusButton} onClick={() => router.push("/topup")}>
+            +
+          </button>
         </div>
       </div>
     </div>

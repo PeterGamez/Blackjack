@@ -156,14 +156,6 @@ export default class AuthRoute implements RouteInterface {
                     message: "Login successful",
                     accessToken,
                     refreshToken,
-                    user: {
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        role: user.role,
-                        coins: user.coins,
-                        tokens: user.tokens,
-                    },
                 });
             } catch (error) {
                 this.server.error("AUTH", "Login error: ");

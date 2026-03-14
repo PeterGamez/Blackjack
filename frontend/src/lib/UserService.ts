@@ -1,10 +1,16 @@
 import config from "../config";
 import { UserInterface } from "../interfaces/API/UserInterface";
 import LocalStorage from "./LocalStorage";
-import SessionStorage from "./SessionStorage";
 
 export default class UserService {
-  public static async login(username: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
+  private static setUser(data: UserInterface) {
+    LocalStorage.setItem("userId", data.id.toString());
+    LocalStorage.setItem("username", data.username);
+    LocalStorage.setItem("coins", data.coins.toString());
+    LocalStorage.setItem("tokens", data.tokens.toString());
+  }
+
+  public static async login(username: string, password: string): Promise<void> {
     const res = await fetch(`${config.apiUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -12,24 +18,15 @@ export default class UserService {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
-    SessionStorage.setItem("accessToken", data.accessToken);
+    LocalStorage.setItem("accessToken", data.accessToken);
     LocalStorage.setItem("refreshToken", data.refreshToken);
 
-    SessionStorage.setItem("cached_userId", data.user.id.toString());
-    SessionStorage.setItem("cached_username", data.user.username);
-    SessionStorage.setItem("cached_coins", data.user.coins.toString());
-    SessionStorage.setItem("cached_tokens", data.user.tokens.toString());
-    return data;
+    const user = await this.getUser();
+    this.setUser(user);
   }
 
   public static logout() {
-    SessionStorage.removeItem("accessToken");
-    LocalStorage.removeItem("refreshToken");
-
-    SessionStorage.removeItem("cached_userId");
-    SessionStorage.removeItem("cached_username");
-    SessionStorage.removeItem("cached_coins");
-    SessionStorage.removeItem("cached_tokens");
+    LocalStorage.clear();
   }
 
   public static async register(username: string, email: string, password: string): Promise<void> {
@@ -43,12 +40,12 @@ export default class UserService {
   }
 
   public static async getUser(): Promise<UserInterface> {
-    let token = SessionStorage.getItem("accessToken");
+    let token = LocalStorage.getItem("accessToken");
 
     if (!token) {
       const hasRefreshed = await this.refreshAccessToken();
       if (!hasRefreshed) return null;
-      token = SessionStorage.getItem("accessToken");
+      token = LocalStorage.getItem("accessToken");
     }
 
     if (token) {
@@ -63,18 +60,22 @@ export default class UserService {
         }
 
         if (res.status === 401) {
-          SessionStorage.removeItem("accessToken");
+          LocalStorage.removeItem("accessToken");
 
           const hasRefreshed = await this.refreshAccessToken();
           if (hasRefreshed) {
-            const newToken = SessionStorage.getItem("accessToken");
+            const newToken = LocalStorage.getItem("accessToken");
 
             const retryRes = await fetch(`${config.apiUrl}/user/me`, {
               cache: "no-store",
               headers: { Authorization: `Bearer ${newToken}` },
             });
 
-            if (retryRes.ok) return await retryRes.json();
+            if (retryRes.ok) {
+              const user = await retryRes.json();
+              this.setUser(user);
+              return user;
+            }
           }
         }
       } catch (error) {
@@ -99,7 +100,7 @@ export default class UserService {
       if (refreshRes.ok) {
         const refreshData = await refreshRes.json();
 
-        SessionStorage.setItem("accessToken", refreshData.accessToken);
+        LocalStorage.setItem("accessToken", refreshData.accessToken);
 
         if (refreshData.refreshToken) {
           LocalStorage.setItem("refreshToken", refreshData.refreshToken);

@@ -168,11 +168,19 @@
   white-space: nowrap;
   margin-left: -6px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
+
+.menuButton:nth-child(1) { z-index: 5; }
+.menuButton:nth-child(2) { z-index: 4; }
+.menuButton:nth-child(3) { z-index: 3; }
+.menuButton:nth-child(4) { z-index: 2; }
+.menuButton:nth-child(5) { z-index: 1; }
 
 .menuButton:hover {
   transform: skewX(-45deg) scale(1.05);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  z-index: 6;
 }
 
 .menuLabel {

@@ -30,6 +30,7 @@ export default class ShopRoute implements RouteInterface {
                 name: product.name,
                 description: product.description,
                 image: product.image,
+                path: product.path,
                 tokens: product.tokens,
                 coins: product.coins,
                 type: product.type,

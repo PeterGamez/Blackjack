@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 
 import config from "../../config";
 import LocalStorage from "../../lib/LocalStorage";
@@ -10,42 +10,79 @@ import UserService from "../../lib/UserService";
 import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "../../lib/cardUtils";
 import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
-
-type TabType = "card" | "chips" | "theme";
+import { ProductInterface } from "@/src/interfaces/API/ProductInterface";
 
 interface SkinItem {
-  id: string; // folder name used in /cards/{id}/
+  path: string; // folder name used in /cards/{id}/
   name: string;
   preview: string; // image path for preview
-  productId?: number;
-  builtIn?: boolean;
+  productId: number;
 }
 
-interface ApiProduct {
-  id: number;
-  name: string;
-  image: string;
-  type: string;
-}
-
-const BUILT_IN_SKINS: Record<TabType, SkinItem[]> = {
-  card: [{ id: "default", name: "default", preview: "/cards/default/backcard.png", builtIn: true }],
-  chips: [],
-  theme: [],
+const BUILT_IN_SKINS: Record<ProductInterface["type"], SkinItem[]> = {
+  card: [{ path: "default", name: "Default Card", preview: "/cards/default/backcard.png", productId: 0 }],
+  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default.png", productId: 0 }],
+  table: [{ path: "default", name: "Default Table", preview: "/tables/default.png", productId: 0 }],
 };
 
-function toFolderName(name: string): string {
-  return name.replace(/\s+/g, "_");
-}
+const TABS: ProductInterface["type"][] = ["card", "chip", "table"];
+
+const CARD_STACK_STYLE: CSSProperties = {
+  position: "relative",
+  width: 140,
+  height: 110,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const CARD_BACK_WRAPPER_STYLE: CSSProperties = {
+  position: "absolute",
+  left: 0,
+  top: 10,
+  transform: "rotate(-8deg)",
+  zIndex: 1,
+};
+
+const CARD_FRONT_WRAPPER_STYLE: CSSProperties = {
+  position: "absolute",
+  right: 0,
+  top: 10,
+  transform: "rotate(8deg)",
+  zIndex: 2,
+};
+
+const CARD_IMAGE_STYLE: CSSProperties = {
+  borderRadius: 6,
+  objectFit: "fill",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+};
+
+const TAB_LABELS: Record<ProductInterface["type"], string> = {
+  card: "Card Skins",
+  chip: "Chip Skins",
+  table: "Table Skins",
+};
 
 export default function InventoryPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabType>("card");
-  const [selectedCardSkin, setSelectedCardSkin] = useState<string>(getSelectedCardSkin());
+  const [activeTab, setActiveTab] = useState<ProductInterface["type"]>("card");
+  const [selectedCardSkin, setSelectedCardSkin] = useState<string>("default");
   const [ownedSkins, setOwnedSkins] = useState<SkinItem[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
 
+  const resetToDefaultSkin = useCallback(() => {
+    setOwnedSkins([]);
+    setSelectedCardSkin("default");
+    LocalStorage.setItem("selectedCardSkin", "default");
+  }, []);
+
   useEffect(() => {
+    // Keep the first SSR/CSR render deterministic; hydrate browser-cached skin after mount.
+    setSelectedCardSkin(getSelectedCardSkin());
+
+    let cancelled = false;
+
     const load = async () => {
       const data = await UserService.getUser();
       if (!data) {
@@ -53,50 +90,74 @@ export default function InventoryPage() {
         return;
       }
 
-      if (!data.inventory?.length) return;
-
       try {
         const token = LocalStorage.getItem("accessToken");
         const res = await fetch(`${config.apiUrl}/shop/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) return;
-        const products: ApiProduct[] = await res.json();
-        const inventorySet = new Set(data.inventory.map((item) => item.productId));
+        if (!res.ok) {
+          if (!cancelled) {
+            resetToDefaultSkin();
+          }
+          return;
+        }
+        const products: ProductInterface[] = await res.json();
+        const inventorySet = new Set((data.inventory ?? []).map((item) => item.productId));
         const owned = products
           .filter((p) => inventorySet.has(p.id) && p.type === "card")
           .map((p) => ({
-            id: toFolderName(p.name),
+            path: p.path,
             name: p.name,
-            preview: p.image || getCardBackImage(toFolderName(p.name)),
+            preview: p.image || getCardBackImage(p.path),
             productId: p.id,
           }));
-        setOwnedSkins(owned);
-
-        const matched = data.cardId ? owned.find((s) => s.productId === data.cardId) : null;
-        const resolvedSkin = matched?.id ?? "Default";
-        setSelectedCardSkin(resolvedSkin);
-        LocalStorage.setItem("selectedCardSkin", resolvedSkin);
+        if (!cancelled) {
+          setOwnedSkins(owned);
+        }
       } catch {
-        // no products in DB yet — that's fine
+        if (!cancelled) {
+          resetToDefaultSkin();
+        }
       }
     };
-    void load();
-  }, [router]);
 
-  const selectSkin = async (skinId: string, productId?: number) => {
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resetToDefaultSkin, router]);
+
+  const selectSkin = useCallback(async (skinId: string, productId?: number) => {
+    if (selectedCardSkin === skinId) {
+      return;
+    }
+
+    const previousSkin = selectedCardSkin;
     setSelectedCardSkin(skinId);
     LocalStorage.setItem("selectedCardSkin", skinId);
     const token = LocalStorage.getItem("accessToken");
-    await fetch(`${config.apiUrl}/user/me`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ cardId: productId ?? 0 }),
-    });
-  };
+    try {
+      const res = await fetch(`${config.apiUrl}/user/me`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ cardId: productId ?? 0 }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update selected skin");
+      }
+    } catch {
+      setSelectedCardSkin(previousSkin);
+      LocalStorage.setItem("selectedCardSkin", previousSkin);
+    }
+  }, [selectedCardSkin]);
 
   const activeHover = hovered || activeTab;
-  const displayedSkins: SkinItem[] = activeTab === "card" ? [...BUILT_IN_SKINS.card, ...ownedSkins] : BUILT_IN_SKINS[activeTab];
+  const displayedSkins: SkinItem[] = useMemo(
+    () => (activeTab === "card" ? [...BUILT_IN_SKINS.card, ...ownedSkins] : BUILT_IN_SKINS[activeTab]),
+    [activeTab, ownedSkins]
+  );
 
   return (
     <div className={styles.container}>
@@ -111,9 +172,9 @@ export default function InventoryPage() {
 
       <div className={styles.main}>
         <div className={styles.sidebar}>
-          {(["card", "chips", "theme"] as TabType[]).map((tab) => (
+          {TABS.map((tab) => (
             <button key={tab} className={activeHover === tab ? styles.active : ""} onMouseEnter={() => setHovered(tab)} onMouseLeave={() => setHovered(null)} onClick={() => setActiveTab(tab)}>
-              {tab === "card" ? "Card Skins" : tab === "chips" ? "Chips" : "Theme"}
+              {TAB_LABELS[tab]}
             </button>
           ))}
         </div>
@@ -123,29 +184,29 @@ export default function InventoryPage() {
             <div className={styles.emptyState}>No items owned yet.</div>
           ) : (
             displayedSkins.map((skin) => {
-              const isEquipped = activeTab === "card" && selectedCardSkin === skin.id;
+              const isEquipped = activeTab === "card" && selectedCardSkin === skin.path;
               return (
-                <div key={skin.id} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => activeTab === "card" && selectSkin(skin.id, skin.productId)}>
+                <div key={skin.path} className={`${styles.skinCard} ${isEquipped ? styles.skinEquipped : ""}`.trim()} onClick={() => activeTab === "card" && selectSkin(skin.path, skin.productId)}>
                   <div className={styles.skinPreview}>
-                    <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
+                    <div style={CARD_STACK_STYLE}>
+                      <div style={CARD_BACK_WRAPPER_STYLE}>
                         <Image
-                          src={getCardBackImage(skin.id)}
+                          src={getCardBackImage(skin.path)}
                           alt="back"
                           width={75}
                           height={110}
                           unoptimized
-                          style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}
+                          style={CARD_IMAGE_STYLE}
                         />
                       </div>
-                      <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
+                      <div style={CARD_FRONT_WRAPPER_STYLE}>
                         <Image
-                          src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.id)}
+                          src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.path)}
                           alt="king"
                           width={75}
                           height={110}
                           unoptimized
-                          style={{ borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}
+                          style={CARD_IMAGE_STYLE}
                         />
                       </div>
                     </div>

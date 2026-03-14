@@ -169,6 +169,7 @@ export default class AdminRoute implements RouteInterface {
                 name: product.name,
                 description: product.description,
                 image: product.image,
+                path: product.path,
                 tokens: product.tokens,
                 coins: product.coins,
                 type: product.type,
@@ -182,7 +183,7 @@ export default class AdminRoute implements RouteInterface {
 
         this.app.post("/product", async (c) => {
             try {
-                let body: { name: string; description: string; image: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
+                let body: { name: string; description: string; image: string; path:string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
                 try {
                     body = await c.req.json<typeof body>();
                 } catch {

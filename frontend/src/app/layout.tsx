@@ -32,7 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} ${inter.variable} antialiased`}>{children}</body>
+      <body suppressHydrationWarning className={`${sora.variable} ${inter.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

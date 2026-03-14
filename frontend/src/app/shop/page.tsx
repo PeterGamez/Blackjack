@@ -45,14 +45,14 @@ export default function StorePage() {
           </button>
 
           <button
-            className={active === "theme" ? styles.active : ""}
-            onMouseEnter={() => setHovered("theme")}
+            className={active === "table" ? styles.active : ""}
+            onMouseEnter={() => setHovered("table")}
             onMouseLeave={() => setHovered(null)}
             onClick={() => {
-              setSelected("theme");
-              router.push("/shop/theme");
+              setSelected("table");
+              router.push("/shop/table");
             }}>
-            Theme
+            Table
           </button>
 
           <button

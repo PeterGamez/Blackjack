@@ -8,7 +8,7 @@ import styles from "../test.module.css";
 
 export default function StorePage() {
   const router = useRouter();
-  const [selected, setSelected] = useState("theme");
+  const [selected, setSelected] = useState("table");
   const [hovered, setHovered] = useState<string | null>(null);
   const active = hovered || selected;
   const products = [
@@ -50,14 +50,14 @@ export default function StorePage() {
           </button>
 
           <button
-            className={active === "theme" ? styles.active : ""}
-            onMouseEnter={() => setHovered("theme")}
+            className={active === "table" ? styles.active : ""}
+            onMouseEnter={() => setHovered("table")}
             onMouseLeave={() => setHovered(null)}
             onClick={() => {
-              setSelected("theme");
-              router.push("/shop/theme");
+              setSelected("table");
+              router.push("/shop/table");
             }}>
-            Theme
+            Table
           </button>
 
           <button

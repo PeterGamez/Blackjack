@@ -10,20 +10,9 @@ import UserService from "../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../lib/cardUtils";
 import Navbar from "../../components/Navbar";
 import styles from "../test.module.css";
+import { ProductInterface } from "@/src/interfaces/API/ProductInterface";
 
-interface ApiProduct {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  tokens: number;
-  coins: number;
-  type: string;
-}
 
-function toFolderName(name: string): string {
-  return name.replace(/\s+/g, "_");
-}
 
 export default function CardShopPage() {
   const router = useRouter();
@@ -31,7 +20,7 @@ export default function CardShopPage() {
   const [hovered, setHovered] = useState<string | null>(null);
   const active = hovered || selected;
 
-  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const [products, setProducts] = useState<ProductInterface[]>([]);
   const [owned, setOwned] = useState<Set<number>>(new Set());
   const [buying, setBuying] = useState<number | null>(null);
   const [message, setMessage] = useState<{ id: number; text: string; ok: boolean } | null>(null);
@@ -54,7 +43,7 @@ export default function CardShopPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) return;
-        const all: ApiProduct[] = await res.json();
+        const all: ProductInterface[] = await res.json();
         setProducts(all.filter((p) => p.type === "card"));
         setOwned(new Set(all.filter((p) => inventorySet.has(p.id)).map((p) => p.id)));
       } catch {
@@ -64,7 +53,7 @@ export default function CardShopPage() {
     void load();
   }, [router]);
 
-  const buy = async (p: ApiProduct) => {
+  const buy = async (p: ProductInterface) => {
     setBuying(p.id);
     setMessage(null);
     try {
@@ -113,11 +102,11 @@ export default function CardShopPage() {
             Recommend
           </button>
           <button
-            className={active === "theme" ? styles.active : ""}
-            onMouseEnter={() => setHovered("theme")}
+            className={active === "table" ? styles.active : ""}
+            onMouseEnter={() => setHovered("table")}
             onMouseLeave={() => setHovered(null)}
             onClick={() => {
-              setSelected("theme");
+              setSelected("table");
               router.push("/shop/theme");
             }}>
             Theme
@@ -157,15 +146,14 @@ export default function CardShopPage() {
                 <div key={p.id} className={styles.product}>
                   <div className={styles.productPreview}>
                     {(() => {
-                      const folder = toFolderName(p.name);
                       const cardStyle = { borderRadius: 6, objectFit: "fill" as const, boxShadow: "0 4px 12px rgba(0,0,0,0.5)" };
                       return (
                         <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
-                            <Image src={getCardBackImage(folder)} alt="back" width={75} height={110} unoptimized style={cardStyle} />
+                            <Image src={getCardBackImage(p.path)} alt="back" width={75} height={110} unoptimized style={cardStyle} />
                           </div>
                           <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                            <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, folder)} alt="king" width={75} height={110} unoptimized style={cardStyle} />
+                            <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, p.path)} alt="king" width={75} height={110} unoptimized style={cardStyle} />
                           </div>
                         </div>
                       );

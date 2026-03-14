@@ -1,11 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
-import SessionCache from "../lib/SessionCache";
-import UserService from "../lib/UserService";
-import ProfileAvatar from "./components/ProfileAvatar";
+import Navbar from "./components/Navbar";
 import styles from "./page.module.css";
 
 const menuItems = [
@@ -18,38 +15,6 @@ const menuItems = [
 
 export default function Home() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
-
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await UserService.getUser();
-        if (!data) return;
-        setUsername(data.username || "");
-        if (typeof data.coins === "number") {
-          setCoins(data.coins);
-        }
-        if (typeof data.tokens === "number") {
-          setTokens(data.tokens);
-        }
-      } catch (err) {
-        console.error("failed to load profile", err);
-      }
-    };
-
-    void loadProfile();
-  }, []);
-
-  // save to cache whenever username, coins, or tokens change
-  useEffect(() => {
-    SessionCache.persistCachedProfile({ username, coins, tokens });
-  }, [username, coins, tokens]);
-
-  const coinsLabel = useMemo(() => coins.toLocaleString(), [coins]);
-  const tokensLabel = useMemo(() => tokens.toLocaleString(), [tokens]);
 
   return (
     <div className={styles.page}>
@@ -60,25 +25,7 @@ export default function Home() {
       <div className={styles.bgOverlay} />
 
       <div className={styles.content}>
-        <div className={styles.topBar}>
-          <div onClick={() => router.push(username ? "/profile" : "/auth")} className={styles.profileCard}>
-            <ProfileAvatar username={username} className={styles.avatar} />
-            <div className={styles.username}>{username || "Sign In"}</div>
-          </div>
-
-          <div className={styles.balanceWrap}>
-            <div className={styles.statCard}>
-              <span className={styles.coinBadge}>🪙</span>
-              {coinsLabel}
-            </div>
-
-            <div className={styles.statCard} onClick={() => router.push("/topup")}>
-              <div className={styles.tokenIcon}>T</div>
-              {tokensLabel}
-              <span className={styles.plus}>+</span>
-            </div>
-          </div>
-        </div>
+        <Navbar />
 
         <div className={styles.placeholderWrap}>
           <div className={styles.placeholder} />

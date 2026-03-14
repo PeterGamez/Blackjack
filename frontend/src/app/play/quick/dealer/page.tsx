@@ -296,6 +296,9 @@ export default function Dealer() {
       <Navbar />
       <div className={styles.main}>
         <div className={styles.tableWrap}>
+          <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
+            ← Back
+          </button>
           <div className={styles.table}>
             <div className={styles.innerShadow} />
 

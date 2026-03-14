@@ -63,7 +63,7 @@ export default function Home() {
         <div className={styles.topBar}>
           <div onClick={() => router.push(username ? "/profile" : "/auth")} className={styles.profileCard}>
             <ProfileAvatar username={username} className={styles.avatar} />
-            <div className={styles.username}>{username || "username"}</div>
+            <div className={styles.username}>{username || "Sign In"}</div>
           </div>
 
           <div className={styles.balanceWrap}>

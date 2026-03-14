@@ -6,7 +6,7 @@ interface Card {
   value: number;
 }
 
-export const getCardImagePath = (card: Card, skin: string = "Default"): string => {
+export const getCardImagePath = (card: Card, skin: string = "default"): string => {
   const suitMap: { [key: string]: string } = {
     "♠": "spades",
     "♣": "clubs",
@@ -27,11 +27,11 @@ export const getCardImagePath = (card: Card, skin: string = "Default"): string =
   return `/cards/${skin}/${suit}_${rank}.png`;
 };
 
-export const getCardBackImage = (skin: string = "Default"): string => {
+export const getCardBackImage = (skin: string = "default"): string => {
   return `/cards/${skin}/backcard.png`;
 };
 
-export const getSelectedSkin = (): string => {
-  if (typeof window === "undefined") return "Default";
-  return LocalStorage.getItem("selectedCardSkin") || "Default";
+export const getSelectedCardSkin = (): string => {
+  if (typeof window === "undefined") return "default";
+  return LocalStorage.getItem("selectedCardSkin") || "default";
 };

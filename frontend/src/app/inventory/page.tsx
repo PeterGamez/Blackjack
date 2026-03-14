@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import config from "../../config";
 import LocalStorage from "../../lib/LocalStorage";
 import UserService from "../../lib/UserService";
-import { getCardBackImage, getCardImagePath } from "../../lib/cardUtils";
+import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "../../lib/cardUtils";
 import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
@@ -29,7 +29,7 @@ interface ApiProduct {
 }
 
 const BUILT_IN_SKINS: Record<TabType, SkinItem[]> = {
-  card: [{ id: "Default", name: "Default", preview: "/cards/Default/backcard.png", builtIn: true }],
+  card: [{ id: "default", name: "default", preview: "/cards/default/backcard.png", builtIn: true }],
   chips: [],
   theme: [],
 };
@@ -41,7 +41,7 @@ function toFolderName(name: string): string {
 export default function InventoryPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("card");
-  const [selectedCardSkin, setSelectedCardSkin] = useState<string>(LocalStorage.getItem("selectedCardSkin") ?? "Default");
+  const [selectedCardSkin, setSelectedCardSkin] = useState<string>(getSelectedCardSkin());
   const [ownedSkins, setOwnedSkins] = useState<SkinItem[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
 

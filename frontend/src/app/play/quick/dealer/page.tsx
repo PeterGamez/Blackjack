@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import UserService from "../../../../lib/UserService";
-import { getCardBackImage, getCardImagePath, getSelectedSkin } from "../../../../lib/cardUtils";
+import { getCardBackImage, getCardImagePath, getSelectedCardSkin } from "../../../../lib/cardUtils";
 import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 
@@ -80,7 +80,7 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin, setCardSkin] = useState<string>(getSelectedSkin);
+  const [cardSkin] = useState<string>(getSelectedCardSkin);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {

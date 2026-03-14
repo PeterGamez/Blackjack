@@ -10,7 +10,6 @@ import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
 
-import config from "@/config";
 import ShopService from "@/lib/ShopService";
 
 import Navbar from "../components/Navbar";
@@ -124,27 +123,17 @@ function StorePageContent() {
     setMessage(null);
 
     try {
-      const token = LocalStorage.getItem("accessToken");
-      const res = await fetch(`${config.apiUrl}/shop/buy`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: p.id, payment: "coins" }),
+      await ShopService.buyProduct(p.id, "coins");
+      setOwned((prev) => new Set([...prev, p.id]));
+      setCoins((prev) => {
+        const nextCoins = prev - p.coins;
+        LocalStorage.setItem("coins", nextCoins.toString());
+        return nextCoins;
       });
-      const data: { message?: string } = await res.json();
-
-      if (res.ok) {
-        setOwned((prev) => new Set([...prev, p.id]));
-        setCoins((prev) => {
-          const nextCoins = prev - p.coins;
-          LocalStorage.setItem("coins", nextCoins.toString());
-          return nextCoins;
-        });
-        setMessage({ id: p.id, text: "Purchased!", ok: true });
-      } else {
-        setMessage({ id: p.id, text: data.message || "Purchase failed", ok: false });
-      }
-    } catch {
-      setMessage({ id: p.id, text: "Network error", ok: false });
+      setMessage({ id: p.id, text: "Purchased!", ok: true });
+    } catch (error) {
+      const messageText = error instanceof Error ? error.message : "Network error";
+      setMessage({ id: p.id, text: messageText, ok: false });
     } finally {
       setBuying(null);
     }

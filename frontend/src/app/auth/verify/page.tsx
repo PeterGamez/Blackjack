@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-import config from "@/config";
+import AuthService from "@/lib/AuthService";
 
 import styles from "./page.module.css";
 
@@ -24,23 +24,14 @@ function VerifyContent() {
 
     const verify = async () => {
       try {
-        const res = await fetch(`${config.apiUrl}/auth/verify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.error || "Verification failed");
-        } else {
-          setMessage(data.message || "Email successfully verified! You may now log in.");
-          setTimeout(() => {
-            router.push("/auth");
-          }, 2000);
-        }
+        const successMessage = await AuthService.verifyEmail(token);
+        setMessage(successMessage);
+        setTimeout(() => {
+          router.push("/auth");
+        }, 2000);
       } catch (e) {
-        console.error(e);
-        setError("Server error during verification");
+        const errorMessage = e instanceof Error ? e.message : "Server error during verification";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

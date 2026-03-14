@@ -10,7 +10,8 @@ import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 import { getCardBackImage, getCardImagePath, getCardSkin, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
-import config from "@/config";
+import AuthService from "@/lib/AuthService";
+import ShopService from "@/lib/ShopService";
 
 import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
@@ -99,13 +100,6 @@ export default function InventoryPage() {
   }, []);
 
   useEffect(() => {
-    // Keep the first SSR/CSR render deterministic; hydrate browser-cached skin after mount.
-    setSelectedSkins({
-      card: getCardSkin(),
-      chip: getChipSkin(),
-      table: getTableSkin(),
-    });
-
     let cancelled = false;
 
     const load = async () => {
@@ -115,18 +109,21 @@ export default function InventoryPage() {
         return;
       }
 
-      try {
-        const token = LocalStorage.getItem("accessToken");
-        const res = await fetch(`${config.apiUrl}/shop/list`, {
-          headers: { Authorization: `Bearer ${token}` },
+      if (!cancelled) {
+        // Hydrate browser-cached skins after mount without sync setState in effect body.
+        setSelectedSkins({
+          card: getCardSkin(),
+          chip: getChipSkin(),
+          table: getTableSkin(),
         });
-        if (!res.ok) {
-          if (!cancelled) {
-            resetToDefaultSkins();
-          }
+      }
+
+      try {
+        const products: ProductInterface[] = await ShopService.getProducts();
+        if (cancelled) {
           return;
         }
-        const products: ProductInterface[] = await res.json();
+
         const inventorySet = new Set((data.inventory ?? []).map((item) => item.productId));
         const ownedByType: OwnedSkinsState = { card: [], chip: [], table: [] };
 
@@ -198,17 +195,8 @@ export default function InventoryPage() {
       setSelectedSkins((prev) => ({ ...prev, [type]: skinId }));
       LocalStorage.setItem(storageKey, skinId);
 
-      const token = LocalStorage.getItem("accessToken");
       try {
-        const res = await fetch(`${config.apiUrl}/user/me`, {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ [payloadKey]: productId ?? 0 }),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to update selected skin");
-        }
+        await AuthService.updateCurrentUser({ [payloadKey]: productId ?? 0 });
       } catch {
         setSelectedSkins((prev) => ({ ...prev, [type]: previousSkin }));
         LocalStorage.setItem(storageKey, previousSkin);

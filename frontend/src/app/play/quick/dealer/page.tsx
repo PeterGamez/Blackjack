@@ -144,26 +144,6 @@ export default function Dealer() {
 
       LocalStorage.setItem("coins", user.coins.toString());
 
-      if (user.cardId) {
-        const token = LocalStorage.getItem("accessToken");
-        try {
-          const shopRes = await fetch(`${config.apiUrl}/shop/list`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (shopRes.ok) {
-            const products: { id: number; name: string; type: string }[] = await shopRes.json();
-            const skinProduct = products.find((p) => p.id === user.cardId && p.type === "card");
-            if (skinProduct) {
-              const skinId = skinProduct.name.replace(/\s+/g, "_");
-              setCardSkin(skinId);
-              LocalStorage.setItem("selectedCardSkin", skinId);
-            }
-          }
-        } catch {
-          // fallback to localStorage value
-        }
-      }
-
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,

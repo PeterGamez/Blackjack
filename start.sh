@@ -1,5 +1,3 @@
-git pull
-
 cd backend
 bun i
 sleep 1

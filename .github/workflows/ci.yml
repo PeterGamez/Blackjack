@@ -28,7 +28,7 @@ jobs:
   backend:
     needs: detect-changes
     if: needs.detect-changes.outputs.backend == 'true'
-    name: Backend Build
+    name: Backend Checks & Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,13 +42,17 @@ jobs:
           bun-version: latest
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+      - name: Format Backend
+        run: bun run format
+      - name: Verify Backend Formatting
+        run: git diff --exit-code
       - name: Build Backend
         run: bun run build
 
   frontend:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
-    name: Frontend Build
+    name: Frontend Checks & Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,5 +66,11 @@ jobs:
           bun-version: latest
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+      - name: Lint Frontend
+        run: bun run lint
+      - name: Format Frontend
+        run: bun run format
+      - name: Verify Frontend Formatting
+        run: git diff --exit-code
       - name: Build Frontend
         run: bun run build

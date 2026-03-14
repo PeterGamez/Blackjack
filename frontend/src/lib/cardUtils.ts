@@ -6,7 +6,7 @@ interface Card {
   value: number;
 }
 
-export const getCardImagePath = (card: Card, skin: string = "Default"): string => {
+export const getCardImagePath = (card: Card, skin: string = "default"): string => {
   const suitMap: { [key: string]: string } = {
     "♠": "spades",
     "♣": "clubs",

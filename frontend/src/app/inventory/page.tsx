@@ -28,7 +28,7 @@ interface ApiProduct {
 }
 
 const BUILT_IN_SKINS: Record<TabType, SkinItem[]> = {
-  card: [{ id: "Default", name: "Default", preview: "/cards/Default/backcard.png", builtIn: true }],
+  card: [{ id: "default", name: "default", preview: "/cards/default/backcard.png", builtIn: true }],
   chips: [],
   theme: [],
 };

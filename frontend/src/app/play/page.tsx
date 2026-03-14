@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { getAvatarColor } from "../../lib/colorUtils";
 import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
 import styles from "./play.module.css";
@@ -68,15 +69,6 @@ export default function Home() {
 
   const getButtonClass = (name: string): string => {
     return `${styles.gameButton} ${hovered === name ? styles.hovered : ""}`;
-  };
-
-  const getAvatarColor = (name: string) => {
-    const colors = ["#e05c5c", "#e0885c", "#d4a632", "#6db86d", "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0", "#e05c9a", "#4ca8c8"];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
   };
 
   return (

@@ -5,6 +5,34 @@ import { useState } from "react";
 
 import UserService from "../../lib/UserService";
 
+const GOLD_GRADIENT = "linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%)";
+
+const INPUT_WRAP_STYLE: React.CSSProperties = {
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+};
+
+const INPUT_STYLE: React.CSSProperties = {
+  width: "100%",
+  padding: "20px 22px",
+  background: "#3d4f6e",
+  border: "none",
+  borderRadius: "20px",
+  color: "#c8d0e0",
+  fontSize: "21px",
+  fontFamily: "var(--font-inter), sans-serif",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const LABEL_STYLE: React.CSSProperties = {
+  color: "#c8d0e0",
+  fontSize: "21px",
+  marginBottom: "9px",
+  display: "block",
+};
+
 function EyeIcon({ closed }: { closed: boolean }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8899bb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -54,7 +82,6 @@ export default function AuthPage() {
     setTab(nextTab);
   };
 
-  const goldGradient = "linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%)";
   const btnStyle = (key: string, disabled: boolean): React.CSSProperties => ({
     border: "none",
     borderRadius: "50px",
@@ -64,7 +91,7 @@ export default function AuthPage() {
     cursor: disabled ? "not-allowed" : "pointer",
     opacity: disabled ? 0.65 : 1,
     letterSpacing: "0.5px",
-    background: disabled ? "#a07830" : goldGradient,
+    background: disabled ? "#a07830" : GOLD_GRADIENT,
     boxShadow:
       hoveredBtn === key && !disabled
         ? "0px 18px 24px rgba(0,0,0,0.25), 0 0 28px rgba(255,255,255,0.5), 0 0 55px rgba(255,255,255,0.25)"
@@ -102,32 +129,6 @@ export default function AuthPage() {
       setRegMessage(err instanceof Error ? err.message : "Server error");
     }
     setRegLoading(false);
-  };
-
-  const inputWrapStyle: React.CSSProperties = {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "20px 22px",
-    background: "#3d4f6e",
-    border: "none",
-    borderRadius: "20px",
-    color: "#c8d0e0",
-    fontSize: "21px",
-    fontFamily: "var(--font-inter), sans-serif",
-    outline: "none",
-    boxSizing: "border-box",
-  };
-
-  const labelStyle: React.CSSProperties = {
-    color: "#c8d0e0",
-    fontSize: "21px",
-    marginBottom: "9px",
-    display: "block",
   };
 
   return (
@@ -251,22 +252,22 @@ export default function AuthPage() {
           {tab === "login" ? (
             <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
               <div>
-                <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
-                <div style={inputWrapStyle}>
-                  <input type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required style={inputStyle} />
+                <label style={{ ...LABEL_STYLE, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
+                <div style={INPUT_WRAP_STYLE}>
+                  <input type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required style={INPUT_STYLE} />
                 </div>
               </div>
 
               <div>
-                <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Password</label>
-                <div style={inputWrapStyle}>
+                <label style={{ ...LABEL_STYLE, fontSize: "25px", paddingLeft: "8px" }}>Password</label>
+                <div style={INPUT_WRAP_STYLE}>
                   <input
                     type={showLoginPassword ? "text" : "password"}
                     placeholder="password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
-                    style={{ ...inputStyle, paddingRight: "64px" }}
+                    style={{ ...INPUT_STYLE, paddingRight: "64px" }}
                   />
                   <button
                     type="button"
@@ -324,26 +325,26 @@ export default function AuthPage() {
                 }}>
                 {/* Username */}
                 <div>
-                  <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
-                  <div style={inputWrapStyle}>
-                    <input placeholder="username/email" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required style={inputStyle} />
+                  <label style={{ ...LABEL_STYLE, fontSize: "25px", paddingLeft: "8px" }}>Username</label>
+                  <div style={INPUT_WRAP_STYLE}>
+                    <input placeholder="username/email" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required style={INPUT_STYLE} />
                   </div>
                 </div>
 
                 {/* Password */}
                 <div>
-                  <label style={{ ...labelStyle, fontSize: "25px", paddingLeft: "8px", display: "flex", alignItems: "baseline", gap: "10px" }}>
+                  <label style={{ ...LABEL_STYLE, fontSize: "25px", paddingLeft: "8px", display: "flex", alignItems: "baseline", gap: "10px" }}>
                     Password
                     <span style={{ fontSize: "13px", color: "#8899bb", fontWeight: "400" }}>At Least 8 Characters: A–Z, a–z, 0–9, Symbols.</span>
                   </label>
-                  <div style={inputWrapStyle}>
+                  <div style={INPUT_WRAP_STYLE}>
                     <input
                       type={showRegPassword ? "text" : "password"}
                       placeholder="password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       required
-                      style={{ ...inputStyle, paddingRight: "64px" }}
+                      style={{ ...INPUT_STYLE, paddingRight: "64px" }}
                     />
                     <button
                       type="button"
@@ -365,23 +366,23 @@ export default function AuthPage() {
 
                 {/* Email */}
                 <div>
-                  <label style={labelStyle}>Email</label>
-                  <div style={inputWrapStyle}>
-                    <input placeholder="Email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required style={inputStyle} />
+                  <label style={LABEL_STYLE}>Email</label>
+                  <div style={INPUT_WRAP_STYLE}>
+                    <input placeholder="Email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required style={INPUT_STYLE} />
                   </div>
                 </div>
 
                 {/* Confirm Password */}
                 <div>
-                  <label style={labelStyle}>Confirm Password</label>
-                  <div style={inputWrapStyle}>
+                  <label style={LABEL_STYLE}>Confirm Password</label>
+                  <div style={INPUT_WRAP_STYLE}>
                     <input
                       type={showRegConfirm ? "text" : "password"}
                       placeholder="password"
                       value={regConfirm}
                       onChange={(e) => setRegConfirm(e.target.value)}
                       required
-                      style={{ ...inputStyle, paddingRight: "64px" }}
+                      style={{ ...INPUT_STYLE, paddingRight: "64px" }}
                     />
                     <button
                       type="button"

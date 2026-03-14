@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { getAvatarColor } from "../lib/colorUtils";
 import SessionCache from "../lib/SessionCache";
 import UserService from "../lib/UserService";
 import styles from "./page.module.css";
@@ -14,15 +15,6 @@ const menuItems = [
   { key: "create", label: "Create Table", path: "/createtable", className: styles.menuButtonCreate },
   { key: "play", label: "Play", path: "/play", className: styles.menuButtonPlay },
 ] as const;
-
-const getAvatarColor = (name: string) => {
-  const colors = ["#e05c5c", "#e0885c", "#d4a632", "#6db86d", "#5cb8b8", "#5c8ae0", "#8e5ce0", "#c05ce0", "#e05c9a", "#4ca8c8"];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-};
 
 export default function Home() {
   const router = useRouter();

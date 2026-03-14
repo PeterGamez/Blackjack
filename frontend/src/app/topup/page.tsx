@@ -266,14 +266,13 @@ export default function TopupPage() {
                 color: "#ffffff",
                 position: "relative",
                 overflow: "hidden",
-                cursor: loading ? "not-allowed" : "pointer",
+                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 boxSizing: "border-box",
               }}
               onClick={() => {
-                if (loading) return;
                 router.push(`/payment?tokens=${pkg.tokens}&price=${pkg.price}`);
               }}>
               <div

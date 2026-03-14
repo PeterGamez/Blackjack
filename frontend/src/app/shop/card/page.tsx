@@ -46,7 +46,7 @@ export default function CardShopPage() {
       }
       if (typeof data.coins === "number") setCoins(data.coins);
 
-      const inventorySet = new Set<number>((data.inventory ?? []).map(Number));
+      const inventorySet = new Set<number>((data.inventory ?? []).map((item) => item.productId));
 
       try {
         const token = LocalStorage.getItem("accessToken");

@@ -61,7 +61,7 @@ export default function InventoryPage() {
         });
         if (!res.ok) return;
         const products: ApiProduct[] = await res.json();
-        const inventorySet = new Set(data.inventory.map(Number));
+        const inventorySet = new Set(data.inventory.map((item) => item.productId));
         const owned = products
           .filter((p) => inventorySet.has(p.id) && p.type === "card")
           .map((p) => ({

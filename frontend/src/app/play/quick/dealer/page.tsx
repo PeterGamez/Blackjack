@@ -7,7 +7,7 @@ import { Socket, io } from "socket.io-client";
 
 import config from "@/src/config";
 import UserService from "../../../../lib/UserService";
-import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
+import { getCardBackImage, getCardImagePath, getSelectedSkin } from "../../../../lib/cardUtils";
 import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 import SessionStorage from "@/src/lib/SessionStorage";
@@ -76,7 +76,7 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin, setCardSkin] = useState<string>("Default");
+  const [cardSkin, setCardSkin] = useState<string>(getSelectedSkin);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {

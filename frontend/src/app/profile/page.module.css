@@ -1,33 +1,168 @@
-.emptyState {
-  text-align: center;
-  margin-top: 100px;
+.page {
+  min-height: 100vh;
+  background: #1e2430;
+  font-family: var(--font-sora), sans-serif;
 }
 
-.panel {
-  padding: 40px;
-  max-width: 400px;
-  margin: 100px auto;
-  background: #ffffff;
-  border: 1px solid #ccc;
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 120px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .backButton {
-  margin-bottom: 20px;
-  padding: 6px 12px;
-  background: #ccc;
+  align-self: flex-start;
+  background: transparent;
   border: none;
+  color: #93a3bb;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  padding: 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.2s, transform 0.2s;
+  margin-top: 4rem;
+  margin-bottom: 20px;
 }
 
-.backButtonAligned {
-  align-self: flex-start;
+.backButton:hover {
+  color: #e6eaf2;
+  transform: translateX(-4px);
+}
+
+.card {
+  background: rgba(92, 107, 138, 0.12);
+  border: 1px solid rgba(92, 107, 138, 0.35);
+  border-radius: 24px;
+  padding: 48px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatarWrapper {
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  font-size: 40px;
+  box-shadow: 0 0 0 3px rgba(242, 200, 121, 0.45), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.info {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.username {
+  color: #e6eaf2;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.roleBadge {
+  display: inline-block;
+  background: linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%);
+  color: #1a1a1a;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-radius: 50px;
+  padding: 4px 14px;
+  margin-bottom: 12px;
+}
+
+.email {
+  color: #93a3bb;
+  font-size: 14px;
+  margin: 10px 0 0;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.statPill {
+  flex: 1;
+  background: rgba(92, 107, 138, 0.25);
+  border: 1px solid rgba(92, 107, 138, 0.5);
+  border-radius: 16px;
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.statLabel {
+  color: #93a3bb;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 6px;
+}
+
+.statValue {
+  color: #f2c879;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .logoutButton {
-  margin-top: 20px;
-  padding: 10px 20px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 50px;
   background: #f44336;
   color: #ffffff;
-  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.logoutButton:hover {
+  background: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.35);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding-top: 180px;
+  color: #93a3bb;
+  font-size: 15px;
+  text-align: center;
+}
+
+.primaryButton {
+  padding: 12px 36px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%);
+  color: #1a1a1a;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }

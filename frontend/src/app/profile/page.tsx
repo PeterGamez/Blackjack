@@ -5,16 +5,29 @@ import { useEffect, useState } from "react";
 
 import UserService from "../../lib/UserService";
 import Navbar from "../components/Navbar";
+import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
+import SessionStorage from "@/src/lib/SessionStorage";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string; email: string; role: string } | null>(null);
+  const [user, setUser] = useState<{
+    username: string;
+    email: string;
+    role: string;
+    coins: number;
+    tokens: number;
+  } | null>(null);
 
   useEffect(() => {
     UserService.getUser().then((data) => {
-      if (data) setUser(data);
+      if (data) {
+        setUser(data);
+        SessionStorage.setItem("coins", data.coins.toString());
+        SessionStorage.setItem("tokens", data.tokens.toString());
+      }
     });
+
   }, []);
 
   const handleLogout = () => {
@@ -24,36 +37,53 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className={styles.emptyState}>
+      <div className={styles.page}>
         <Navbar />
-        <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
-          ← Back
-        </button>
-        <p>No profile data. Please login first.</p>
-        <button onClick={() => router.push("/login")}>Go to Login</button>
+        <div className={styles.emptyState}>
+          <p>No profile data. Please login first.</p>
+          <button type="button" onClick={() => router.push("/auth")} className={styles.primaryButton}>
+            Go to Login
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.panel}>
+    <div className={styles.page}>
       <Navbar />
-      <button type="button" onClick={() => router.back()} className={`${styles.backButton} ${styles.backButtonAligned}`}>
-        ← Back
-      </button>
-      <h2>Profile</h2>
-      <p>
-        <strong>Username:</strong> {user.username}
-      </p>
-      <p>
-        <strong>Email:</strong> {user.email}
-      </p>
-      <p>
-        <strong>Role:</strong> {user.role}
-      </p>
-      <button onClick={handleLogout} className={styles.logoutButton}>
-        Logout
-      </button>
+      <div className={styles.container}>
+        <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
+          ← Back
+        </button>
+        <div className={styles.card}>
+          <div className={styles.avatarWrapper}>
+            <ProfileAvatar username={user.username} className={styles.avatar} />
+          </div>
+          <div className={styles.info}>
+            <h1 className={styles.username}>{user.username}</h1>
+            <span className={styles.roleBadge}>{user.role}</span>
+            <p className={styles.email}>{user.email}</p>
+          </div>
+          <div className={styles.stats}>
+            <div className={styles.statPill}>
+              <div>
+                <p className={styles.statLabel}>Coins</p>
+                <p className={styles.statValue}>{user.coins.toLocaleString()}</p>
+              </div>
+            </div>
+            <div className={styles.statPill}>
+              <div>
+                <p className={styles.statLabel}>Tokens</p>
+                <p className={styles.statValue}>{user.tokens.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+          <button type="button" onClick={handleLogout} className={styles.logoutButton}>
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -39,7 +39,15 @@ export default class UserRoute implements RouteInterface {
                 role: user.role,
                 tokens: user.tokens,
                 coins: user.coins,
-                inventory: userInventory.map((item) => item.productId),
+                cardId: user.cardId,
+                chipId: user.chipId,
+                themeId: user.themeId,
+                inventory: userInventory.map((item) => {
+                    return {
+                        productId: item.productId,
+                        type: item.type,
+                    };
+                }),
             };
 
             return c.json(response);

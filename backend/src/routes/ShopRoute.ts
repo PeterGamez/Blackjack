@@ -34,6 +34,7 @@ export default class ShopRoute implements RouteInterface {
                 tokens: product.tokens,
                 coins: product.coins,
                 type: product.type,
+                isRecommend: product.isRecommend,
             }));
 
             return c.json(response);

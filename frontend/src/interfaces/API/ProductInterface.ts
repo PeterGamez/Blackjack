@@ -7,4 +7,5 @@ export interface ProductInterface {
     tokens: number;
     coins: number;
     type: "card" | "chip" | "table";
+    isRecommend: boolean;
 }

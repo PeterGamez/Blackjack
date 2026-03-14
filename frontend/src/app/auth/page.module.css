@@ -1,0 +1,265 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1a2234;
+  font-family: Sora, sans-serif;
+}
+
+.backButton {
+  position: fixed;
+  top: 70px;
+  left: 70px;
+  background: transparent;
+  border: none;
+  color: #e6eaf2;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 50;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.backButton:hover {
+  background: rgba(92, 107, 138, 0.6);
+  transform: translateX(-5px);
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 28px;
+  transition: width 0.3s ease;
+}
+
+.shellLogin {
+  width: 578px;
+}
+
+.shellRegister {
+  width: 1156px;
+}
+
+.avatar {
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  background: #c8cfd8;
+  margin-bottom: 44px;
+}
+
+.tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 290px;
+  margin-bottom: 50px;
+  align-items: end;
+}
+
+.tabIndicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: #d4a84b;
+  transition: transform 0.28s ease;
+}
+
+.tabIndicatorRegister {
+  transform: translateX(100%);
+}
+
+.tabButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 25px;
+  font-weight: 400;
+  color: #93a3bb;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 9px;
+  transition: color 0.28s ease;
+}
+
+.tabButtonActive {
+  color: #d4a84b;
+}
+
+.formWrap {
+  width: 100%;
+}
+
+.slideFromRight {
+  animation: slideInFromRight 0.28s ease;
+}
+
+.slideFromLeft {
+  animation: slideInFromLeft 0.28s ease;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.gridForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 40px;
+}
+
+.field label {
+  color: #c8d0e0;
+  font-size: 21px;
+  margin-bottom: 9px;
+  display: block;
+}
+
+.fieldLabelLarge {
+  font-size: 25px;
+  padding-left: 8px;
+}
+
+.passwordLabel {
+  display: flex !important;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.passwordHint {
+  font-size: 13px;
+  color: #8899bb;
+  font-weight: 400;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 20px 22px;
+  background: #3d4f6e;
+  border: none;
+  border-radius: 20px;
+  color: #c8d0e0;
+  font-size: 21px;
+  font-family: var(--font-inter), sans-serif;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.inputWithIcon {
+  padding-right: 64px;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.messageError {
+  color: #ff6b6b;
+  font-size: 18px;
+  text-align: center;
+}
+
+.messageSuccess {
+  font-size: 18px;
+  text-align: center;
+  color: #4ade80;
+}
+
+.submitButton {
+  border: none;
+  border-radius: 50px;
+  color: #1a2234;
+  font-weight: 700;
+  font-size: 22px;
+  cursor: pointer;
+  opacity: 1;
+  letter-spacing: 0.5px;
+  background: linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, opacity 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  box-shadow: 0 18px 24px rgba(0, 0, 0, 0.25), 0 0 28px rgba(255, 255, 255, 0.5), 0 0 55px rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.04);
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  background: #a07830;
+}
+
+.signInButton {
+  margin-top: 11px;
+  align-self: center;
+  padding: 20px 72px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.createButtonWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 11px;
+}
+
+.createButton {
+  padding: 20px 80px;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #93a3bb;
+  font-size: 17px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(44px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-44px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

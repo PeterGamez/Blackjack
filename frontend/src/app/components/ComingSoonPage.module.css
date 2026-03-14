@@ -1,0 +1,31 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #d9d3c7;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cool {
+  background: #f4f4f4;
+}
+
+.title {
+  font-size: 32px;
+  color: #333;
+}
+
+.message {
+  color: #666;
+}
+
+.backButton {
+  padding: 10px 20px;
+  background: #4da6ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

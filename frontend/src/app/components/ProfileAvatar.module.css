@@ -1,0 +1,21 @@
+.avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff;
+  user-select: none;
+}
+
+.color0 { background: #e05c5c; }
+.color1 { background: #e0885c; }
+.color2 { background: #d4a632; }
+.color3 { background: #6db86d; }
+.color4 { background: #5cb8b8; }
+.color5 { background: #5c8ae0; }
+.color6 { background: #8e5ce0; }
+.color7 { background: #c05ce0; }
+.color8 { background: #e05c9a; }
+.color9 { background: #4ca8c8; }
+.neutral { background: #5c6b8a; }

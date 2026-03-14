@@ -1,0 +1,33 @@
+.emptyState {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.panel {
+  padding: 40px;
+  max-width: 400px;
+  margin: 100px auto;
+  background: #ffffff;
+  border: 1px solid #ccc;
+}
+
+.backButton {
+  margin-bottom: 20px;
+  padding: 6px 12px;
+  background: #ccc;
+  border: none;
+  cursor: pointer;
+}
+
+.backButtonAligned {
+  align-self: flex-start;
+}
+
+.logoutButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #f44336;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}

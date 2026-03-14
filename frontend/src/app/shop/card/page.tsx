@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import config from "../../../config";
 import Navbar from "../../components/Navbar";
+import { getCardBackImage, getCardImagePath } from "../../../lib/cardUtils";
+import SessionStorage from "../../../lib/SessionStorage";
+import UserService from "../../../lib/UserService";
 import styles from "../test.module.css";
 
 interface ApiProduct {
@@ -31,19 +35,61 @@ export default function CardShopPage() {
   const [owned, setOwned] = useState<Set<number>>(new Set());
   const [buying, setBuying] = useState<number | null>(null);
   const [message, setMessage] = useState<{ id: number; text: string; ok: boolean } | null>(null);
+  const [coins, setCoins] = useState<number>(0);
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await UserService.getUser();
+      if (!data) { router.push("/auth"); return; }
+      if (typeof data.coins === "number") setCoins(data.coins);
+
+      const inventorySet = new Set<number>((data.inventory ?? []).map(Number));
+
+      try {
+        const token = SessionStorage.getItem("accessToken");
+        const res = await fetch(`${config.apiUrl}/shop/list`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const all: ApiProduct[] = await res.json();
+        setProducts(all.filter((p) => p.type === "card"));
+        setOwned(new Set(all.filter((p) => inventorySet.has(p.id)).map((p) => p.id)));
+      } catch {
+        // ignore
+      }
+    };
+    void load();
+  }, [router]);
+
+  const buy = async (p: ApiProduct) => {
+    setBuying(p.id);
+    setMessage(null);
+    try {
+      const token = SessionStorage.getItem("accessToken");
+      const res = await fetch(`${config.apiUrl}/shop/buy`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: p.id, payment: "coins" }),
+      });
+      const data: { message?: string } = await res.json();
+      if (res.ok) {
+        setOwned((prev) => new Set([...prev, p.id]));
+        setCoins((prev) => prev - p.coins);
+        SessionStorage.setItem("coins", (coins - p.coins).toString());
+        setMessage({ id: p.id, text: "Purchased!", ok: true });
+      } else {
+        setMessage({ id: p.id, text: data.message || "Purchase failed", ok: false });
+      }
+    } catch {
+      setMessage({ id: p.id, text: "Network error", ok: false });
+    } finally {
+      setBuying(null);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <Navbar />
-      {/* Back Button */}
-      <button onClick={() => router.push("/")} className={styles.backButton}>
-        ← Lobby
-      </button>
-      {/* Mode Title */}
-      <div className={styles.Title}>
-        <h2>Shop</h2>
-      </div>
-
       <button onClick={() => router.push("/")} className={styles.backButton}>← Lobby</button>
       <div className={styles.Title}><h2>Shop</h2></div>
 
@@ -85,6 +131,7 @@ export default function CardShopPage() {
               const isOwned = owned.has(p.id);
               const isLoading = buying === p.id;
               const msg = message?.id === p.id ? message : null;
+
               return (
                 <div key={p.id} className={styles.product}>
                   <div className={styles.productPreview}>

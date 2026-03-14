@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import config from "../../config";
-import LocalStorage from "../../lib/LocalStorage";
-import SessionCache from "../../lib/SessionCache";
 import UserService from "../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../lib/cardUtils";
 import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
+import SessionStorage from "../../lib/SessionStorage";
 
 type TabType = "card" | "chips" | "theme";
 
@@ -40,13 +39,12 @@ function toFolderName(name: string): string {
 
 export default function InventoryPage() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
+  const [username, setUsername] = useState<string>(SessionStorage.getItem("username"));
+  const [coins, setCoins] = useState<number>(Number(SessionStorage.getItem("coins")));
+  const [tokens, setTokens] = useState<number>(Number(SessionStorage.getItem("tokens")));
   const [activeTab, setActiveTab] = useState<TabType>("card");
   const [selectedCardSkin, setSelectedCardSkin] = useState<string>(
-    LocalStorage.getItem("selectedCardSkin") ?? "Default"
+    SessionStorage.getItem("selectedCardSkin") ?? "Default"
   );
   const [ownedSkins, setOwnedSkins] = useState<SkinItem[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -63,7 +61,7 @@ export default function InventoryPage() {
       if (!data.inventory?.length) return;
 
       try {
-        const token = sessionStorage.getItem("accessToken");
+        const token = SessionStorage.getItem("accessToken");
         const res = await fetch(`${config.apiUrl}/shop/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -87,7 +85,7 @@ export default function InventoryPage() {
 
   const selectSkin = (skinId: string) => {
     setSelectedCardSkin(skinId);
-    LocalStorage.setItem("selectedCardSkin", skinId);
+    SessionStorage.setItem("selectedCardSkin", skinId);
   };
 
   const activeHover = hovered || activeTab;

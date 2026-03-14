@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import ProfileAvatar from "./ProfileAvatar";
 import styles from "./Navbar.module.css";
+import SessionStorage from "../../lib/SessionStorage";
 
 export default function Navbar() {
   const router = useRouter();
@@ -15,9 +16,9 @@ export default function Navbar() {
 
   useEffect(() => {
     const readCache = () => {
-      setUsername(sessionStorage.getItem("cached_username"));
-      setCoins(parseInt(sessionStorage.getItem("cached_coins") || "0"));
-      setTokens(parseInt(sessionStorage.getItem("cached_tokens") || "0"));
+      setUsername(SessionStorage.getItem("username"));
+      setCoins(parseInt(SessionStorage.getItem("coins") || "0"));
+      setTokens(parseInt(SessionStorage.getItem("tokens") || "0"));
     };
 
     readCache();

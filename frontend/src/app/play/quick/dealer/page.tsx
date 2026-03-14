@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-import config from "../../../../config";
+import config from "@/src/config";
 import UserService from "../../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
 import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
+import SessionStorage from "@/src/lib/SessionStorage";
 
 interface Card {
   suit: string;
@@ -137,12 +138,12 @@ export default function Dealer() {
       setUserId(user.id);
       setPlayerChips(user.coins);
 
-      sessionStorage.setItem("cached_coins", user.coins.toString());
+      SessionStorage.setItem("coins", user.coins.toString());
 
       const socket = io(config.socketUrl, {
         reconnection: true,
         reconnectionAttempts: 5,
-        auth: { token: sessionStorage.getItem("accessToken") },
+        auth: { token: SessionStorage.getItem("accessToken") },
       });
 
       socket.on("connect", () => console.log("Socket connected"));
@@ -170,7 +171,7 @@ export default function Dealer() {
           setResult(msg);
           const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : playerChips;
           setPlayerChips(nextChips);
-          sessionStorage.setItem("cached_coins", nextChips.toString());
+          SessionStorage.setItem("coins", nextChips.toString());
           setGameStatus("game-over");
           setIsLoading(false);
         }
@@ -214,7 +215,7 @@ export default function Dealer() {
       setBet(ack.bet);
       const nextChips = typeof ack?.balance === "number" ? ack.balance : typeof ack?.coins === "number" ? ack.coins : playerChips;
       setPlayerChips(nextChips);
-      sessionStorage.setItem("cached_coins", nextChips.toString());
+      SessionStorage.setItem("coins", nextChips.toString());
       setMessage("");
 
       // Blackjack on initial deal — game is already over
@@ -253,7 +254,7 @@ export default function Dealer() {
         setResult(msg);
         const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips;
         setPlayerChips(nextChips);
-        sessionStorage.setItem("cached_coins", nextChips.toString());
+        SessionStorage.setItem("coins", nextChips.toString());
         setGameStatus("game-over");
       } else {
         startTimer();

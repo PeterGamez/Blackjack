@@ -15,21 +15,16 @@ export default class UserService {
     SessionStorage.setItem("accessToken", data.accessToken);
     LocalStorage.setItem("refreshToken", data.refreshToken);
 
-    SessionStorage.setItem("cached_userId", data.user.id.toString());
-    SessionStorage.setItem("cached_username", data.user.username);
-    SessionStorage.setItem("cached_coins", data.user.coins.toString());
-    SessionStorage.setItem("cached_tokens", data.user.tokens.toString());
+    SessionStorage.setItem("userId", data.user.id.toString());
+    SessionStorage.setItem("username", data.user.username);
+    SessionStorage.setItem("coins", data.user.coins.toString());
+    SessionStorage.setItem("tokens", data.user.tokens.toString());
     return data;
   }
 
   public static logout() {
-    SessionStorage.removeItem("accessToken");
-    LocalStorage.removeItem("refreshToken");
-
-    SessionStorage.removeItem("cached_userId");
-    SessionStorage.removeItem("cached_username");
-    SessionStorage.removeItem("cached_coins");
-    SessionStorage.removeItem("cached_tokens");
+    SessionStorage.clear();
+    LocalStorage.clear();
   }
 
   public static async register(username: string, email: string, password: string): Promise<void> {

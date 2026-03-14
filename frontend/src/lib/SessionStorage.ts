@@ -1,14 +1,16 @@
+type SessionKey = "accessToken" | "userId" | "username" | "coins" | "tokens" | "selectedCardSkin";
+
 export default class SessionStorage {
   private static isBrowser() {
     return typeof window !== "undefined";
   }
-  public static setItem(key: string, value: string) {
+  public static setItem(key: SessionKey, value: string) {
     if (this.isBrowser()) {
       sessionStorage.setItem(key, value);
     }
   }
 
-  public static getItem(key: string): string | null {
+  public static getItem(key: SessionKey): string {
     if (!this.isBrowser()) {
       return null;
     } else {
@@ -16,9 +18,15 @@ export default class SessionStorage {
     }
   }
 
-  public static removeItem(key: string) {
+  public static removeItem(key: SessionKey) {
     if (this.isBrowser()) {
       sessionStorage.removeItem(key);
+    }
+  }
+
+  public static clear() {
+    if (this.isBrowser()) {
+      sessionStorage.clear();
     }
   }
 }

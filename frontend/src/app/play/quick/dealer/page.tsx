@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import config from "../../../../config";
+import LocalStorage from "../../../../lib/LocalStorage";
 import SessionCache from "../../../../lib/SessionCache";
 import UserService from "../../../../lib/UserService";
 import { getCardBackImage, getCardImagePath } from "../../../../lib/cardUtils";
@@ -77,6 +78,7 @@ export default function Dealer() {
   const [userId, setUserId] = useState<number>(0);
   const [username, setUsername] = useState<string>("username");
   const [timer, setTimer] = useState<number>(10);
+  const [cardSkin, setCardSkin] = useState<string>("default");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -139,6 +141,7 @@ export default function Dealer() {
       setUserId(userData.id);
       setUsername(userData.username || "username");
       setPlayerChips(userData.coins ?? cachedProfile.coins);
+      setCardSkin(LocalStorage.getItem("selectedCardSkin") ?? "default");
       sessionStorage.setItem("userId", userData.id.toString());
 
       const token = sessionStorage.getItem("accessToken");
@@ -345,12 +348,12 @@ export default function Dealer() {
               {gameStatus !== "betting" &&
                 dealerHand.map((card, i) => (
                   <div key={i} className={`${styles.cardFrame} ${styles.card} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()}>
-                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
               {gameStatus === "playing" && (
                 <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
-                  <Image src={getCardBackImage(1)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
+                  <Image src={getCardBackImage(1, cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
                 </div>
               )}
             </div>
@@ -372,7 +375,7 @@ export default function Dealer() {
               {gameStatus !== "betting" &&
                 playerHand.map((card, i) => (
                   <div key={i} className={`${styles.cardFrame} ${styles.card}`.trim()}>
-                    <Image src={getCardImagePath(card)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
             </div>

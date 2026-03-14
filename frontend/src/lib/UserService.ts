@@ -48,6 +48,7 @@ export default class UserService {
     if (token) {
       try {
         const res = await fetch(`${config.apiUrl}/user/me`, {
+          cache: "no-store",
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -63,6 +64,7 @@ export default class UserService {
             const newToken = SessionStorage.getItem("accessToken");
 
             const retryRes = await fetch(`${config.apiUrl}/user/me`, {
+              cache: "no-store",
               headers: { Authorization: `Bearer ${newToken}` },
             });
 

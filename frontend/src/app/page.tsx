@@ -10,7 +10,7 @@ import styles from "./page.module.css";
 
 const menuItems = [
   { key: "shop", label: "Shop", path: "/shop", className: styles.menuButtonShop },
-  { key: "inventory", label: "Inventory", path: "/profile", className: styles.menuButtonInventory },
+  { key: "inventory", label: "Inventory", path: "/inventory", className: styles.menuButtonInventory },
   { key: "gambling", label: "Gambling", path: "/gambling", className: styles.menuButtonGambling },
   { key: "create", label: "Create Table", path: "/createtable", className: styles.menuButtonCreate },
   { key: "play", label: "Play", path: "/play", className: styles.menuButtonPlay },
@@ -18,10 +18,9 @@ const menuItems = [
 
 export default function Home() {
   const router = useRouter();
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
-  const [username, setUsername] = useState<string>(cachedProfile.username);
-  const [coins, setCoins] = useState<number>(cachedProfile.coins);
-  const [tokens, setTokens] = useState<number>(cachedProfile.tokens);
+  const [username, setUsername] = useState<string>("");
+  const [coins, setCoins] = useState<number>(0);
+  const [tokens, setTokens] = useState<number>(0);
 
   useEffect(() => {
     const loadProfile = async () => {

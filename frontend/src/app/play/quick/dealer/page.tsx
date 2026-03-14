@@ -31,7 +31,7 @@ interface GameStartAck {
   bet: number;
   balance?: number;
   coins?: number;
-  result?: "win" | "lose" | "draw" | "push";
+  result?: "win" | "lose" | "draw";
   blackjack?: boolean;
 }
 
@@ -43,7 +43,7 @@ interface GameActionAck {
   bust?: boolean;
   balance?: number;
   coins?: number;
-  result?: "win" | "lose" | "draw" | "push";
+  result?: "win" | "lose" | "draw";
 }
 
 type GameStatus = "betting" | "playing" | "game-over";
@@ -90,7 +90,6 @@ const styles = `
 `;
 
 export default function Dealer() {
-  const cachedProfile = SessionCache.getCachedProfileSnapshot();
   const router = useRouter();
   const socketRef = useRef<Socket | null>(null);
   const [gameStatus, setGameStatus] = useState<GameStatus>("betting");
@@ -98,7 +97,7 @@ export default function Dealer() {
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [bet, setBet] = useState<number>(0);
   const [pendingBet, setPendingBet] = useState<number>(0);
-  const [playerChips, setPlayerChips] = useState<number>(cachedProfile.coins);
+  const [playerChips, setPlayerChips] = useState<number>(0);
   const [message, setMessage] = useState<string>("");
   const [result, setResult] = useState<string>("");
   const [gameId, setGameId] = useState<number>(0);
@@ -167,6 +166,7 @@ export default function Dealer() {
 
   useEffect(() => {
     (async () => {
+      const cachedProfile = SessionCache.getCachedProfileSnapshot();
       const userData = await UserService.getUser();
       if (!userData) {
         router.push("/auth");
@@ -202,11 +202,11 @@ export default function Dealer() {
 
       socket.on(
         "game:finished",
-        (data: { playerHand: Card[]; dealerHand: Card[]; playerValue: number; dealerValue: number; result: "win" | "lose" | "draw" | "push"; reward: number; balance?: number; coins?: number }) => {
+        (data: { playerHand: Card[]; dealerHand: Card[]; playerValue: number; dealerValue: number; result: "win" | "lose" | "draw"; reward: number; balance?: number; coins?: number }) => {
           stopTimer();
           setPlayerHand(data.playerHand);
           setDealerHand(data.dealerHand);
-          const msg = data.result === "win" ? "You win! 🎉" : data.result === "draw" || data.result === "push" ? "Draw!" : "Dealer wins";
+          const msg = data.result === "win" ? "You win! 🎉" : data.result === "draw" ? "Draw!" : "Dealer wins";
           setResult(msg);
           const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : cachedProfile.coins;
           setPlayerChips(nextChips);
@@ -225,7 +225,7 @@ export default function Dealer() {
       stopTimer();
       socketRef.current?.disconnect();
     };
-  }, [cachedProfile.coins, router]);
+  }, [router]);
 
   const startGame = (betAmount: number) => {
     if (betAmount <= 0 || betAmount > playerChips) {
@@ -259,7 +259,7 @@ export default function Dealer() {
 
       // Blackjack on initial deal — game is already over
       if (ack.result !== undefined) {
-        const msg = ack.result === "win" ? (ack.blackjack ? "Blackjack! 🎉 You win!" : "You win! 🎉") : ack.result === "draw" || ack.result === "push" ? "Draw! Both Blackjack" : "Dealer Blackjack — Dealer wins";
+        const msg = ack.result === "win" ? (ack.blackjack ? "Blackjack! 🎉 You win!" : "You win! 🎉") : ack.result === "draw" ? "Draw! Both Blackjack" : "Dealer Blackjack — Dealer wins";
         setResult(msg);
         setGameStatus("game-over");
         stopTimer();
@@ -289,7 +289,7 @@ export default function Dealer() {
         // Player hit exactly 21 — dealer resolved automatically
         stopTimer();
         if (ack.dealerHand) setDealerHand(ack.dealerHand);
-        const msg = ack.result === "win" ? "You win! 🎉" : ack.result === "draw" || ack.result === "push" ? "Draw!" : "Dealer wins";
+        const msg = ack.result === "win" ? "You win! 🎉" : ack.result === "draw" ? "Draw!" : "Dealer wins";
         setResult(msg);
         const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips;
         setPlayerChips(nextChips);
@@ -652,7 +652,7 @@ export default function Dealer() {
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
-                  background: result.includes("win") ? "rgba(16,185,129,0.92)" : result.includes("Draw") || result.includes("Push") ? "rgba(245,158,11,0.92)" : "rgba(239,68,68,0.92)",
+                  background: result.includes("win") ? "rgba(16,185,129,0.92)" : result.includes("Draw") ? "rgba(245,158,11,0.92)" : "rgba(239,68,68,0.92)",
                   borderRadius: "16px",
                   padding: "18px 40px",
                   fontWeight: 800,

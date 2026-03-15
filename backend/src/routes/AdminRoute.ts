@@ -171,6 +171,10 @@ export default class AdminRoute implements RouteInterface {
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });
 
+        this.app.get("/code/:id", async (c) => {});
+
+        this.app.patch("/code/:id", async (c) => {});
+
         this.app.patch("/code/:id", async (c) => {
             const codeId = parseInt(c.req.param("id"));
             if (isNaN(codeId)) {
@@ -277,6 +281,10 @@ export default class AdminRoute implements RouteInterface {
             }
         });
 
+        this.app.get("/package/:id", async (c) => {});
+
+        this.app.patch("/package/:id", async (c) => {});
+
         this.app.get("/products", async (c) => {
             const products = await ProductModel.selectAllProducts();
 
@@ -320,6 +328,10 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Internal server error" }, 500);
             }
         });
+
+        this.app.get("/product/:id", async (c) => {});
+
+        this.app.patch("/product/:id", async (c) => {});
     }
 
     public getApp(app: Hono) {

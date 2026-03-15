@@ -11,7 +11,7 @@ import ProfileAvatar from "./ProfileAvatar";
 export default function Navbar() {
   const router = useRouter();
 
-  const [username, setUsername] = useState<string>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [coins, setCoins] = useState(0);
   const [tokens, setTokens] = useState(0);
 
@@ -20,15 +20,26 @@ export default function Navbar() {
       const _username = LocalStorage.getItem("username");
       if (_username) {
         setUsername(_username[0].toUpperCase() + _username.slice(1));
-        setCoins(parseInt(LocalStorage.getItem("coins")));
-        setTokens(parseInt(LocalStorage.getItem("tokens")));
+        setCoins(parseInt(LocalStorage.getItem("coins") || "0", 10));
+        setTokens(parseInt(LocalStorage.getItem("tokens") || "0", 10));
+        return;
       }
+
+      setUsername(null);
+      setCoins(0);
+      setTokens(0);
     };
 
     readCache();
 
-    const interval = setInterval(readCache, 1000);
-    return () => clearInterval(interval);
+    const onStorageChange = () => readCache();
+    window.addEventListener("storage", onStorageChange);
+    window.addEventListener("local-storage-change", onStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", onStorageChange);
+      window.removeEventListener("local-storage-change", onStorageChange);
+    };
   }, []);
 
   return (

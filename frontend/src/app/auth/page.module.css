@@ -273,7 +273,136 @@
 }
 
 @media (max-width: 768px) {
+  .backButton {
+    top: 12px;
+    left: 16px;
+  }
+
+  .shell {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .shellLogin,
+  .shellRegister {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .logoWrap {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
+  }
+
+  .tabs {
+    margin-bottom: 28px;
+  }
+
+  .tabButton {
+    font-size: 20px;
+  }
+
+  .form {
+    gap: 18px;
+  }
+
+  .field label {
+    font-size: 17px;
+    margin-bottom: 6px;
+  }
+
+  .fieldLabelLarge {
+    font-size: 20px;
+  }
+
+  .input {
+    padding: 14px 16px;
+    font-size: 17px;
+    border-radius: 14px;
+  }
+
+  .inputWithIcon {
+    padding-right: 50px;
+  }
+
+  .signInButton {
+    padding: 14px 48px;
+    font-size: 18px;
+  }
+
+  .createButton {
+    padding: 14px 56px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0 16px;
+  }
+
+  .tabs {
+    margin-bottom: 16px;
+    width: 220px;
+  }
+
+  .tabButton {
+    font-size: 17px;
+  }
+
+  .form {
+    gap: 12px;
+  }
+
+  .field label {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .fieldLabelLarge {
+    font-size: 16px;
+  }
+
+  .passwordLabel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .input {
+    padding: 11px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .gridForm {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .signInButton {
+    padding: 12px 36px;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+
+  .createButtonWrap {
+    margin-top: 4px;
+  }
+
+  .createButton {
+    padding: 12px 40px;
+    font-size: 16px;
+  }
+
+  .messageError,
+  .messageSuccess {
+    font-size: 14px;
+  }
+
+  .linkButton {
+    font-size: 13px;
+    margin-top: 2px;
   }
 }

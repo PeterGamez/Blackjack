@@ -138,6 +138,33 @@
   box-shadow: 0 8px 20px rgba(244, 67, 54, 0.35);
 }
 
+.actionButtons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adminButton {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 50px;
+  background: #2e7d32;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.adminButton:hover {
+  background: #1b5e20;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46, 125, 50, 0.35);
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -167,178 +194,6 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-.adminPanel {
-  margin-top: 20px;
-  background: rgba(92, 107, 138, 0.12);
-  border: 1px solid rgba(92, 107, 138, 0.35);
-  border-radius: 24px;
-  padding: 28px;
-}
-
-.adminPanelHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.adminPanelTitle {
-  margin: 0;
-  color: #e6eaf2;
-  font-size: 20px;
-  letter-spacing: 0.5px;
-}
-
-.reloadButton {
-  border: none;
-  border-radius: 12px;
-  background: #2e7d32;
-  color: #ffffff;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.reloadButton:disabled {
-  cursor: wait;
-  opacity: 0.75;
-}
-
-.reloadButton:hover:not(:disabled) {
-  background: #1b5e20;
-  transform: translateY(-1px);
-}
-
-.adminError {
-  margin: 0 0 14px;
-  color: #ff8a80;
-  font-size: 13px;
-}
-
-.adminHint {
-  margin: 0;
-  color: #93a3bb;
-  font-size: 14px;
-}
-
-.adminUsersList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.adminUserCard {
-  background: rgba(30, 36, 48, 0.65);
-  border: 1px solid rgba(92, 107, 138, 0.4);
-  border-radius: 16px;
-  padding: 16px;
-}
-
-.adminUserHead {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.adminUserId {
-  margin: 0;
-  color: #93a3bb;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-}
-
-.adminStatus {
-  background: rgba(242, 200, 121, 0.18);
-  border: 1px solid rgba(242, 200, 121, 0.5);
-  border-radius: 999px;
-  color: #f2c879;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 700;
-  padding: 3px 10px;
-}
-
-.adminGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.adminLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #93a3bb;
-  font-size: 12px;
-}
-
-.adminPlayerSelect {
-  margin-bottom: 12px;
-}
-
-.adminInput {
-  width: 100%;
-  border: 1px solid rgba(147, 163, 187, 0.35);
-  border-radius: 10px;
-  background: rgba(14, 20, 31, 0.5);
-  color: #e6eaf2;
-  padding: 10px;
-  font-size: 14px;
-}
-
-.adminCheckboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #93a3bb;
-  font-size: 13px;
-}
-
-.adminActions {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.saveButton,
-.deleteButton {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
-}
-
-.saveButton {
-  background: #f2c879;
-  color: #1a1a1a;
-}
-
-.deleteButton {
-  background: #a53535;
-  color: #ffffff;
-}
-
-.saveButton:disabled,
-.deleteButton:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.saveButton:hover:not(:disabled),
-.deleteButton:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
 @media (max-width: 700px) {
   .container {
     padding: 100px 16px 72px;
@@ -346,27 +201,5 @@
 
   .card {
     padding: 32px 20px;
-  }
-
-  .adminPanel {
-    padding: 20px 14px;
-  }
-
-  .adminGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .adminPanelHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .adminActions {
-    justify-content: stretch;
-  }
-
-  .saveButton,
-  .deleteButton {
-    flex: 1;
   }
 }

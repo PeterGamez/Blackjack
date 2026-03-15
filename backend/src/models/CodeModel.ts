@@ -43,4 +43,33 @@ export default class CodeModel {
             connection.release();
         }
     }
+
+    public static async selectCodeById(id: number): Promise<CodeInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [id]);
+            return rows[0];
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updateCode(id: number, payload: Partial<Omit<CodeInterface, "id" | "createdAt" | "updatedAt">>): Promise<void> {
+        const keys = Object.keys(payload);
+        if (keys.length === 0) {
+            return;
+        }
+
+        const setClause = keys.map((key) => `${key} = ?`).join(", ");
+        const values = keys.map((key) => payload[key as keyof typeof payload]);
+
+        const sql = `UPDATE ${this.table} SET ${setClause} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [...values, id]);
+        } finally {
+            connection.release();
+        }
+    }
 }

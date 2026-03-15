@@ -225,6 +225,120 @@ export default class AdminRoute implements RouteInterface {
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });
 
+        this.app.patch("/code/:id", async (c) => {
+            const codeId = parseInt(c.req.param("id"));
+            if (isNaN(codeId)) {
+                return c.json({ error: "Invalid code ID" }, 400);
+            }
+
+            let body: {
+                code?: string;
+                amount?: number;
+                type?: CodeInterface["type"];
+                maxUses?: number;
+                isActive?: boolean;
+                expiredDate?: string;
+            };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const hasNoUpdates =
+                typeof body.code === "undefined" &&
+                typeof body.amount === "undefined" &&
+                typeof body.type === "undefined" &&
+                typeof body.maxUses === "undefined" &&
+                typeof body.isActive === "undefined" &&
+                typeof body.expiredDate === "undefined";
+
+            if (hasNoUpdates) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const targetCode = await CodeModel.selectCodeById(codeId);
+            if (!targetCode) {
+                return c.json({ error: "Code not found" }, 404);
+            }
+
+            const updatePayload: {
+                code?: string;
+                amount?: number;
+                type?: CodeInterface["type"];
+                maxUses?: number;
+                isActive?: boolean;
+                expiredDate?: Date;
+            } = {};
+
+            if (typeof body.code !== "undefined") {
+                const newCode = body.code.trim();
+                if (!newCode) {
+                    return c.json({ error: "Invalid code" }, 400);
+                }
+
+                if (newCode !== targetCode.code) {
+                    const existingCode = await CodeModel.selectCodeByCode(newCode);
+                    if (existingCode && existingCode.id !== codeId) {
+                        return c.json({ error: "Code already exists" }, 400);
+                    }
+                }
+
+                updatePayload.code = newCode;
+            }
+
+            if (typeof body.amount !== "undefined") {
+                if (!Number.isInteger(body.amount) || body.amount <= 0) {
+                    return c.json({ error: "Invalid amount" }, 400);
+                }
+                updatePayload.amount = body.amount;
+            }
+
+            if (typeof body.type !== "undefined") {
+                if (body.type !== "coins" && body.type !== "tokens") {
+                    return c.json({ error: "Invalid type" }, 400);
+                }
+                updatePayload.type = body.type;
+            }
+
+            if (typeof body.maxUses !== "undefined") {
+                if (!Number.isInteger(body.maxUses) || body.maxUses <= 0) {
+                    return c.json({ error: "Invalid maxUses" }, 400);
+                }
+                updatePayload.maxUses = body.maxUses;
+            }
+
+            if (typeof body.isActive !== "undefined") {
+                updatePayload.isActive = body.isActive;
+            }
+
+            if (typeof body.expiredDate !== "undefined") {
+                const parsedDate = new Date(body.expiredDate);
+                if (isNaN(parsedDate.getTime())) {
+                    return c.json({ error: "Invalid expiredDate" }, 400);
+                }
+                updatePayload.expiredDate = parsedDate;
+            }
+
+            await CodeModel.updateCode(codeId, updatePayload);
+
+            const updatedCode = await CodeModel.selectCodeById(codeId);
+
+            return c.json({
+                message: "Code updated successfully",
+                code: {
+                    id: updatedCode.id,
+                    code: updatedCode.code,
+                    amount: updatedCode.amount,
+                    type: updatedCode.type,
+                    maxUses: updatedCode.maxUses,
+                    isActive: updatedCode.isActive,
+                    expiredDate: updatedCode.expiredDate,
+                },
+            });
+        });
+
         this.app.get("/payments", async (c) => {
             const payments = await PaymentModel.selectAllPayments();
 

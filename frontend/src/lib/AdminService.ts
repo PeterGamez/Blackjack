@@ -13,6 +13,16 @@ export interface AdminUser {
   isVerified: boolean;
 }
 
+export interface AdminCode {
+  id: number;
+  code: string;
+  amount: number;
+  type: "coins" | "tokens";
+  maxUses: number;
+  isActive: boolean;
+  expiredDate: string;
+}
+
 interface UpdateAdminUserPayload {
   username?: string;
   email?: string;
@@ -20,6 +30,23 @@ interface UpdateAdminUserPayload {
   tokens?: number;
   coins?: number;
   isVerified?: boolean;
+}
+
+interface CreateAdminCodePayload {
+  code: string;
+  amount: number;
+  type: "coins" | "tokens";
+  maxUses: number;
+  expiredDate: string;
+}
+
+interface UpdateAdminCodePayload {
+  code?: string;
+  amount?: number;
+  type?: "coins" | "tokens";
+  maxUses?: number;
+  isActive?: boolean;
+  expiredDate?: string;
 }
 
 export default class AdminService {
@@ -138,5 +165,52 @@ export default class AdminService {
     if (!response.ok) {
       await this.parseError(response);
     }
+  }
+
+  public static async getCodes(): Promise<AdminCode[]> {
+    const response = await this.authenticatedFetch("/admin/codes", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminCode[];
+  }
+
+  public static async createCode(payload: CreateAdminCodePayload): Promise<number> {
+    const response = await this.authenticatedFetch("/admin/code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    const data = (await response.json()) as { codeId: number };
+    return data.codeId;
+  }
+
+  public static async updateCode(codeId: number, payload: UpdateAdminCodePayload): Promise<AdminCode> {
+    const response = await this.authenticatedFetch(`/admin/code/${codeId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    const data = (await response.json()) as { code: AdminCode };
+    return data.code;
   }
 }

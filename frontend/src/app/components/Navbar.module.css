@@ -147,13 +147,59 @@
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 16px 20px;
+    --side-offset: 16px;
+    padding: 0.75rem 1rem;
     height: auto;
-    min-height: 80px;
+    min-height: 70px;
   }
 
   .resourceBox {
-    min-width: 140px;
+    min-width: 0;
     width: auto;
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .coinIcon,
+  .tokenIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    --side-offset: 0px;
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .profileSection {
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    border-radius: 14px;
+    margin-left: 16px;
+  }
+
+  .resourcesSection {
+    gap: 0.5rem;
+  }
+
+  .resourceBox {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+    border-radius: 14px;
+  }
+
+  .username {
+    max-width: 60px;
+    font-size: 0.85rem;
+  }
+
+  .coinIcon,
+  .tokenIcon {
+    width: 26px;
+    height: 26px;
+    font-size: 1rem;
   }
 }

@@ -1,6 +1,7 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { ProductInterface } from "../interfaces/Database";
+import { ProductType } from "../interfaces/Type";
 
 export default class ProductModel {
     private static table: string;
@@ -15,21 +16,21 @@ export default class ProductModel {
         return this.table;
     }
 
-    public static async insertProduct(product: Omit<ProductInterface, "id" | "createdAt" | "updatedAt">): Promise<void> {
+    public static async insertProduct(
+        name: string,
+        description: string,
+        image: string,
+        path: string,
+        tokens: number,
+        coins: number,
+        type: ProductInterface["type"],
+        isRecommend: boolean,
+        isActive: boolean
+    ): Promise<void> {
         const sql = `INSERT INTO ${this.table} (name, description, image, path, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute<ResultSetHeader>(sql, [
-                product.name,
-                product.description,
-                product.image,
-                product.path,
-                product.tokens,
-                product.coins,
-                product.type,
-                product.isRecommend,
-                product.isActive,
-            ]);
+            await connection.execute<ResultSetHeader>(sql, [name, description, image, path, tokens, coins, type, isRecommend, isActive]);
         } finally {
             connection.release();
         }
@@ -63,6 +64,16 @@ export default class ProductModel {
         try {
             const [rows] = await connection.execute(sql, [id]);
             return (rows as ProductInterface[])[0];
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updateProduct<T extends keyof ProductType>(id: number, type: T, value: ProductType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

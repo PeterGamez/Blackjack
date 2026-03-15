@@ -13,6 +13,7 @@ import styles from "./page.module.css";
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<{
+    id: number;
     username: string;
     email: string;
     role: string;
@@ -35,6 +36,15 @@ export default function ProfilePage() {
     router.push("/auth");
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/");
+  };
+
   if (!user) {
     return (
       <div className={styles.page}>
@@ -53,7 +63,7 @@ export default function ProfilePage() {
     <div className={styles.page}>
       <Navbar />
       <div className={styles.container}>
-        <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
+        <button type="button" onClick={handleBack} className={styles.backButton}>
           ← Back
         </button>
         <div className={styles.card}>
@@ -79,9 +89,16 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          <button type="button" onClick={handleLogout} className={styles.logoutButton}>
-            Logout
-          </button>
+          <div className={styles.actionButtons}>
+            {user.role === "admin" && (
+              <button type="button" onClick={() => router.push("/admin")} className={styles.adminButton}>
+                Open Admin Panel
+              </button>
+            )}
+            <button type="button" onClick={handleLogout} className={styles.logoutButton}>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
 import type Server from "../Server";
-import type { CodeInterface, ProductInterface } from "../interfaces/Database";
+import type { CodeInterface, ProductInterface, UserInterface } from "../interfaces/Database";
 import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PackageModel from "../models/PackageModel";
@@ -26,6 +26,28 @@ export default class AdminRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
         this.app.use("*", this.server.Middleware.adminOnly());
 
+        this.userRoutes();
+        this.codeRoutes();
+        this.packageRoutes();
+        this.productRoutes();
+
+        this.app.get("/payments", async (c) => {
+            const payments = await PaymentModel.selectAllPayments();
+
+            const response = payments.map((payment) => ({
+                id: payment.id,
+                userId: payment.userId,
+                receiptRef: payment.receiptRef,
+                type: payment.type,
+                amount: payment.amount,
+                createdAt: payment.createdAt,
+            }));
+
+            return c.json(response);
+        });
+    }
+
+    private userRoutes() {
         this.app.get("/users", async (c) => {
             const users = await UserModel.selectAllUser();
 
@@ -66,6 +88,73 @@ export default class AdminRoute implements RouteInterface {
             return c.json(response);
         });
 
+        this.app.patch("/user/:id", async (c) => {
+            const userId = parseInt(c.req.param("id"));
+            if (isNaN(userId)) {
+                return c.json({ error: "Invalid user ID" }, 400);
+            }
+
+            let body: { username?: string; email?: string; role?: UserInterface["role"]; tokens?: number; coins?: number };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { username, email, role, tokens, coins } = body;
+
+            if (!username && !email && !role && tokens === undefined && coins === undefined) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const user = await UserModel.selectUser(userId);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            if (username) {
+                await UserModel.updateUser(userId, "username", username);
+            }
+            if (email) {
+                await UserModel.updateUser(userId, "email", email);
+            }
+            if (role) {
+                await UserModel.updateUser(userId, "role", role);
+            }
+            if (tokens !== undefined) {
+                await UserModel.updateUser(userId, "tokens", tokens);
+            }
+            if (coins !== undefined) {
+                await UserModel.updateUser(userId, "coins", coins);
+            }
+
+            return c.json({ message: "User updated successfully" });
+        });
+
+        this.app.delete("/user/:id", async (c) => {
+            const userId = parseInt(c.req.param("id"));
+            if (isNaN(userId)) {
+                return c.json({ error: "Invalid user ID" }, 400);
+            }
+
+            const authUser = await this.server.Middleware.getUser(c);
+            if (authUser.role == "admin") {
+                return c.json({ error: "Admins cannot delete users" }, 403);
+            }
+
+            const user = await UserModel.selectUser(userId);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            await UserModel.deleteUser(userId);
+
+            return c.json({ message: "User deleted successfully" });
+        });
+    }
+
+    private codeRoutes() {
         this.app.get("/codes", async (c) => {
             const codes = await CodeModel.selectAllCodes();
 
@@ -106,21 +195,83 @@ export default class AdminRoute implements RouteInterface {
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });
 
-        this.app.get("/payments", async (c) => {
-            const payments = await PaymentModel.selectAllPayments();
+        this.app.get("/code/:id", async (c) => {
+            const codeId = parseInt(c.req.param("id"));
+            if (isNaN(codeId)) {
+                return c.json({ error: "Invalid code ID" }, 400);
+            }
 
-            const response = payments.map((payment) => ({
-                id: payment.id,
-                userId: payment.userId,
-                receiptRef: payment.receiptRef,
-                type: payment.type,
-                amount: payment.amount,
-                createdAt: payment.createdAt,
-            }));
+            const code = await CodeModel.selectCode(codeId);
+            if (!code) {
+                return c.json({ error: "Code not found" }, 404);
+            }
+
+            const response = {
+                id: code.id,
+                code: code.code,
+                amount: code.amount,
+                type: code.type,
+                maxUses: code.maxUses,
+                isActive: code.isActive,
+                expiredDate: code.expiredDate,
+            };
 
             return c.json(response);
         });
 
+        this.app.patch("/code/:id", async (c) => {
+            const codeId = parseInt(c.req.param("id"));
+            if (isNaN(codeId)) {
+                return c.json({ error: "Invalid code ID" }, 400);
+            }
+
+            let body: { code?: string; amount?: number; type?: CodeInterface["type"]; maxUses?: number; isActive?: boolean; expiredDate?: string };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { code, amount, type, maxUses, isActive, expiredDate } = body;
+
+            if (!code && !amount && !type && !maxUses && isActive === undefined && !expiredDate) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const targetCode = await CodeModel.selectCode(codeId);
+            if (!targetCode) {
+                return c.json({ error: "Code not found" }, 404);
+            }
+
+            if (code) {
+                const existingCode = await CodeModel.selectCodeByCode(code);
+                if (existingCode && existingCode.id !== codeId) {
+                    return c.json({ error: "Code already exists" }, 400);
+                }
+                await CodeModel.updateCode(codeId, "code", code);
+            }
+            if (amount !== undefined) {
+                await CodeModel.updateCode(codeId, "amount", amount);
+            }
+            if (type) {
+                await CodeModel.updateCode(codeId, "type", type);
+            }
+            if (maxUses !== undefined) {
+                await CodeModel.updateCode(codeId, "maxUses", maxUses);
+            }
+            if (isActive !== undefined) {
+                await CodeModel.updateCode(codeId, "isActive", isActive);
+            }
+            if (expiredDate) {
+                await CodeModel.updateCode(codeId, "expiredDate", new Date(expiredDate));
+            }
+
+            return c.json({ message: "Code updated successfully" });
+        });
+    }
+
+    private packageRoutes() {
         this.app.get("/packages", async (c) => {
             const packages = await PackageModel.selectAllPackages();
 
@@ -161,6 +312,61 @@ export default class AdminRoute implements RouteInterface {
             }
         });
 
+        this.app.get("/package/:id", async (c) => {
+            const packageId = parseInt(c.req.param("id"));
+            if (isNaN(packageId)) {
+                return c.json({ error: "Invalid package ID" }, 400);
+            }
+
+            const pkg = await PackageModel.selectPackage(packageId);
+            if (!pkg) {
+                return c.json({ error: "Package not found" }, 404);
+            }
+        });
+
+        this.app.patch("/package/:id", async (c) => {
+            const packageId = parseInt(c.req.param("id"));
+            if (isNaN(packageId)) {
+                return c.json({ error: "Invalid package ID" }, 400);
+            }
+
+            let body: { image?: string; price?: number; tokens?: number; isActive?: boolean };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { image, price, tokens, isActive } = body;
+
+            if (!image && !price && !tokens && isActive === undefined) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const pkg = await PackageModel.selectPackage(packageId);
+            if (!pkg) {
+                return c.json({ error: "Package not found" }, 404);
+            }
+
+            if (image) {
+                await PackageModel.updatePackage(packageId, "image", image);
+            }
+            if (price !== undefined) {
+                await PackageModel.updatePackage(packageId, "price", price);
+            }
+            if (tokens !== undefined) {
+                await PackageModel.updatePackage(packageId, "tokens", tokens);
+            }
+            if (isActive !== undefined) {
+                await PackageModel.updatePackage(packageId, "isActive", isActive);
+            }
+
+            return c.json({ message: "Package updated successfully" });
+        });
+    }
+
+    private productRoutes() {
         this.app.get("/products", async (c) => {
             const products = await ProductModel.selectAllProducts();
 
@@ -195,7 +401,7 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
-                await ProductModel.insertProduct(body);
+                await ProductModel.insertProduct(name, description, image, path, tokens, coins, type, isRecommend, isActive);
 
                 return c.json({ message: "Product created successfully" });
             } catch (error) {
@@ -204,6 +410,10 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Internal server error" }, 500);
             }
         });
+
+        this.app.get("/product/:id", async (c) => {});
+
+        this.app.patch("/product/:id", async (c) => {});
     }
 
     public getApp(app: Hono) {

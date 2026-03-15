@@ -1,6 +1,7 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { CodeInterface } from "../interfaces/Database";
+import { CodeType } from "../interfaces/Type";
 
 export default class CodeModel {
     private static table: string;
@@ -33,12 +34,33 @@ export default class CodeModel {
         }
     }
 
+    public static async selectCode(id: number): Promise<CodeInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [id]);
+            return rows[0];
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async selectCodeByCode(code: string): Promise<CodeInterface> {
         const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [code]);
             return rows[0];
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updateCode<T extends keyof CodeType>(id: number, type: T, value: CodeType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

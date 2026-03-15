@@ -2,7 +2,7 @@
   "module": "dist/index.js",
   "scripts": {
     "dev": "bun run build && bun run .",
-    "build": "tsc",
+    "build": "bun run tools/clear.js && tsc",
     "format": "prettier --write src/**/*.ts --config .prettierrc.js"
   },
   "dependencies": {

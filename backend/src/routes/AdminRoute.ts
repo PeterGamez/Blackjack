@@ -66,6 +66,125 @@ export default class AdminRoute implements RouteInterface {
             return c.json(response);
         });
 
+        this.app.patch("/user/:id", async (c) => {
+            const userId = parseInt(c.req.param("id"));
+            if (isNaN(userId)) {
+                return c.json({ error: "Invalid user ID" }, 400);
+            }
+
+            let body: {
+                username?: string;
+                email?: string;
+                role?: "user" | "admin";
+                tokens?: number;
+                coins?: number;
+                isVerified?: boolean;
+            };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const hasNoUpdates =
+                typeof body.username === "undefined" &&
+                typeof body.email === "undefined" &&
+                typeof body.role === "undefined" &&
+                typeof body.tokens === "undefined" &&
+                typeof body.coins === "undefined" &&
+                typeof body.isVerified === "undefined";
+
+            if (hasNoUpdates) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const targetUser = await UserModel.selectUser(userId);
+            if (!targetUser) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            if (typeof body.username !== "undefined") {
+                const username = body.username.trim();
+                if (!username) {
+                    return c.json({ error: "Invalid username" }, 400);
+                }
+                await UserModel.updateUser(userId, "username", username);
+            }
+
+            if (typeof body.email !== "undefined") {
+                const email = body.email.trim();
+                if (!email) {
+                    return c.json({ error: "Invalid email" }, 400);
+                }
+                await UserModel.updateUser(userId, "email", email);
+            }
+
+            if (typeof body.role !== "undefined") {
+                if (body.role !== "user" && body.role !== "admin") {
+                    return c.json({ error: "Invalid role" }, 400);
+                }
+                await UserModel.updateUser(userId, "role", body.role);
+            }
+
+            if (typeof body.tokens !== "undefined") {
+                if (!Number.isInteger(body.tokens) || body.tokens < 0) {
+                    return c.json({ error: "Invalid tokens" }, 400);
+                }
+                await UserModel.updateUser(userId, "tokens", body.tokens);
+            }
+
+            if (typeof body.coins !== "undefined") {
+                if (!Number.isInteger(body.coins) || body.coins < 0) {
+                    return c.json({ error: "Invalid coins" }, 400);
+                }
+                await UserModel.updateUser(userId, "coins", body.coins);
+            }
+
+            if (typeof body.isVerified !== "undefined") {
+                await UserModel.updateUser(userId, "isVerified", body.isVerified);
+            }
+
+            await this.server.Middleware.invalidateUserCache(userId);
+
+            const updatedUser = await UserModel.selectUser(userId);
+
+            return c.json({
+                message: "User updated successfully",
+                user: {
+                    id: updatedUser.id,
+                    username: updatedUser.username,
+                    email: updatedUser.email,
+                    role: updatedUser.role,
+                    tokens: updatedUser.tokens,
+                    coins: updatedUser.coins,
+                    isVerified: updatedUser.isVerified,
+                },
+            });
+        });
+
+        this.app.delete("/user/:id", async (c) => {
+            const userId = parseInt(c.req.param("id"));
+            if (isNaN(userId)) {
+                return c.json({ error: "Invalid user ID" }, 400);
+            }
+
+            const authUser = await this.server.Middleware.getUser(c);
+            if (authUser.id === userId) {
+                return c.json({ error: "You cannot delete your own account" }, 400);
+            }
+
+            const user = await UserModel.selectUser(userId);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            await UserModel.deleteUser(userId);
+            await this.server.Middleware.invalidateUserCache(userId);
+
+            return c.json({ message: "User deleted successfully" });
+        });
+
         this.app.get("/codes", async (c) => {
             const codes = await CodeModel.selectAllCodes();
 

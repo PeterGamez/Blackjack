@@ -86,7 +86,6 @@ export default class ShopRoute implements RouteInterface {
                 }
 
                 await UserInventoryModel.createUserInventory(user.id, product.id);
-                await this.server.Middleware.invalidateUserCache(user.id);
 
                 return c.json({ message: "Product purchased successfully" });
             } catch (err) {

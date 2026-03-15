@@ -59,17 +59,16 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            let body: { password?: string; cardId?: number; chipId?: number; tableId?: number; themeId?: number };
+            let body: { password?: string; cardId?: number; chipId?: number; tableId?: number };
             try {
                 body = await c.req.json();
             } catch {
                 return c.json({ error: "Invalid request body" }, 400);
             }
 
-            const { password, cardId, chipId, tableId, themeId } = body;
-            const resolvedTableId = tableId ?? themeId;
+            const { password, cardId, chipId, tableId } = body;
 
-            if (!password && cardId === undefined && chipId === undefined && resolvedTableId === undefined) {
+            if (!password && cardId === undefined && chipId === undefined && tableId === undefined) {
                 return c.json({ error: "Missing fields to update" }, 400);
             }
 
@@ -83,11 +82,9 @@ export default class UserRoute implements RouteInterface {
             if (chipId !== undefined) {
                 await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
             }
-            if (resolvedTableId !== undefined) {
-                await UserModel.updateUser(user.id, "themeId", resolvedTableId === 0 ? null : resolvedTableId);
+            if (tableId !== undefined) {
+                await UserModel.updateUser(user.id, "themeId", tableId === 0 ? null : tableId);
             }
-
-            await this.server.Middleware.invalidateUserCache(user.id);
 
             return c.json({ ok: true });
         });
@@ -120,38 +117,32 @@ export default class UserRoute implements RouteInterface {
 
             const response = gameHistory.map((game) => {
                 const isPlayer = game.playerId === user.id;
-
-                let result: GameHistoryInterface["result"];
-
-                if (game.result === "draw") {
-                    result = "draw";
-                } else if (game.result === "blackjack") {
-                    result = isPlayer ? "win" : "lose";
-                } else if (isPlayer) {
-                    result = game.result;
-                } else {
-                    result = game.result === "win" ? "lose" : "win";
-                }
-
+                const result = this.resolveGameResult(game.result, isPlayer);
                 const reward = isPlayer ? game.playerPayout : game.dealerPayout;
-
-                const myScore = isPlayer ? game.playerScore : game.dealerScore;
+                const score = isPlayer ? game.playerScore : game.dealerScore;
                 const opponentScore = isPlayer ? game.dealerScore : game.playerScore;
 
                 return {
                     role: isPlayer ? "player" : "dealer",
-                    result: result,
-                    score: myScore,
-                    opponentScore: opponentScore,
+                    result,
+                    score,
+                    opponentScore,
                     bet: game.bet,
                     mode: game.mode,
-                    reward: reward,
+                    reward,
                     createdAt: game.createdAt,
                 };
             });
 
             return c.json(response);
         });
+    }
+
+    private resolveGameResult(result: GameHistoryInterface["result"], isPlayer: boolean): GameHistoryInterface["result"] {
+        if (result === "draw") return "draw";
+        if (result === "blackjack") return isPlayer ? "win" : "lose";
+        if (isPlayer) return result;
+        return result === "win" ? "lose" : "win";
     }
 
     public getApp(app: Hono) {

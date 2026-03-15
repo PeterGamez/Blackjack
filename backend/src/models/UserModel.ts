@@ -2,6 +2,7 @@ import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { UserInterface } from "../interfaces/Database";
 import type { CurrencyType, UserType } from "../interfaces/Type";
+import UserService from "../services/UserService";
 
 export default class UserModel {
     private static table: string;
@@ -72,6 +73,7 @@ export default class UserModel {
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);
+            await UserService.delUser(id);
         } finally {
             connection.release();
         }
@@ -82,6 +84,7 @@ export default class UserModel {
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [amount, id]);
+            await UserService.delUser(id);
         } finally {
             connection.release();
         }
@@ -92,6 +95,7 @@ export default class UserModel {
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [amount, id, amount]);
+            await UserService.delUser(id);
         } finally {
             connection.release();
         }
@@ -102,6 +106,7 @@ export default class UserModel {
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [id]);
+            await UserService.delUser(id);
         } finally {
             connection.release();
         }

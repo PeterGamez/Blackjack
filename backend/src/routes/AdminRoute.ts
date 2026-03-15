@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
 import type Server from "../Server";
-import type { CodeInterface, ProductInterface } from "../interfaces/Database";
+import type { CodeInterface, ProductInterface, UserInterface } from "../interfaces/Database";
 import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PackageModel from "../models/PackageModel";
@@ -72,14 +72,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Invalid user ID" }, 400);
             }
 
-            let body: {
-                username?: string;
-                email?: string;
-                role?: "user" | "admin";
-                tokens?: number;
-                coins?: number;
-                isVerified?: boolean;
-            };
+            let body: { username?: string; email?: string; role?: UserInterface["role"]; tokens?: number; coins?: number };
 
             try {
                 body = await c.req.json<typeof body>();
@@ -87,80 +80,34 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
 
-            const hasNoUpdates =
-                typeof body.username === "undefined" &&
-                typeof body.email === "undefined" &&
-                typeof body.role === "undefined" &&
-                typeof body.tokens === "undefined" &&
-                typeof body.coins === "undefined" &&
-                typeof body.isVerified === "undefined";
+            const { username, email, role, tokens, coins } = body;
 
-            if (hasNoUpdates) {
+            if (!username && !email && !role && tokens === undefined && coins === undefined) {
                 return c.json({ error: "No update fields provided" }, 400);
             }
 
-            const targetUser = await UserModel.selectUser(userId);
-            if (!targetUser) {
+            const user = await UserModel.selectUser(userId);
+            if (!user) {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            if (typeof body.username !== "undefined") {
-                const username = body.username.trim();
-                if (!username) {
-                    return c.json({ error: "Invalid username" }, 400);
-                }
+            if (username) {
                 await UserModel.updateUser(userId, "username", username);
             }
-
-            if (typeof body.email !== "undefined") {
-                const email = body.email.trim();
-                if (!email) {
-                    return c.json({ error: "Invalid email" }, 400);
-                }
+            if (email) {
                 await UserModel.updateUser(userId, "email", email);
             }
-
-            if (typeof body.role !== "undefined") {
-                if (body.role !== "user" && body.role !== "admin") {
-                    return c.json({ error: "Invalid role" }, 400);
-                }
-                await UserModel.updateUser(userId, "role", body.role);
+            if (role) {
+                await UserModel.updateUser(userId, "role", role);
+            }
+            if (tokens !== undefined) {
+                await UserModel.updateUser(userId, "tokens", tokens);
+            }
+            if (coins !== undefined) {
+                await UserModel.updateUser(userId, "coins", coins);
             }
 
-            if (typeof body.tokens !== "undefined") {
-                if (!Number.isInteger(body.tokens) || body.tokens < 0) {
-                    return c.json({ error: "Invalid tokens" }, 400);
-                }
-                await UserModel.updateUser(userId, "tokens", body.tokens);
-            }
-
-            if (typeof body.coins !== "undefined") {
-                if (!Number.isInteger(body.coins) || body.coins < 0) {
-                    return c.json({ error: "Invalid coins" }, 400);
-                }
-                await UserModel.updateUser(userId, "coins", body.coins);
-            }
-
-            if (typeof body.isVerified !== "undefined") {
-                await UserModel.updateUser(userId, "isVerified", body.isVerified);
-            }
-
-            await this.server.Middleware.invalidateUserCache(userId);
-
-            const updatedUser = await UserModel.selectUser(userId);
-
-            return c.json({
-                message: "User updated successfully",
-                user: {
-                    id: updatedUser.id,
-                    username: updatedUser.username,
-                    email: updatedUser.email,
-                    role: updatedUser.role,
-                    tokens: updatedUser.tokens,
-                    coins: updatedUser.coins,
-                    isVerified: updatedUser.isVerified,
-                },
-            });
+            return c.json({ message: "User updated successfully" });
         });
 
         this.app.delete("/user/:id", async (c) => {
@@ -170,8 +117,8 @@ export default class AdminRoute implements RouteInterface {
             }
 
             const authUser = await this.server.Middleware.getUser(c);
-            if (authUser.id === userId) {
-                return c.json({ error: "You cannot delete your own account" }, 400);
+            if (authUser.role == "admin") {
+                return c.json({ error: "Admins cannot delete users" }, 403);
             }
 
             const user = await UserModel.selectUser(userId);
@@ -180,7 +127,6 @@ export default class AdminRoute implements RouteInterface {
             }
 
             await UserModel.deleteUser(userId);
-            await this.server.Middleware.invalidateUserCache(userId);
 
             return c.json({ message: "User deleted successfully" });
         });

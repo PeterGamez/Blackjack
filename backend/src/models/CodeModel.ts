@@ -34,22 +34,22 @@ export default class CodeModel {
         }
     }
 
-    public static async selectCodeByCode(code: string): Promise<CodeInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
+    public static async selectCode(id: number): Promise<CodeInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [code]);
+            const [rows] = await connection.execute(sql, [id]);
             return rows[0];
         } finally {
             connection.release();
         }
     }
 
-    public static async selectCodeById(id: number): Promise<CodeInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+    public static async selectCodeByCode(code: string): Promise<CodeInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql, [id]);
+            const [rows] = await connection.execute(sql, [code]);
             return rows[0];
         } finally {
             connection.release();

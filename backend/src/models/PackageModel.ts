@@ -1,6 +1,7 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { PackageInterface } from "../interfaces/Database";
+import { PackageType } from "../interfaces/Type";
 
 export default class PackageModel {
     private static table: string;
@@ -50,6 +51,16 @@ export default class PackageModel {
         try {
             const [rows] = await connection.execute(sql, [id]);
             return rows[0];
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async updatePackage<T extends keyof PackageType>(id: number, type: T, value: PackageType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

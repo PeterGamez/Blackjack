@@ -26,6 +26,28 @@ export default class AdminRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
         this.app.use("*", this.server.Middleware.adminOnly());
 
+        this.userRoutes();
+        this.codeRoutes();
+        this.packageRoutes();
+        this.productRoutes();
+
+        this.app.get("/payments", async (c) => {
+            const payments = await PaymentModel.selectAllPayments();
+
+            const response = payments.map((payment) => ({
+                id: payment.id,
+                userId: payment.userId,
+                receiptRef: payment.receiptRef,
+                type: payment.type,
+                amount: payment.amount,
+                createdAt: payment.createdAt,
+            }));
+
+            return c.json(response);
+        });
+    }
+
+    private userRoutes() {
         this.app.get("/users", async (c) => {
             const users = await UserModel.selectAllUser();
 
@@ -130,7 +152,9 @@ export default class AdminRoute implements RouteInterface {
 
             return c.json({ message: "User deleted successfully" });
         });
+    }
 
+    private codeRoutes() {
         this.app.get("/codes", async (c) => {
             const codes = await CodeModel.selectAllCodes();
 
@@ -171,9 +195,29 @@ export default class AdminRoute implements RouteInterface {
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });
 
-        this.app.get("/code/:id", async (c) => {});
+        this.app.get("/code/:id", async (c) => {
+            const codeId = parseInt(c.req.param("id"));
+            if (isNaN(codeId)) {
+                return c.json({ error: "Invalid code ID" }, 400);
+            }
 
-        this.app.patch("/code/:id", async (c) => {});
+            const code = await CodeModel.selectCode(codeId);
+            if (!code) {
+                return c.json({ error: "Code not found" }, 404);
+            }
+
+            const response = {
+                id: code.id,
+                code: code.code,
+                amount: code.amount,
+                type: code.type,
+                maxUses: code.maxUses,
+                isActive: code.isActive,
+                expiredDate: code.expiredDate,
+            };
+
+            return c.json(response);
+        });
 
         this.app.patch("/code/:id", async (c) => {
             const codeId = parseInt(c.req.param("id"));
@@ -195,7 +239,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "No update fields provided" }, 400);
             }
 
-            const targetCode = await CodeModel.selectCodeById(codeId);
+            const targetCode = await CodeModel.selectCode(codeId);
             if (!targetCode) {
                 return c.json({ error: "Code not found" }, 404);
             }
@@ -225,22 +269,9 @@ export default class AdminRoute implements RouteInterface {
 
             return c.json({ message: "Code updated successfully" });
         });
+    }
 
-        this.app.get("/payments", async (c) => {
-            const payments = await PaymentModel.selectAllPayments();
-
-            const response = payments.map((payment) => ({
-                id: payment.id,
-                userId: payment.userId,
-                receiptRef: payment.receiptRef,
-                type: payment.type,
-                amount: payment.amount,
-                createdAt: payment.createdAt,
-            }));
-
-            return c.json(response);
-        });
-
+    private packageRoutes() {
         this.app.get("/packages", async (c) => {
             const packages = await PackageModel.selectAllPackages();
 
@@ -281,10 +312,61 @@ export default class AdminRoute implements RouteInterface {
             }
         });
 
-        this.app.get("/package/:id", async (c) => {});
+        this.app.get("/package/:id", async (c) => {
+            const packageId = parseInt(c.req.param("id"));
+            if (isNaN(packageId)) {
+                return c.json({ error: "Invalid package ID" }, 400);
+            }
 
-        this.app.patch("/package/:id", async (c) => {});
+            const pkg = await PackageModel.selectPackage(packageId);
+            if (!pkg) {
+                return c.json({ error: "Package not found" }, 404);
+            }
+        });
 
+        this.app.patch("/package/:id", async (c) => {
+            const packageId = parseInt(c.req.param("id"));
+            if (isNaN(packageId)) {
+                return c.json({ error: "Invalid package ID" }, 400);
+            }
+
+            let body: { image?: string; price?: number; tokens?: number; isActive?: boolean };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { image, price, tokens, isActive } = body;
+
+            if (!image && !price && !tokens && isActive === undefined) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const pkg = await PackageModel.selectPackage(packageId);
+            if (!pkg) {
+                return c.json({ error: "Package not found" }, 404);
+            }
+
+            if (image) {
+                await PackageModel.updatePackage(packageId, "image", image);
+            }
+            if (price !== undefined) {
+                await PackageModel.updatePackage(packageId, "price", price);
+            }
+            if (tokens !== undefined) {
+                await PackageModel.updatePackage(packageId, "tokens", tokens);
+            }
+            if (isActive !== undefined) {
+                await PackageModel.updatePackage(packageId, "isActive", isActive);
+            }
+
+            return c.json({ message: "Package updated successfully" });
+        });
+    }
+
+    private productRoutes() {
         this.app.get("/products", async (c) => {
             const products = await ProductModel.selectAllProducts();
 

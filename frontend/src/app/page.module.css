@@ -258,3 +258,15 @@
     max-width: 320px;
   }
 }
+
+@media (max-width: 480px) {
+  .content {
+    padding: 80px 16px 40px;
+  }
+
+  .placeholderWrap {
+    padding-top: 0;
+    justify-content: center;
+    align-items: center;
+  }
+}

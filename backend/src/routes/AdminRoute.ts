@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
 
 import type Server from "../Server";
-import type { CodeInterface, ProductInterface } from "../interfaces/Database";
+import type { CodeInterface, ProductInterface, UserInterface } from "../interfaces/Database";
 import type { RouteInterface } from "../interfaces/Route";
 import CodeModel from "../models/CodeModel";
 import PackageModel from "../models/PackageModel";
@@ -75,7 +75,7 @@ export default class AdminRoute implements RouteInterface {
             let body: {
                 username?: string;
                 email?: string;
-                role?: "user" | "admin";
+                role?: UserInterface["role"];
                 tokens?: number;
                 coins?: number;
                 isVerified?: boolean;
@@ -145,8 +145,6 @@ export default class AdminRoute implements RouteInterface {
                 await UserModel.updateUser(userId, "isVerified", body.isVerified);
             }
 
-            await this.server.Middleware.invalidateUserCache(userId);
-
             const updatedUser = await UserModel.selectUser(userId);
 
             return c.json({
@@ -180,7 +178,6 @@ export default class AdminRoute implements RouteInterface {
             }
 
             await UserModel.deleteUser(userId);
-            await this.server.Middleware.invalidateUserCache(userId);
 
             return c.json({ message: "User deleted successfully" });
         });

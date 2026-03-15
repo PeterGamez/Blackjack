@@ -87,8 +87,6 @@ export default class UserRoute implements RouteInterface {
                 await UserModel.updateUser(user.id, "themeId", resolvedTableId === 0 ? null : resolvedTableId);
             }
 
-            await this.server.Middleware.invalidateUserCache(user.id);
-
             return c.json({ ok: true });
         });
 

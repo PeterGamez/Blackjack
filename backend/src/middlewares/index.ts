@@ -12,10 +12,6 @@ export default class Middleware {
         this.server = server;
     }
 
-    public async invalidateUserCache(userId: number): Promise<void> {
-        await RedisService.del(`${this.USER_CACHE_PREFIX}${userId}`);
-    }
-
     public auth() {
         return createMiddleware(async (c, next): Promise<Response> => {
             const authHeader = c.req.header("Authorization");

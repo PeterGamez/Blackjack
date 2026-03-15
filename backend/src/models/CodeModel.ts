@@ -1,6 +1,7 @@
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 
 import type { CodeInterface } from "../interfaces/Database";
+import { CodeType } from "../interfaces/Type";
 
 export default class CodeModel {
     private static table: string;
@@ -55,19 +56,11 @@ export default class CodeModel {
         }
     }
 
-    public static async updateCode(id: number, payload: Partial<Omit<CodeInterface, "id" | "createdAt" | "updatedAt">>): Promise<void> {
-        const keys = Object.keys(payload);
-        if (keys.length === 0) {
-            return;
-        }
-
-        const setClause = keys.map((key) => `${key} = ?`).join(", ");
-        const values = keys.map((key) => payload[key as keyof typeof payload]);
-
-        const sql = `UPDATE ${this.table} SET ${setClause} WHERE id = ?`;
+    public static async updateCode<T extends keyof CodeType>(id: number, type: T, value: CodeType[T]): Promise<void> {
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute(sql, [...values, id]);
+            await connection.execute(sql, [value, id]);
         } finally {
             connection.release();
         }

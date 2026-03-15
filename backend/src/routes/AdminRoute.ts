@@ -177,14 +177,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Invalid code ID" }, 400);
             }
 
-            let body: {
-                code?: string;
-                amount?: number;
-                type?: CodeInterface["type"];
-                maxUses?: number;
-                isActive?: boolean;
-                expiredDate?: string;
-            };
+            let body: { code?: string; amount?: number; type?: CodeInterface["type"]; maxUses?: number; isActive?: boolean; expiredDate?: string };
 
             try {
                 body = await c.req.json<typeof body>();
@@ -192,15 +185,9 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
 
-            const hasNoUpdates =
-                typeof body.code === "undefined" &&
-                typeof body.amount === "undefined" &&
-                typeof body.type === "undefined" &&
-                typeof body.maxUses === "undefined" &&
-                typeof body.isActive === "undefined" &&
-                typeof body.expiredDate === "undefined";
+            const { code, amount, type, maxUses, isActive, expiredDate } = body;
 
-            if (hasNoUpdates) {
+            if (!code && !amount && !type && !maxUses && isActive === undefined && !expiredDate) {
                 return c.json({ error: "No update fields provided" }, 400);
             }
 
@@ -209,80 +196,30 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Code not found" }, 404);
             }
 
-            const updatePayload: {
-                code?: string;
-                amount?: number;
-                type?: CodeInterface["type"];
-                maxUses?: number;
-                isActive?: boolean;
-                expiredDate?: Date;
-            } = {};
-
-            if (typeof body.code !== "undefined") {
-                const newCode = body.code.trim();
-                if (!newCode) {
-                    return c.json({ error: "Invalid code" }, 400);
+            if (code) {
+                const existingCode = await CodeModel.selectCodeByCode(code);
+                if (existingCode && existingCode.id !== codeId) {
+                    return c.json({ error: "Code already exists" }, 400);
                 }
-
-                if (newCode !== targetCode.code) {
-                    const existingCode = await CodeModel.selectCodeByCode(newCode);
-                    if (existingCode && existingCode.id !== codeId) {
-                        return c.json({ error: "Code already exists" }, 400);
-                    }
-                }
-
-                updatePayload.code = newCode;
+                await CodeModel.updateCode(codeId, "code", code);
+            }
+            if (amount !== undefined) {
+                await CodeModel.updateCode(codeId, "amount", amount);
+            }
+            if (type) {
+                await CodeModel.updateCode(codeId, "type", type);
+            }
+            if (maxUses !== undefined) {
+                await CodeModel.updateCode(codeId, "maxUses", maxUses);
+            }
+            if (isActive !== undefined) {
+                await CodeModel.updateCode(codeId, "isActive", isActive);
+            }
+            if (expiredDate) {
+                await CodeModel.updateCode(codeId, "expiredDate", new Date(expiredDate));
             }
 
-            if (typeof body.amount !== "undefined") {
-                if (!Number.isInteger(body.amount) || body.amount <= 0) {
-                    return c.json({ error: "Invalid amount" }, 400);
-                }
-                updatePayload.amount = body.amount;
-            }
-
-            if (typeof body.type !== "undefined") {
-                if (body.type !== "coins" && body.type !== "tokens") {
-                    return c.json({ error: "Invalid type" }, 400);
-                }
-                updatePayload.type = body.type;
-            }
-
-            if (typeof body.maxUses !== "undefined") {
-                if (!Number.isInteger(body.maxUses) || body.maxUses <= 0) {
-                    return c.json({ error: "Invalid maxUses" }, 400);
-                }
-                updatePayload.maxUses = body.maxUses;
-            }
-
-            if (typeof body.isActive !== "undefined") {
-                updatePayload.isActive = body.isActive;
-            }
-
-            if (typeof body.expiredDate !== "undefined") {
-                const parsedDate = new Date(body.expiredDate);
-                if (isNaN(parsedDate.getTime())) {
-                    return c.json({ error: "Invalid expiredDate" }, 400);
-                }
-                updatePayload.expiredDate = parsedDate;
-            }
-
-            await CodeModel.updateCode(codeId, updatePayload);
-
-            const updatedCode = await CodeModel.selectCodeById(codeId);
-
-            return c.json({
-                message: "Code updated successfully",
-                code: {
-                    id: updatedCode.id,
-                    code: updatedCode.code,
-                    amount: updatedCode.amount,
-                    type: updatedCode.type,
-                    maxUses: updatedCode.maxUses,
-                    isActive: updatedCode.isActive,
-                    expiredDate: updatedCode.expiredDate,
-                },
-            });
+            return c.json({ message: "Code updated successfully" });
         });
 
         this.app.get("/payments", async (c) => {
@@ -374,7 +311,7 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
-                await ProductModel.insertProduct(body);
+                await ProductModel.insertProduct(name, description, image, path, tokens, coins, type, isRecommend, isActive);
 
                 return c.json({ message: "Product created successfully" });
             } catch (error) {

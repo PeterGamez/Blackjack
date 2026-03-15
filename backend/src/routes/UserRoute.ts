@@ -69,7 +69,7 @@ export default class UserRoute implements RouteInterface {
             const { password, cardId, chipId, tableId } = body;
 
             if (!password && cardId === undefined && chipId === undefined && tableId === undefined) {
-                return c.json({ error: "Missing fields to update" }, 400);
+                return c.json({ error: "No update fields provided" }, 400);
             }
 
             if (password) {

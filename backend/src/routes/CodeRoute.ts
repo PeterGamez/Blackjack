@@ -67,6 +67,7 @@ export default class CodeRoute implements RouteInterface {
                 }
 
                 await Promise.all([CodeHistoryModel.createCodeHistory(codeData.id, user.id), UserModel.increaseBalance(user.id, codeData.type, codeData.amount)]);
+                await this.server.Middleware.invalidateUserCache(user.id);
 
                 return c.json({ message: "Code redeemed successfully", amount: codeData.amount, type: codeData.type });
             } catch (error) {

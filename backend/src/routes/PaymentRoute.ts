@@ -79,6 +79,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
+                await this.server.Middleware.invalidateUserCache(user.id);
 
                 return c.json({ message: "Bank slip verified successfully" });
             } catch (error) {
@@ -139,6 +140,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
+                await this.server.Middleware.invalidateUserCache(user.id);
 
                 return c.json({ message: "Voucher redeemed successfully" });
             } catch (error) {

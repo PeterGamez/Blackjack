@@ -77,12 +77,14 @@ export default class GameController {
         await GameState.setUserCurrentGame(userId, gameId);
         await GameState.setSocketUser(socketId, userId);
         await UserModel.decreaseBalance(userId, currency, bet);
+        await this.server.Middleware.invalidateUserCache(userId);
 
         const balance = user[currency] - bet + reward;
 
         if (status === "game-over") {
             if (reward > 0) {
                 await UserModel.increaseBalance(userId, currency, reward);
+                await this.server.Middleware.invalidateUserCache(userId);
             }
             const historyResult = isBlackjack && !isDealerBlackjack ? "blackjack" : result === "draw" ? "draw" : result === "win" ? "win" : "lose";
             const playerPayout = result === "lose" ? -bet : reward;
@@ -154,6 +156,7 @@ export default class GameController {
 
         if (playerValue === 21) {
             const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
+            await this.server.Middleware.invalidateUserCache(gameState.userId);
             const historyResult = resolved.result;
             const playerPayout = resolved.result === "lose" ? -gameState.playerBet : resolved.reward;
             const dealerPayout = resolved.result === "lose" ? gameState.playerBet : resolved.result === "draw" ? 0 : -resolved.reward;
@@ -185,6 +188,7 @@ export default class GameController {
         }
 
         const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
+        await this.server.Middleware.invalidateUserCache(gameState.userId);
         const historyResult = resolved.result;
         const playerPayout = resolved.result === "lose" ? -gameState.playerBet : resolved.reward;
         const dealerPayout = resolved.result === "lose" ? gameState.playerBet : resolved.result === "draw" ? 0 : -resolved.reward;

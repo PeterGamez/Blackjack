@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -54,14 +55,16 @@ export default function Navbar() {
       <div className={styles.resourcesSection}>
         {/* Coins */}
         <div className={styles.resourceBox}>
-          <span className={styles.coinIcon}>🪙</span>
+          <div className={styles.coinIcon}>
+            <Image src="/icons/coin.png" alt="coin" width={45} height={45} />
+          </div>
           <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
         </div>
 
         {/* Tokens */}
         <div className={styles.resourceBox}>
           <div className={styles.tokenIcon}>
-            <span className={styles.tokenLetter}>T</span>
+            <Image src="/icons/token.png" alt="token" width={45} height={45} />
           </div>
           <span className={styles.resourceValue}>{tokens.toLocaleString()}</span>
           <button className={styles.plusButton} onClick={() => router.push("/topup")}>

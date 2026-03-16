@@ -141,6 +141,7 @@ function StorePageContent() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.pageTopBar} aria-hidden="true" />
       <Navbar />
       <button onClick={() => router.push("/")} className={styles.backButton}>
         ← Lobby

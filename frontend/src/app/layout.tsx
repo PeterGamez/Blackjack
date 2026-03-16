@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 
+import config from "@/config";
+
 import "./globals.css";
 
 const sora = Sora({
@@ -18,6 +20,18 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Blackjack Game",
   description: "Play a simple web-based Blackjack game built with Next.js.",
+  keywords: ["blackjack", "game"],
+  openGraph: {
+    title: "Blackjack Game",
+    description: "Play a simple web-based Blackjack game built with Next.js.",
+    url: config.siteUrl,
+    siteName: "Blackjack Game",
+    images: [
+      {
+        url: `${config.siteUrl}/logo.png`,
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {

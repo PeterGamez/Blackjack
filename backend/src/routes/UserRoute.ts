@@ -89,6 +89,38 @@ export default class UserRoute implements RouteInterface {
             return c.json({ ok: true });
         });
 
+        this.app.delete("/me", async (c) => {
+            try {
+                let body: { password: string };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
+
+                const { password } = body;
+                if (!password) {
+                    return c.json({ error: "Password is required" }, 400);
+                }
+
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                const passwordMatch = await this.server.Password.compare(password, user.password);
+                if (!passwordMatch) {
+                    return c.json({ error: "Incorrect password" }, 401);
+                }
+
+                await UserModel.deleteUser(user.id);
+                return c.json({ ok: true });
+            } catch (error) {
+                this.server.error("UserRoute", `Error deleting user: ${(error as Error).message}`);
+                return c.json({ error: "Internal server error" }, 500);
+            }
+        });
+
         this.app.get("/payment-history", async (c) => {
             const user = await this.server.Middleware.getUser(c);
             if (!user) {

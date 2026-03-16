@@ -94,7 +94,7 @@ function ResetPasswordContent() {
             <label htmlFor="new-password" className={styles.label}>
               New password
             </label>
-            <span className={styles.hint}>Use at least 8 characters.</span>
+            <span className={styles.hint}>Use at least 8 characters: A–Z, a–z, 0–9, symbols.</span>
             <div className={styles.inputWrap}>
               <input
                 id="new-password"
@@ -143,9 +143,6 @@ function ResetPasswordContent() {
           <div className={styles.buttonRow}>
             <button type="submit" disabled={loading || !token} className={styles.submitButton}>
               {loading ? "Saving..." : "Reset password"}
-            </button>
-            <button type="button" onClick={() => router.push("/auth/forgot-password")} className={styles.secondaryButton}>
-              Request new link
             </button>
           </div>
         </form>

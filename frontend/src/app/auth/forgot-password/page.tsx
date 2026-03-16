@@ -72,9 +72,6 @@ export default function ForgotPasswordPage() {
             <button type="submit" disabled={loading} className={styles.submitButton}>
               {loading ? "Sending..." : "Send reset link"}
             </button>
-            <button type="button" onClick={() => router.push("/auth")} className={styles.secondaryButton}>
-              Cancel
-            </button>
           </div>
         </form>
       </div>

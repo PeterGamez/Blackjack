@@ -197,8 +197,7 @@
   border: 1px solid rgba(74, 222, 128, 0.26);
 }
 
-.submitButton,
-.secondaryButton {
+.submitButton {
   border: none;
   border-radius: 999px;
   font-size: 1rem;
@@ -215,15 +214,7 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
-.secondaryButton {
-  padding: 13px 20px;
-  color: #dbe4f2;
-  background: rgba(136, 153, 187, 0.14);
-  border: 1px solid rgba(136, 153, 187, 0.22);
-}
-
-.submitButton:hover:not(:disabled),
-.secondaryButton:hover {
+.submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 

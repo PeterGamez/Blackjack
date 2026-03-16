@@ -161,7 +161,7 @@ export default function AuthPage() {
                 <div className={styles.field}>
                   <label className={`${styles.fieldLabelLarge} ${styles.passwordLabel}`}>
                     Password
-                    <span className={styles.passwordHint}>At Least 8 Characters: A–Z, a–z, 0–9, Symbols.</span>
+                    <span className={styles.passwordHint}>Use at least 8 characters: A–Z, a–z, 0–9, symbols.</span>
                   </label>
                   <div className={styles.inputWrap}>
                     <input

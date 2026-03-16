@@ -170,9 +170,17 @@ export default function AdminCodeEditPage() {
                   <input className={styles.input} type="date" value={draft.expiredDate} onChange={(e) => handleDraftChange("expiredDate", e.target.value)} />
                 </label>
 
-                <label className={styles.checkboxLabel}>
-                  <input type="checkbox" checked={draft.isActive} onChange={(e) => handleDraftChange("isActive", e.target.checked)} />
+                <label className={styles.label}>
+                  <input
+                    className={styles.toggleInput}
+                    type="checkbox"
+                    checked={draft.isActive}
+                    onChange={(e) => handleDraftChange("isActive", e.target.checked)}
+                  />
                   Active
+                  <div className={`${styles.toggleTrack}${draft.isActive ? ` ${styles.toggleTrackOn}` : ""}`}>
+                    <div className={`${styles.toggleThumb}${draft.isActive ? ` ${styles.toggleThumbOn}` : ""}`} />
+                  </div>
                 </label>
               </div>
 

@@ -231,7 +231,7 @@ export default class AuthRoute implements RouteInterface {
                     }
 
                     try {
-                        await this.server.Email.sendPasswordResetEmail(user.id, email);
+                        await this.server.Email.sendPasswordResetEmail(user.id, user.email);
                     } catch (emailError) {
                         this.server.error("EMAIL", `Failed to send password reset email: ${emailError}`);
                         return c.json({ error: "Failed to send password reset email" }, 500);

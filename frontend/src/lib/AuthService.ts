@@ -37,6 +37,36 @@ export default class AuthService {
     }
   }
 
+  public static async requestPasswordReset(email: string): Promise<string> {
+    const res = await fetch(`${config.apiUrl}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data: { message?: string; error?: string } = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to request password reset");
+    }
+
+    return data.message || "Password reset email sent";
+  }
+
+  public static async resetPassword(token: string, password: string): Promise<string> {
+    const res = await fetch(`${config.apiUrl}/auth/reset-password/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password }),
+    });
+
+    const data: { message?: string; error?: string } = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to reset password");
+    }
+
+    return data.message || "Password reset successful";
+  }
+
   public static async verifyEmail(token: string): Promise<string> {
     const res = await fetch(`${config.apiUrl}/auth/verify`, {
       method: "POST",

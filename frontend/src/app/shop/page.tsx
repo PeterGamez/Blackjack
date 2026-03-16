@@ -231,7 +231,9 @@ function StorePageContent() {
                       <span style={{ color: "#2f6b2f", fontWeight: 700 }}>Owned</span>
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                        <span>{isTokenPayment ? "🎟️" : "🪙"} {priceText}</span>
+                        <span>
+                          {isTokenPayment ? "🎟️" : "🪙"} {priceText}
+                        </span>
                         <button
                           onClick={() => void buy(p)}
                           disabled={isLoading || !canAfford}

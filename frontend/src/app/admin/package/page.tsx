@@ -85,13 +85,7 @@ export default function AdminPackagesPage() {
 
           <div>
             <h2 className={styles.sectionTitle}>All Packages ({packages.length})</h2>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search by image URL, token amount, or price..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <input type="text" className={styles.searchInput} placeholder="Search by image URL, token amount, or price..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 
             <div className={styles.itemList}>
               {packages.length === 0 ? (
@@ -102,16 +96,16 @@ export default function AdminPackagesPage() {
                     const normalized = searchTerm.trim().toLowerCase();
                     if (!normalized) return true;
 
-                    return (
-                      item.image.toLowerCase().includes(normalized) ||
-                      item.tokens.toString().includes(normalized) ||
-                      item.price.toString().includes(normalized)
-                    );
+                    return item.image.toLowerCase().includes(normalized) || item.tokens.toString().includes(normalized) || item.price.toString().includes(normalized);
                   })
                   .map((item) => (
                     <button key={item.id} type="button" className={styles.itemRow} onClick={() => router.push(`/admin/package/${item.id}`)}>
-                      <span>#{item.id} • {item.tokens} tokens</span>
-                      <span className={styles.itemMeta}>{item.price} THB • {item.isActive ? "active" : "inactive"}</span>
+                      <span>
+                        #{item.id} • {item.tokens} tokens
+                      </span>
+                      <span className={styles.itemMeta}>
+                        {item.price} THB • {item.isActive ? "active" : "inactive"}
+                      </span>
                     </button>
                   ))
               )}

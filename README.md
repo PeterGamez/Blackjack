@@ -250,8 +250,9 @@
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
 | API-USER-02 | `PATCH` | `/user/me` | `{password?, cardId?, chipId?, tableId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
-| API-USER-03 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
-| API-USER-04 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
+| API-USER-03 | `DELETE` | `/user/me` | None | Bearer | ลบบัญชีผู้ใช้ของตนเอง (soft delete หรือ permanent ตามที่ระบบกำหนด) |
+| API-USER-04 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
+| API-USER-05 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
 
 #### 4.2.3 Code API
 
@@ -284,7 +285,7 @@
 | API-ADMIN-02 | `GET` | `/admin/user/:id` | None | Bearer | ดึงข้อมูลผู้ใช้รายบุคคลตาม ID |
 | API-ADMIN-03 | `PATCH` | `/admin/user/:id` | `{username?, email?, role?, tokens?, coins?}` | Bearer | อัปเดตข้อมูลผู้ใช้ตาม ID |
 | API-ADMIN-05 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
-| API-ADMIN-06 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
+| API-ADMIN-06 | `POST` | `/admin/code` | `{code, amount, type, maxUses, isActive, expiredDate}` | Bearer | สร้าง code ใหม่ |
 | API-ADMIN-07 | `GET` | `/admin/code/:id` | None | Bearer | ดึงข้อมูล code ตาม ID |
 | API-ADMIN-08 | `PATCH` | `/admin/code/:id` | `{code?, amount?, type?, maxUses?, isActive?, expiredDate?}` | Bearer | อัปเดต code ตาม ID |
 | API-ADMIN-09 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |

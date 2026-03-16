@@ -64,6 +64,16 @@ export default function AdminPage() {
               <h2>Code Management</h2>
               <p>View all codes, create new codes, and edit existing codes.</p>
             </Link>
+
+            <Link href="/admin/package" className={styles.menuCard}>
+              <h2>Package Management</h2>
+              <p>Manage top-up packages for price, token amount, and status.</p>
+            </Link>
+
+            <Link href="/admin/product" className={styles.menuCard}>
+              <h2>Product Management</h2>
+              <p>Manage shop items, recommendation flags, and availability.</p>
+            </Link>
           </div>
         </div>
       </div>

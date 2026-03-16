@@ -12,11 +12,11 @@ export default class CodeModel {
         this.DB = DB;
     }
 
-    public static async createCode(code: string, amount: number, type: CodeInterface["type"], maxUses: number, expiredDate: Date): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (code, amount, type, maxUses, expiredDate) VALUES (?, ?, ?, ?, ?)`;
+    public static async createCode(code: string, amount: number, type: CodeInterface["type"], maxUses: number, isActive: boolean, expiredDate: Date): Promise<number> {
+        const sql = `INSERT INTO ${this.table} (code, amount, type, maxUses, expiredDate) VALUES (?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [code, amount, type, maxUses, expiredDate]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [code, amount, type, maxUses, isActive, expiredDate]);
             return result.insertId;
         } finally {
             connection.release();

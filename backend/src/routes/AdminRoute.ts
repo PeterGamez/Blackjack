@@ -151,16 +151,16 @@ export default class AdminRoute implements RouteInterface {
         });
 
         this.app.post("/code", async (c) => {
-            let body: { code: string; amount: number; type: CodeInterface["type"]; maxUses: number; expiredDate: string };
+            let body: { code: string; amount: number; type: CodeInterface["type"]; maxUses: number; isActive: boolean; expiredDate: string };
             try {
                 body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
 
-            const { code, amount, type, maxUses, expiredDate } = body;
+            const { code, amount, type, maxUses, isActive, expiredDate } = body;
 
-            if (!code || !amount || !type || !maxUses || !expiredDate) {
+            if (!code || !amount || !type || !maxUses || isActive === undefined || !expiredDate) {
                 return c.json({ error: "Missing required fields" }, 400);
             }
 
@@ -169,7 +169,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Code already exists" }, 400);
             }
 
-            const newCodeId = await CodeModel.createCode(code, amount, type, maxUses, new Date(expiredDate));
+            const newCodeId = await CodeModel.createCode(code, amount, type, maxUses, isActive, new Date(expiredDate));
 
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });
@@ -297,10 +297,21 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Invalid package ID" }, 400);
             }
 
-            const pkg = await PackageModel.selectPackage(packageId);
+            const pkg = await PackageModel.selectPackageById(packageId);
             if (!pkg) {
                 return c.json({ error: "Package not found" }, 404);
             }
+
+            const response = {
+                id: pkg.id,
+                image: pkg.image,
+                price: pkg.price,
+                tokens: pkg.tokens,
+                isActive: pkg.isActive,
+                updatedAt: pkg.updatedAt,
+            };
+
+            return c.json(response);
         });
 
         this.app.patch("/package/:id", async (c) => {
@@ -323,7 +334,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "No update fields provided" }, 400);
             }
 
-            const pkg = await PackageModel.selectPackage(packageId);
+            const pkg = await PackageModel.selectPackageById(packageId);
             if (!pkg) {
                 return c.json({ error: "Package not found" }, 404);
             }
@@ -376,8 +387,16 @@ export default class AdminRoute implements RouteInterface {
                 }
                 const { name, description, image, path, tokens, coins, type, isRecommend, isActive } = body;
 
-                if (!name || !description || !image || !path || !tokens || !coins || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
+                if (!name || !description || !image || !path || tokens === undefined || coins === undefined || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
                     return c.json({ error: "Missing required fields" }, 400);
+                }
+
+                if (!Number.isInteger(tokens) || tokens < 0 || !Number.isInteger(coins) || coins < 0) {
+                    return c.json({ error: "Tokens and coins must be integers >= 0" }, 400);
+                }
+
+                if (tokens === 0 && coins === 0) {
+                    return c.json({ error: "At least one of tokens or coins must be greater than 0" }, 400);
                 }
 
                 await ProductModel.insertProduct(name, description, image, path, tokens, coins, type, isRecommend, isActive);
@@ -406,6 +425,13 @@ export default class AdminRoute implements RouteInterface {
                 name: product.name,
                 description: product.description,
                 image: product.image,
+                path: product.path,
+                tokens: product.tokens,
+                coins: product.coins,
+                type: product.type,
+                isRecommend: product.isRecommend,
+                isActive: product.isActive,
+                updatedAt: product.updatedAt,
             };
 
             return c.json(response);
@@ -444,6 +470,16 @@ export default class AdminRoute implements RouteInterface {
             const product = await ProductModel.selectProduct(productId);
             if (!product) {
                 return c.json({ error: "Product not found" }, 404);
+            }
+
+            if ((tokens !== undefined && (!Number.isInteger(tokens) || tokens < 0)) || (coins !== undefined && (!Number.isInteger(coins) || coins < 0))) {
+                return c.json({ error: "Tokens and coins must be integers >= 0" }, 400);
+            }
+
+            const nextTokens = tokens ?? product.tokens;
+            const nextCoins = coins ?? product.coins;
+            if (nextTokens === 0 && nextCoins === 0) {
+                return c.json({ error: "At least one of tokens or coins must be greater than 0" }, 400);
             }
 
             if (name) {

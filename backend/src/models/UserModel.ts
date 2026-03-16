@@ -36,7 +36,7 @@ export default class UserModel {
     }
 
     public static async selectAllUser(): Promise<UserInterface[]> {
-        const sql = `SELECT * FROM ${this.table}`;
+        const sql = `SELECT * FROM ${this.table} WHERE id > 10`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);

@@ -56,6 +56,17 @@ export default class PackageModel {
         }
     }
 
+    public static async selectPackageById(id: number): Promise<PackageInterface> {
+        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql, [id]);
+            return rows[0];
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async updatePackage<T extends keyof PackageType>(id: number, type: T, value: PackageType[T]): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
         const connection = await this.DB.getConnection();

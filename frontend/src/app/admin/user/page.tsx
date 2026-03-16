@@ -52,9 +52,9 @@ export default function AdminUsersPage() {
   }, [router]);
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
-  const filteredUsers = users.filter((item) => {
+  const filteredUsers = users.filter((user) => {
     if (!normalizedSearch) return true;
-    return item.username.toLowerCase().includes(normalizedSearch) || item.email.toLowerCase().includes(normalizedSearch) || item.role.toLowerCase().includes(normalizedSearch);
+    return user.username.toLowerCase().includes(normalizedSearch) || user.email.toLowerCase().includes(normalizedSearch) || user.role.toLowerCase().includes(normalizedSearch);
   });
 
   if (status === "loading") {
@@ -95,10 +95,17 @@ export default function AdminUsersPage() {
               {filteredUsers.length === 0 ? (
                 <p className={styles.emptyText}>No users matched your search.</p>
               ) : (
-                filteredUsers.map((item) => (
-                  <button key={item.id} type="button" className={styles.userRow} onClick={() => router.push(`/admin/user/${item.id}`)}>
-                    <span>{item.username}</span>
-                    <span className={styles.userMeta}>{item.role}</span>
+                filteredUsers.map((user) => (
+                  <button key={user.id} type="button" className={styles.userRow} onClick={() => router.push(`/admin/user/${user.id}`)}>
+                    <span>{user.username}</span>
+                    <span className={styles.userMeta}>
+                      {user.isVerified ? (
+                        <span className={styles.verifiedBadge} style={{ marginRight: 8 }}>VERIFIED</span>
+                      ) : (
+                        <span className={styles.unverifiedBadge} style={{ marginRight: 8 }}>UNVERIFIED</span>
+                      )}
+                      {user.role}
+                    </span>
                   </button>
                 ))
               )}

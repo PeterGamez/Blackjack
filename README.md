@@ -285,7 +285,7 @@
 | API-ADMIN-02 | `GET` | `/admin/user/:id` | None | Bearer | ดึงข้อมูลผู้ใช้รายบุคคลตาม ID |
 | API-ADMIN-03 | `PATCH` | `/admin/user/:id` | `{username?, email?, role?, tokens?, coins?}` | Bearer | อัปเดตข้อมูลผู้ใช้ตาม ID |
 | API-ADMIN-05 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
-| API-ADMIN-06 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
+| API-ADMIN-06 | `POST` | `/admin/code` | `{code, amount, type, maxUses, isActive, expiredDate}` | Bearer | สร้าง code ใหม่ |
 | API-ADMIN-07 | `GET` | `/admin/code/:id` | None | Bearer | ดึงข้อมูล code ตาม ID |
 | API-ADMIN-08 | `PATCH` | `/admin/code/:id` | `{code?, amount?, type?, maxUses?, isActive?, expiredDate?}` | Bearer | อัปเดต code ตาม ID |
 | API-ADMIN-09 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |

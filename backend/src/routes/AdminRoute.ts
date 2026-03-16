@@ -151,16 +151,16 @@ export default class AdminRoute implements RouteInterface {
         });
 
         this.app.post("/code", async (c) => {
-            let body: { code: string; amount: number; type: CodeInterface["type"]; maxUses: number; expiredDate: string };
+            let body: { code: string; amount: number; type: CodeInterface["type"]; maxUses: number; isActive: boolean; expiredDate: string };
             try {
                 body = await c.req.json<typeof body>();
             } catch {
                 return c.json({ error: "Invalid or missing JSON body" }, 400);
             }
 
-            const { code, amount, type, maxUses, expiredDate } = body;
+            const { code, amount, type, maxUses, isActive, expiredDate } = body;
 
-            if (!code || !amount || !type || !maxUses || !expiredDate) {
+            if (!code || !amount || !type || !maxUses || isActive === undefined || !expiredDate) {
                 return c.json({ error: "Missing required fields" }, 400);
             }
 
@@ -169,7 +169,7 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ error: "Code already exists" }, 400);
             }
 
-            const newCodeId = await CodeModel.createCode(code, amount, type, maxUses, new Date(expiredDate));
+            const newCodeId = await CodeModel.createCode(code, amount, type, maxUses, isActive, new Date(expiredDate));
 
             return c.json({ message: "Code created successfully", codeId: newCodeId });
         });

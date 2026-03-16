@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
@@ -13,7 +14,6 @@ import { getCardBackImage, getCardImagePath, getCardSkin, getChipSkin, getTableI
 import AuthService from "@/lib/AuthService";
 import ShopService from "@/lib/ShopService";
 
-import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 interface SkinItem {

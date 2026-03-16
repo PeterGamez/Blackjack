@@ -1,11 +1,11 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import UserService from "@lib/UserService";
 
-import Navbar from "../components/Navbar";
 import styles from "./play.module.css";
 
 export default function Home() {

@@ -249,7 +249,7 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
-| API-USER-02 | `PATCH` | `/user/me` | `{password?, cardId?, chipId?, themeId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
+| API-USER-02 | `PATCH` | `/user/me` | `{password?, cardId?, chipId?, tableId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
 | API-USER-03 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
 | API-USER-04 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
 
@@ -264,7 +264,7 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-PAYMENT-01 | `GET` | `/payment/packages` | None | Bearer | ดึงรายการแพ็กเกจเติมเงินทั้งหมด |
-| API-PAYMENT-02 | `POST` | `/payment/bank` | `{image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
+| API-PAYMENT-02 | `POST` | `/payment/bank` | `multipart/form-data: {image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
 | API-PAYMENT-03 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
 
 #### 4.2.5 Shop API
@@ -282,9 +282,21 @@
 |----|--------|----------|------|------|----------|
 | API-ADMIN-01 | `GET` | `/admin/users` | None | Bearer | ดึงรายชื่อผู้ใช้ทั้งหมดในระบบ |
 | API-ADMIN-02 | `GET` | `/admin/user/:id` | None | Bearer | ดึงข้อมูลผู้ใช้รายบุคคลตาม ID |
-| API-ADMIN-03 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
-| API-ADMIN-04 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
-| API-ADMIN-05 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |
+| API-ADMIN-03 | `PATCH` | `/admin/user/:id` | `{username?, email?, role?, tokens?, coins?}` | Bearer | อัปเดตข้อมูลผู้ใช้ตาม ID |
+| API-ADMIN-04 | `DELETE` | `/admin/user/:id` | None | Bearer | ลบผู้ใช้ตาม ID |
+| API-ADMIN-05 | `GET` | `/admin/codes` | None | Bearer | ดึงรายการ code ทั้งหมด |
+| API-ADMIN-06 | `POST` | `/admin/code` | `{code, amount, type, maxUses, expiredDate}` | Bearer | สร้าง code ใหม่ |
+| API-ADMIN-07 | `GET` | `/admin/code/:id` | None | Bearer | ดึงข้อมูล code ตาม ID |
+| API-ADMIN-08 | `PATCH` | `/admin/code/:id` | `{code?, amount?, type?, maxUses?, isActive?, expiredDate?}` | Bearer | อัปเดต code ตาม ID |
+| API-ADMIN-09 | `GET` | `/admin/payments` | None | Bearer | ดึงประวัติการชำระเงินทั้งหมด |
+| API-ADMIN-10 | `GET` | `/admin/packages` | None | Bearer | ดึงรายการ package เติมเงินทั้งหมด |
+| API-ADMIN-11 | `POST` | `/admin/package` | `{image, price, tokens, isActive}` | Bearer | สร้าง package เติมเงินใหม่ |
+| API-ADMIN-12 | `GET` | `/admin/package/:id` | None | Bearer | ดึงข้อมูล package ตาม ID |
+| API-ADMIN-13 | `PATCH` | `/admin/package/:id` | `{image?, price?, tokens?, isActive?}` | Bearer | อัปเดต package ตาม ID |
+| API-ADMIN-14 | `GET` | `/admin/products` | None | Bearer | ดึงรายการสินค้าทั้งหมด |
+| API-ADMIN-15 | `POST` | `/admin/product` | `{name, description, image, path, tokens, coins, type, isRecommend, isActive}` | Bearer | สร้างสินค้าใหม่ |
+| API-ADMIN-16 | `GET` | `/admin/product/:id` | None | Bearer | ดึงข้อมูลสินค้าตาม ID |
+| API-ADMIN-17 | `PATCH` | `/admin/product/:id` | `{name?, description?, image?, path?, tokens?, coins?, type?, isRecommend?, isActive?}` | Bearer | อัปเดตสินค้าตาม ID |
 
 ### 4.3 Socket.IO Events
 

@@ -24,7 +24,7 @@ export default class CodeModel {
     }
 
     public static async selectAllCodes(): Promise<CodeInterface[]> {
-        const sql = `SELECT * FROM ${this.table}`;
+        const sql = `SELECT * FROM ${this.table} ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);

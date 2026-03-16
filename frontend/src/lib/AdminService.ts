@@ -140,7 +140,20 @@ export default class AdminService {
     return (await response.json()) as AdminUser[];
   }
 
-  public static async updateUser(userId: number, payload: UpdateAdminUserPayload): Promise<AdminUser> {
+  public static async getUser(userId: number): Promise<AdminUser> {
+    const response = await this.authenticatedFetch(`/admin/user/${userId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminUser;
+  }
+
+  public static async updateUser(userId: number, payload: UpdateAdminUserPayload): Promise<void> {
     const response = await this.authenticatedFetch(`/admin/user/${userId}`, {
       method: "PATCH",
       headers: {
@@ -152,9 +165,6 @@ export default class AdminService {
     if (!response.ok) {
       await this.parseError(response);
     }
-
-    const data = (await response.json()) as { user: AdminUser };
-    return data.user;
   }
 
   public static async deleteUser(userId: number): Promise<void> {
@@ -197,7 +207,20 @@ export default class AdminService {
     return data.codeId;
   }
 
-  public static async updateCode(codeId: number, payload: UpdateAdminCodePayload): Promise<AdminCode> {
+  public static async getCode(codeId: number): Promise<AdminCode> {
+    const response = await this.authenticatedFetch(`/admin/code/${codeId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminCode;
+  }
+
+  public static async updateCode(codeId: number, payload: UpdateAdminCodePayload): Promise<void> {
     const response = await this.authenticatedFetch(`/admin/code/${codeId}`, {
       method: "PATCH",
       headers: {
@@ -209,8 +232,5 @@ export default class AdminService {
     if (!response.ok) {
       await this.parseError(response);
     }
-
-    const data = (await response.json()) as { code: AdminCode };
-    return data.code;
   }
 }

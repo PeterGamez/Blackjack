@@ -1,10 +1,10 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
-import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 function PaymentContent() {

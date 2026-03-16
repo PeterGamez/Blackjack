@@ -1,13 +1,21 @@
 .page {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background: #1e2430;
   font-family: var(--font-sora), sans-serif;
 }
 
 .container {
   max-width: 1080px;
+  width: 100%;
   margin: 0 auto;
-  padding: 210px 24px 80px;
+  padding: 210px 24px 24px;
+  flex: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .loadingState {
@@ -43,6 +51,30 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+}
+
+.verifiedBadge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(46, 125, 50, 0.25);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  color: #81c784;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unverifiedBadge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(165, 53, 53, 0.2);
+  border: 1px solid rgba(229, 115, 115, 0.45);
+  color: #ef9a9a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .title {
@@ -198,7 +230,7 @@
 
 @media (max-width: 760px) {
   .container {
-    padding: 120px 16px 72px;
+    padding: 120px 16px 16px;
   }
 
   .card {

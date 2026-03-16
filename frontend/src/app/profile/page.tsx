@@ -1,13 +1,13 @@
 "use client";
 
+import Navbar from "@components/Navbar";
+import ProfileAvatar from "@components/ProfileAvatar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 
-import Navbar from "../components/Navbar";
-import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
 
 export default function ProfilePage() {
@@ -36,15 +36,6 @@ export default function ProfilePage() {
     router.push("/auth");
   };
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.push("/");
-  };
-
   if (!user) {
     return (
       <div className={styles.page}>
@@ -63,10 +54,15 @@ export default function ProfilePage() {
     <div className={styles.page}>
       <Navbar />
       <div className={styles.container}>
-        <button type="button" onClick={handleBack} className={styles.backButton}>
+        <button type="button" onClick={() => router.push("/")} className={styles.backButton}>
           ← Back
         </button>
         <div className={styles.card}>
+          {user.role === "admin" && (
+            <button type="button" onClick={() => router.push("/admin")} className={styles.adminButton}>
+              Open Admin Panel
+            </button>
+          )}
           <div className={styles.avatarWrapper}>
             <ProfileAvatar username={user.username} className={styles.avatar} />
           </div>
@@ -90,11 +86,6 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className={styles.actionButtons}>
-            {user.role === "admin" && (
-              <button type="button" onClick={() => router.push("/admin")} className={styles.adminButton}>
-                Open Admin Panel
-              </button>
-            )}
             <button type="button" onClick={handleLogout} className={styles.logoutButton}>
               Logout
             </button>

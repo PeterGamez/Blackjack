@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -12,7 +13,6 @@ import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
 
 import ShopService from "@/lib/ShopService";
 
-import Navbar from "../components/Navbar";
 import styles from "./shop.module.css";
 
 type ShopTab = "recommend" | "table" | "card" | "chip";

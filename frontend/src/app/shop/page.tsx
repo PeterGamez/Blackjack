@@ -150,17 +150,13 @@ function StorePageContent() {
       setOwned((prev) => new Set([...prev, p.id]));
 
       if (payment.type === "coins") {
-        setCoins((prev) => {
-          const nextCoins = prev - payment.amount;
-          LocalStorage.setItem("coins", nextCoins.toString());
-          return nextCoins;
-        });
+        const nextCoins = coins - payment.amount;
+        setCoins(nextCoins);
+        LocalStorage.setItem("coins", nextCoins.toString());
       } else {
-        setTokens((prev) => {
-          const nextTokens = prev - payment.amount;
-          LocalStorage.setItem("tokens", nextTokens.toString());
-          return nextTokens;
-        });
+        const nextTokens = tokens - payment.amount;
+        setTokens(nextTokens);
+        LocalStorage.setItem("tokens", nextTokens.toString());
       }
 
       setMessage({ id: p.id, text: "Purchased!", ok: true });

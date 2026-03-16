@@ -411,9 +411,92 @@ export default class AdminRoute implements RouteInterface {
             }
         });
 
-        this.app.get("/product/:id", async (c) => {});
+        this.app.get("/product/:id", async (c) => {
+            const productId = parseInt(c.req.param("id"));
+            if (isNaN(productId)) {
+                return c.json({ error: "Invalid product ID" }, 400);
+            }
 
-        this.app.patch("/product/:id", async (c) => {});
+            const product = await ProductModel.selectProduct(productId);
+            if (!product) {
+                return c.json({ error: "Product not found" }, 404);
+            }
+
+            const response = {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                image: product.image,
+            };
+
+            return c.json(response);
+        });
+
+        this.app.patch("/product/:id", async (c) => {
+            const productId = parseInt(c.req.param("id"));
+            if (isNaN(productId)) {
+                return c.json({ error: "Invalid product ID" }, 400);
+            }
+
+            let body: {
+                name?: string;
+                description?: string;
+                image?: string;
+                path?: string;
+                tokens?: number;
+                coins?: number;
+                type?: ProductInterface["type"];
+                isRecommend?: boolean;
+                isActive?: boolean;
+            };
+
+            try {
+                body = await c.req.json<typeof body>();
+            } catch {
+                return c.json({ error: "Invalid or missing JSON body" }, 400);
+            }
+
+            const { name, description, image, path, tokens, coins, type, isRecommend, isActive } = body;
+
+            if (!name && !description && !image && !path && tokens === undefined && coins === undefined && !type && isRecommend === undefined && isActive === undefined) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            const product = await ProductModel.selectProduct(productId);
+            if (!product) {
+                return c.json({ error: "Product not found" }, 404);
+            }
+
+            if (name) {
+                await ProductModel.updateProduct(productId, "name", name);
+            }
+            if (description) {
+                await ProductModel.updateProduct(productId, "description", description);
+            }
+            if (image) {
+                await ProductModel.updateProduct(productId, "image", image);
+            }
+            if (path) {
+                await ProductModel.updateProduct(productId, "path", path);
+            }
+            if (tokens !== undefined) {
+                await ProductModel.updateProduct(productId, "tokens", tokens);
+            }
+            if (coins !== undefined) {
+                await ProductModel.updateProduct(productId, "coins", coins);
+            }
+            if (type) {
+                await ProductModel.updateProduct(productId, "type", type);
+            }
+            if (isRecommend !== undefined) {
+                await ProductModel.updateProduct(productId, "isRecommend", isRecommend);
+            }
+            if (isActive !== undefined) {
+                await ProductModel.updateProduct(productId, "isActive", isActive);
+            }
+
+            return c.json({ message: "Product updated successfully" });
+        });
     }
 
     public getApp(app: Hono) {

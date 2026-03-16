@@ -24,7 +24,7 @@ export default class PackageModel {
     }
 
     public static async selectAllPackages(): Promise<PackageInterface[]> {
-        const sql = `SELECT * FROM ${this.table}`;
+        const sql = `SELECT * FROM ${this.table} ORDER BY price ASC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);

@@ -13,6 +13,7 @@ export default function AdminCodesPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready">("loading");
   const [codes, setCodes] = useState<AdminCode[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,16 +85,34 @@ export default function AdminCodesPage() {
 
           <div className={styles.listSection}>
             <h2 className={styles.sectionTitle}>All Codes ({codes.length})</h2>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search by code or type..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ marginBottom: 10 }}
+            />
+
             <div className={styles.codeList}>
               {codes.length === 0 ? (
                 <p className={styles.emptyText}>No codes found.</p>
               ) : (
-                codes.map((item) => (
-                  <button key={item.id} type="button" className={styles.codeRow} onClick={() => router.push(`/admin/code/${item.id}`)}>
-                    <span>{item.code}</span>
-                    <span className={styles.codeMeta}>{item.type}</span>
-                  </button>
-                ))
+                codes
+                  .filter((item) => {
+                    const normalized = searchTerm.trim().toLowerCase();
+                    if (!normalized) return true;
+                    return (
+                      item.code.toLowerCase().includes(normalized) ||
+                      item.type.toLowerCase().includes(normalized)
+                    );
+                  })
+                  .map((item) => (
+                    <button key={item.id} type="button" className={styles.codeRow} onClick={() => router.push(`/admin/code/${item.id}`)}>
+                      <span>{item.code}</span>
+                      <span className={styles.codeMeta}>{item.type}</span>
+                    </button>
+                  ))
               )}
             </div>
           </div>

@@ -18,19 +18,32 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Blackjack Game",
-  description: "Play a simple web-based Blackjack game built with Next.js.",
-  keywords: ["blackjack", "game"],
+  metadataBase: config.siteUrl,
+  title: {
+    default: "Twenty-One Degrees | Free Online Blackjack Game",
+    template: "%s | Twenty-One Degrees",
+  },
+  description: "Play Twenty-One Degrees, a sleek and fast web-based Blackjack game. Test your strategy, beat the dealer, and enjoy playing 21 for free directly in your browser.",
+  keywords: ["blackjack", "online blackjack", "play blackjack free", "web-based card game", "21 card game", "browser game", "casino game", "Twenty-One Degrees"],
   openGraph: {
-    title: "Blackjack Game",
-    description: "Play a simple web-based Blackjack game built with Next.js.",
+    type: "website",
+    locale: "th_TH",
     url: config.siteUrl,
-    siteName: "Blackjack Game",
+    siteName: "Twenty-One Degrees",
+    title: "Twenty-One Degrees - Play Free Blackjack Online",
+    description: "Experience the thrill of 21. Play our free web-based Blackjack game directly in your browser. No downloads required.",
     images: [
       {
-        url: `${config.siteUrl}/logo.png`,
+        url: "/logo.png",
+        alt: "Twenty-One Degrees Blackjack Game Logo",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Twenty-One Degrees | Free Online Blackjack",
+    description: "Test your skills against the dealer in this sleek web-based Blackjack game.",
+    images: ["/logo.png"],
   },
 };
 

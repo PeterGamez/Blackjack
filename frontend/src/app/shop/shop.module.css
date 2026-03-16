@@ -12,6 +12,16 @@
   flex-direction: column;
 }
 
+.pageTopBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 184px;
+  background: #1f2532;
+  z-index: 1;
+}
+
 .stage {
   position: absolute;
   top: 50%;
@@ -360,6 +370,10 @@
 /* ================= MOBILE ================= */
 
 @media (max-width: 768px) {
+  .pageTopBar {
+    height: 132px;
+  }
+
   .main {
     flex-direction: column;
     padding: 20px;

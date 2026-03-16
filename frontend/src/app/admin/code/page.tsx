@@ -85,14 +85,7 @@ export default function AdminCodesPage() {
 
           <div className={styles.listSection}>
             <h2 className={styles.sectionTitle}>All Codes ({codes.length})</h2>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search by code or type..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ marginBottom: 10 }}
-            />
+            <input type="text" className={styles.searchInput} placeholder="Search by code or type..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ marginBottom: 10 }} />
 
             <div className={styles.codeList}>
               {codes.length === 0 ? (
@@ -102,10 +95,7 @@ export default function AdminCodesPage() {
                   .filter((item) => {
                     const normalized = searchTerm.trim().toLowerCase();
                     if (!normalized) return true;
-                    return (
-                      item.code.toLowerCase().includes(normalized) ||
-                      item.type.toLowerCase().includes(normalized)
-                    );
+                    return item.code.toLowerCase().includes(normalized) || item.type.toLowerCase().includes(normalized);
                   })
                   .map((item) => (
                     <button key={item.id} type="button" className={styles.codeRow} onClick={() => router.push(`/admin/code/${item.id}`)}>

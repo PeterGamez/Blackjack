@@ -100,9 +100,13 @@ export default function AdminUsersPage() {
                     <span>{user.username}</span>
                     <span className={styles.userMeta}>
                       {user.isVerified ? (
-                        <span className={styles.verifiedBadge} style={{ marginRight: 8 }}>VERIFIED</span>
+                        <span className={styles.verifiedBadge} style={{ marginRight: 8 }}>
+                          VERIFIED
+                        </span>
                       ) : (
-                        <span className={styles.unverifiedBadge} style={{ marginRight: 8 }}>UNVERIFIED</span>
+                        <span className={styles.unverifiedBadge} style={{ marginRight: 8 }}>
+                          UNVERIFIED
+                        </span>
                       )}
                       {user.role}
                     </span>

@@ -131,9 +131,9 @@
   width: 820px;
   max-width: 98vw;
   height: 460px;
-  background: #c8922a;
+  background: transparent;
   border-radius: 0 0 430px 430px / 0 0 460px 460px;
-  box-shadow: 0 0 0 10px #e8b84b, 0 8px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
   position: relative;
   overflow: hidden;
 }

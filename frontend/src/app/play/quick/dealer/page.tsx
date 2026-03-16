@@ -8,7 +8,7 @@ import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getChipSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
 import config from "@/config";
 
@@ -75,6 +75,7 @@ export default function Dealer() {
   const [timer, setTimer] = useState<number>(10);
   const [cardSkin] = useState<string>(getCardSkin);
   const [chipSkin] = useState<string>(getChipSkin);
+  const [tableSkin] = useState<string>(getTableSkin);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getChipStacks = (amount: number): ChipStack[] => {
@@ -294,6 +295,7 @@ export default function Dealer() {
             ← Back
           </button>
           <div className={styles.table}>
+            <Image src={getTableImage(tableSkin)} alt="game table" fill style={{ objectFit: "fill", zIndex: 0 }} unoptimized />
             <div className={styles.innerShadow} />
 
             {gameStatus !== "betting" && (

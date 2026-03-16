@@ -1,0 +1,299 @@
+.page {
+	min-height: 100vh;
+	background: radial-gradient(circle at 15% 10%, #2b364b 0%, #1a202d 45%, #11161f 100%);
+	color: #e6eaf2;
+	font-family: var(--font-sora), sans-serif;
+}
+
+.container {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 212px 24px 72px;
+}
+
+.backButton {
+	border: none;
+	background: transparent;
+	color: #93a3bb;
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0.8px;
+	text-transform: uppercase;
+	cursor: pointer;
+	margin-bottom: 18px;
+	transition: color 0.2s, transform 0.2s;
+}
+
+.backButton:hover {
+	color: #f2c879;
+	transform: translateX(-4px);
+}
+
+.settingsCard {
+	background: rgba(22, 28, 40, 0.82);
+	border: 1px solid rgba(146, 165, 194, 0.24);
+	border-radius: 22px;
+	padding: 28px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.title {
+	margin: 0 0 22px;
+	font-size: 28px;
+	color: #f2c879;
+	letter-spacing: 0.8px;
+}
+
+.soundRow {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.sliderBox {
+	background: rgba(92, 107, 138, 0.2);
+	border: 1px solid rgba(146, 165, 194, 0.3);
+	border-radius: 14px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.sliderLabel {
+	font-size: 13px;
+	font-weight: 700;
+	color: #b8c5d8;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+}
+
+.slider {
+	width: 100%;
+	accent-color: #f2c879;
+}
+
+.sliderValue {
+	font-size: 14px;
+	font-weight: 700;
+	color: #f2c879;
+}
+
+.redeemRow {
+	background: rgba(92, 107, 138, 0.16);
+	border: 1px solid rgba(146, 165, 194, 0.3);
+	border-radius: 14px;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.redeemLabel {
+	display: block;
+	font-size: 13px;
+	font-weight: 700;
+	color: #b8c5d8;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+	margin-bottom: 10px;
+}
+
+.redeemControls {
+	display: flex;
+	gap: 10px;
+}
+
+.redeemInput {
+	flex: 1;
+	height: 44px;
+	border: 1px solid rgba(146, 165, 194, 0.4);
+	border-radius: 12px;
+	background: rgba(10, 13, 19, 0.55);
+	color: #e6eaf2;
+	padding: 0 14px;
+	font-size: 14px;
+	outline: none;
+}
+
+.redeemInput:focus {
+	border-color: rgba(242, 200, 121, 0.8);
+	box-shadow: 0 0 0 2px rgba(242, 200, 121, 0.25);
+}
+
+.redeemButton {
+	border: none;
+	border-radius: 12px;
+	height: 44px;
+	padding: 0 18px;
+	background: linear-gradient(48deg, #f2c879 10%, #c99a3f 90%);
+	color: #141414;
+	font-weight: 700;
+	cursor: pointer;
+	transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.redeemButton:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+
+.redeemButton:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.feedbackSuccess,
+.feedbackError {
+	margin: 10px 0 0;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.feedbackSuccess {
+	color: #7dde97;
+}
+
+.feedbackError {
+	color: #ff8b8b;
+}
+
+.historyRow {
+	background: rgba(92, 107, 138, 0.12);
+	border: 1px solid rgba(146, 165, 194, 0.28);
+	border-radius: 14px;
+	padding: 16px;
+}
+
+.historyTitle {
+	margin: 0 0 10px;
+	font-size: 18px;
+	color: #e6eaf2;
+}
+
+.historyHead,
+.historyItem {
+	display: grid;
+	grid-template-columns: 1.5fr 1.8fr 1fr 0.8fr;
+	gap: 10px;
+	align-items: center;
+}
+
+.historyHead {
+	color: #93a3bb;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	padding: 0 12px 8px;
+	border-bottom: 1px solid rgba(146, 165, 194, 0.24);
+}
+
+.historyScroll {
+	margin-top: 8px;
+	max-height: 260px;
+	overflow-y: auto;
+	padding-right: 4px;
+}
+
+.historyScroll::-webkit-scrollbar {
+	width: 8px;
+}
+
+.historyScroll::-webkit-scrollbar-thumb {
+	background: rgba(146, 165, 194, 0.4);
+	border-radius: 6px;
+}
+
+.historyItem {
+	padding: 10px 12px;
+	border-radius: 10px;
+	font-size: 14px;
+	color: #d6deea;
+}
+
+.historyItem:nth-child(odd) {
+	background: rgba(10, 13, 19, 0.32);
+}
+
+.amountPositive {
+	color: #7dde97;
+	font-weight: 700;
+}
+
+.amountNegative {
+	color: #ff9d9d;
+	font-weight: 700;
+}
+
+.statusCompleted,
+.statusWin,
+.statusLose,
+.statusDraw {
+	text-transform: capitalize;
+	font-weight: 700;
+}
+
+.statusCompleted,
+.statusWin {
+	color: #7dde97;
+}
+
+.statusLose {
+	color: #ff9d9d;
+}
+
+.statusDraw {
+	color: #f2c879;
+}
+
+.emptyMessage {
+	font-size: 14px;
+	color: #93a3bb;
+	padding: 14px 12px;
+}
+
+@media (max-width: 900px) {
+	.soundRow {
+		grid-template-columns: 1fr;
+	}
+
+	.historyHead,
+	.historyItem {
+		grid-template-columns: 1.4fr 1.4fr 1fr 0.9fr;
+	}
+}
+
+@media (max-width: 680px) {
+	.container {
+		padding: 136px 14px 56px;
+	}
+
+	.settingsCard {
+		padding: 18px;
+	}
+
+	.title {
+		font-size: 24px;
+	}
+
+	.redeemControls {
+		flex-direction: column;
+	}
+
+	.redeemButton {
+		width: 100%;
+	}
+
+	.historyHead,
+	.historyItem {
+		grid-template-columns: 1fr;
+		gap: 6px;
+	}
+
+	.historyHead {
+		display: none;
+	}
+
+	.historyItem {
+		border: 1px solid rgba(146, 165, 194, 0.2);
+	}
+}

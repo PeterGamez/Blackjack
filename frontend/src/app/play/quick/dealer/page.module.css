@@ -221,16 +221,57 @@
   justify-content: center;
 }
 
-.card {
-  animation: cardSlideIn 0.45s ease-out;
+.deckZone {
+  position: absolute;
+  left: 140px;
+  top: 185px;
+  width: 90px;
+  height: 130px;
+  pointer-events: none;
+}
+
+.deckCard {
+  position: absolute;
+  width: 85px;
+  height: 125px;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.deckCardBottom {
+  transform: rotate(-8deg) translate(-6px, 8px);
+  opacity: 0.7;
+}
+
+.deckCardTop {
+  transform: rotate(4deg);
+  animation: deckPulse 2.1s ease-in-out infinite;
+}
+
+.dealCard {
+  animation-name: dealFromDeck;
+  animation-duration: 0.52s;
+  animation-timing-function: cubic-bezier(0.2, 0.88, 0.24, 1.04);
+  animation-fill-mode: both;
+  --deal-from-x: -340px;
+  --deal-from-y: 0px;
+  --deal-rot-from: -14deg;
+}
+
+.dealToDealer {
+  --deal-from-x: -360px;
+  --deal-from-y: 160px;
+  --deal-rot-from: -16deg;
+}
+
+.dealToPlayer {
+  --deal-from-x: -360px;
+  --deal-from-y: -250px;
+  --deal-rot-from: 16deg;
 }
 
 .cardFlip {
   animation: cardFlip 0.6s ease-in-out;
-}
-
-.cardBack {
-  animation: cardSlideIn 0.45s ease-out;
 }
 
 .cardFrame {
@@ -484,9 +525,25 @@
   font-size: 14px;
 }
 
-@keyframes cardSlideIn {
-  from { opacity: 0; transform: translateY(-40px) scale(0.85); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes dealFromDeck {
+  from {
+    opacity: 0;
+    transform: translate(var(--deal-from-x), var(--deal-from-y)) rotate(var(--deal-rot-from)) scale(0.78);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes deckPulse {
+  0%,
+  100% {
+    transform: rotate(4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-3px);
+  }
 }
 
 @keyframes cardFlip {

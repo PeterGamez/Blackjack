@@ -3,7 +3,7 @@
 import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
@@ -286,6 +286,14 @@ export default function Dealer() {
   const chipStacks = getChipStacks(bet);
   const resultClassName = result.includes("win") ? styles.resultWin : result.includes("Draw") ? styles.resultDraw : styles.resultLose;
 
+  const getDealerDealStyle = (cardIndex: number): CSSProperties => ({
+    animationDelay: gameStatus === "game-over" ? "0s" : `${cardIndex * 0.12}s`,
+  });
+
+  const getPlayerDealStyle = (cardIndex: number): CSSProperties => ({
+    animationDelay: gameStatus === "game-over" ? "0s" : gameStatus === "playing" && playerHand.length > 2 ? "0.02s" : `${cardIndex * 0.12 + 0.08}s`,
+  });
+
   return (
     <div className={styles.page}>
       <Navbar />
@@ -319,15 +327,22 @@ export default function Dealer() {
               </div>
             )}
 
+            {gameStatus !== "betting" && (
+              <div className={styles.deckZone} aria-hidden="true">
+                <Image src={getCardBackImage(cardSkin)} alt="Deck" width={85} height={125} unoptimized className={`${styles.deckCard} ${styles.deckCardBottom}`.trim()} />
+                <Image src={getCardBackImage(cardSkin)} alt="Deck" width={85} height={125} unoptimized className={`${styles.deckCard} ${styles.deckCardTop}`.trim()} />
+              </div>
+            )}
+
             <div className={styles.dealerRow}>
               {gameStatus !== "betting" &&
                 dealerHand.map((card, i) => (
-                  <div key={i} className={`${styles.cardFrame} ${styles.card} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()}>
+                  <div key={i} className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToDealer} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()} style={getDealerDealStyle(i)}>
                     <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}
               {gameStatus === "playing" && (
-                <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
+                <div className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToDealer}`.trim()} style={getDealerDealStyle(dealerHand.length)}>
                   <Image src={getCardBackImage(cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
                 </div>
               )}
@@ -349,7 +364,7 @@ export default function Dealer() {
             <div className={styles.playerRow}>
               {gameStatus !== "betting" &&
                 playerHand.map((card, i) => (
-                  <div key={i} className={`${styles.cardFrame} ${styles.card}`.trim()}>
+                  <div key={i} className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToPlayer}`.trim()} style={getPlayerDealStyle(i)}>
                     <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                   </div>
                 ))}

@@ -26,7 +26,7 @@ interface SkinItem {
 
 const BUILT_IN_SKINS: Record<ProductInterface["type"], SkinItem[]> = {
   card: [{ path: "default", name: "Default Card", preview: "/cards/default/backcard.png", productId: 0, type: "card" }],
-  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chip100.png", productId: 0, type: "chip" }],
+  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chips100.png", productId: 0, type: "chip" }],
   table: [{ path: "default", name: "Default Table", preview: "/tables/default/table.png", productId: 0, type: "table" }],
 };
 
@@ -147,7 +147,7 @@ export default function InventoryPage() {
             ownedByType.chip.push({
               path: product.path,
               name: product.name,
-              preview: product.image || `/chips/${product.path}/chip100.png`,
+              preview: product.image || `/chips/${product.path}/chips100.png`,
               productId: product.id,
               type: "chip",
             });

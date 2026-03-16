@@ -52,6 +52,6 @@ export const getTableSkin = (): string => {
 
 export const getChipImagePath = (value: number, skin: string = "default"): string => {
   const normalized = Math.max(1, Math.floor(value));
-  const filename = normalized === 1000 ? "chips1000" : `chip${normalized}`;
+  const filename = `chips${normalized}`;
   return `/chips/${skin}/${filename}.png`;
 };

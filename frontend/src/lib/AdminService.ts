@@ -23,6 +23,29 @@ export interface AdminCode {
   expiredDate: string;
 }
 
+export interface AdminPackage {
+  id: number;
+  image: string;
+  price: number;
+  tokens: number;
+  isActive: boolean;
+  updatedAt: string;
+}
+
+export interface AdminProduct {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  path: string;
+  tokens: number;
+  coins: number;
+  type: "card" | "chip" | "table";
+  isRecommend: boolean;
+  isActive: boolean;
+  updatedAt: string;
+}
+
 interface UpdateAdminUserPayload {
   username?: string;
   email?: string;
@@ -47,6 +70,44 @@ interface UpdateAdminCodePayload {
   maxUses?: number;
   isActive?: boolean;
   expiredDate?: string;
+}
+
+interface CreateAdminPackagePayload {
+  image: string;
+  price: number;
+  tokens: number;
+  isActive: boolean;
+}
+
+interface UpdateAdminPackagePayload {
+  image?: string;
+  price?: number;
+  tokens?: number;
+  isActive?: boolean;
+}
+
+interface CreateAdminProductPayload {
+  name: string;
+  description: string;
+  image: string;
+  path: string;
+  tokens: number;
+  coins: number;
+  type: "card" | "chip" | "table";
+  isRecommend: boolean;
+  isActive: boolean;
+}
+
+interface UpdateAdminProductPayload {
+  name?: string;
+  description?: string;
+  image?: string;
+  path?: string;
+  tokens?: number;
+  coins?: number;
+  type?: "card" | "chip" | "table";
+  isRecommend?: boolean;
+  isActive?: boolean;
 }
 
 export default class AdminService {
@@ -222,6 +283,117 @@ export default class AdminService {
 
   public static async updateCode(codeId: number, payload: UpdateAdminCodePayload): Promise<void> {
     const response = await this.authenticatedFetch(`/admin/code/${codeId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+  }
+
+  public static async getPackages(): Promise<AdminPackage[]> {
+    const response = await this.authenticatedFetch("/admin/packages", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminPackage[];
+  }
+
+  public static async createPackage(payload: CreateAdminPackagePayload): Promise<number> {
+    const response = await this.authenticatedFetch("/admin/package", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    const data = (await response.json()) as { packageId: number };
+    return data.packageId;
+  }
+
+  public static async getPackage(packageId: number): Promise<AdminPackage> {
+    const response = await this.authenticatedFetch(`/admin/package/${packageId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminPackage;
+  }
+
+  public static async updatePackage(packageId: number, payload: UpdateAdminPackagePayload): Promise<void> {
+    const response = await this.authenticatedFetch(`/admin/package/${packageId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+  }
+
+  public static async getProducts(): Promise<AdminProduct[]> {
+    const response = await this.authenticatedFetch("/admin/products", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminProduct[];
+  }
+
+  public static async createProduct(payload: CreateAdminProductPayload): Promise<void> {
+    const response = await this.authenticatedFetch("/admin/product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+  }
+
+  public static async getProduct(productId: number): Promise<AdminProduct> {
+    const response = await this.authenticatedFetch(`/admin/product/${productId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+
+    return (await response.json()) as AdminProduct;
+  }
+
+  public static async updateProduct(productId: number, payload: UpdateAdminProductPayload): Promise<void> {
+    const response = await this.authenticatedFetch(`/admin/product/${productId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

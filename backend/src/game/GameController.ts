@@ -16,6 +16,10 @@ export default class GameController {
         return gameType === "rank_player" ? "tokens" : "coins";
     }
 
+    private static getBlackjackPayout(bet: number): number {
+        return Math.floor(bet * 2.5);
+    }
+
     public static async startGame(userId: number, gameType: GameType, bet: number, socketId: string): Promise<StartResult> {
         if (gameType !== "quick_ai") {
             return { ok: false, message: "Game mode not available" };
@@ -50,7 +54,7 @@ export default class GameController {
                 reward = bet;
             } else if (isBlackjack) {
                 result = "win";
-                reward = Math.floor(bet * 2.5); // Blackjack pays 3:2
+                reward = this.getBlackjackPayout(bet);
             } else {
                 result = "lose";
             }

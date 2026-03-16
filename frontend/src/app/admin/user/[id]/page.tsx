@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import AdminService, { AdminUser } from "@lib/AdminService";
+import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 
 import styles from "../page.module.css";
@@ -94,6 +95,12 @@ export default function AdminUserEditPage() {
       const updated = await AdminService.getUser(userId);
       setUser(updated);
       setDraft({ username: updated.username, email: updated.email, role: updated.role, tokens: updated.tokens.toString(), coins: updated.coins.toString() });
+
+      if (authUserId === updated.id) {
+        LocalStorage.setItem("username", updated.username);
+        LocalStorage.setItem("coins", updated.coins.toString());
+        LocalStorage.setItem("tokens", updated.tokens.toString());
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to update user");
     } finally {

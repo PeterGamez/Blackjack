@@ -51,6 +51,12 @@ export default function Navbar() {
         <span className={styles.username}>{username || "Sign in"}</span>
       </div>
 
+      <button type="button" className={styles.logoHomeButton} aria-label="Back to main menu" onClick={() => router.push("/")}>
+        <span className={styles.logoIconWrap}>
+          <Image src="/logo.png" alt="21 Blackjack" width={54} height={54} className={styles.logoImage} priority />
+        </span>
+      </button>
+
       {/* Resources Section */}
       <div className={styles.resourcesSection}>
         {/* Coins */}
@@ -72,7 +78,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        <button className={styles.settingsButton} aria-label="Open settings" onClick={() => router.push("/comingsoon")}>
+        <button className={styles.settingsButton} aria-label="Open settings" onClick={() => router.push("/settings")}>
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M12 8.75A3.25 3.25 0 1 1 8.75 12 3.25 3.25 0 0 1 12 8.75Z" stroke="currentColor" strokeWidth="1.9" />
             <path

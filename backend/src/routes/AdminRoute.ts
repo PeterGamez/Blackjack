@@ -131,27 +131,6 @@ export default class AdminRoute implements RouteInterface {
 
             return c.json({ message: "User updated successfully" });
         });
-
-        this.app.delete("/user/:id", async (c) => {
-            const userId = parseInt(c.req.param("id"));
-            if (isNaN(userId)) {
-                return c.json({ error: "Invalid user ID" }, 400);
-            }
-
-            const authUser = await this.server.Middleware.getUser(c);
-            if (authUser.role == "admin") {
-                return c.json({ error: "Admins cannot delete users" }, 403);
-            }
-
-            const user = await UserModel.selectUser(userId);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
-            }
-
-            await UserModel.deleteUser(userId);
-
-            return c.json({ message: "User deleted successfully" });
-        });
     }
 
     private codeRoutes() {

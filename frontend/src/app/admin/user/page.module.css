@@ -1,13 +1,21 @@
 .page {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background: #1e2430;
   font-family: var(--font-sora), sans-serif;
 }
 
 .container {
   max-width: 1080px;
+  width: 100%;
   margin: 0 auto;
-  padding: 210px 24px 80px;
+  padding: 210px 24px 24px;
+  flex: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .loadingState {
@@ -77,10 +85,56 @@
   font-size: 18px;
 }
 
-.createSection,
-.listSection,
-.editorSection {
-  margin-top: 18px;
+.userListSection {
+  margin-bottom: 18px;
+}
+
+.searchInput {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid rgba(147, 163, 187, 0.35);
+  border-radius: 10px;
+  background: rgba(14, 20, 31, 0.5);
+  color: #e6eaf2;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.userList {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emptyText {
+  margin: 0;
+  color: #93a3bb;
+  font-size: 14px;
+  padding: 10px 4px;
+}
+
+.userRow {
+  width: 100%;
+  border: 1px solid rgba(92, 107, 138, 0.4);
+  background: rgba(14, 20, 31, 0.45);
+  color: #e6eaf2;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.userRowActive {
+  border-color: rgba(242, 200, 121, 0.6);
+}
+
+.userMeta {
+  color: #93a3bb;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
 .editorSection {
@@ -118,19 +172,20 @@
   color: #93a3bb;
 }
 
-.createButton,
-.saveButton {
+.actionRow {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.saveButton,
+.deleteButton {
   border: none;
   border-radius: 10px;
   padding: 10px 14px;
-  margin-top: 12px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.createButton {
-  background: #2e7d32;
-  color: #fff;
 }
 
 .saveButton {
@@ -138,50 +193,20 @@
   color: #1a1a1a;
 }
 
-.createButton:disabled,
-.saveButton:disabled {
+.deleteButton {
+  background: #a53535;
+  color: #fff;
+}
+
+.saveButton:disabled,
+.deleteButton:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
-.codeList {
-  max-height: 220px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.codeRow {
-  width: 100%;
-  border: 1px solid rgba(92, 107, 138, 0.4);
-  background: rgba(14, 20, 31, 0.45);
-  color: #e6eaf2;
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.codeRowActive {
-  border-color: rgba(242, 200, 121, 0.6);
-}
-
-.codeMeta {
-  color: #93a3bb;
-  text-transform: uppercase;
-  font-size: 12px;
-}
-
-.actionRow {
-  display: flex;
-  justify-content: flex-end;
-}
-
 @media (max-width: 760px) {
   .container {
-    padding: 120px 16px 72px;
+    padding: 120px 16px 16px;
   }
 
   .card {
@@ -202,7 +227,8 @@
     justify-content: stretch;
   }
 
-  .saveButton {
-    width: 100%;
+  .saveButton,
+  .deleteButton {
+    flex: 1;
   }
 }

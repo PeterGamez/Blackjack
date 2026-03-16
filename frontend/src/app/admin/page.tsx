@@ -13,15 +13,6 @@ export default function AdminPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready">("loading");
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.push("/profile");
-  };
-
   useEffect(() => {
     const checkPermission = async () => {
       const currentUser = await UserService.getUser();
@@ -55,7 +46,7 @@ export default function AdminPage() {
     <div className={styles.page}>
       <Navbar />
       <div className={styles.container}>
-        <button type="button" onClick={handleBack} className={styles.backButton}>
+        <button type="button" onClick={() => router.push("/profile")} className={styles.backButton}>
           ← Back to Profile
         </button>
 
@@ -64,12 +55,12 @@ export default function AdminPage() {
           <p className={styles.subtitle}>Choose a management menu.</p>
 
           <div className={styles.menuGrid}>
-            <Link href="/admin/users" className={styles.menuCard}>
+            <Link href="/admin/user" className={styles.menuCard}>
               <h2>User Management</h2>
               <p>View all users and edit player data.</p>
             </Link>
 
-            <Link href="/admin/codes" className={styles.menuCard}>
+            <Link href="/admin/code" className={styles.menuCard}>
               <h2>Code Management</h2>
               <p>View all codes, create new codes, and edit existing codes.</p>
             </Link>

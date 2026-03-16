@@ -132,6 +132,31 @@
   transform: scale(1.1);
 }
 
+.settingsButton {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(92, 107, 138, 0.52);
+  color: #e6eaf2;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.settingsButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.settingsButton:hover {
+  background: rgba(92, 107, 138, 0.8);
+  color: #f2c879;
+  transform: translateY(-2px) rotate(12deg);
+}
+
 @media (max-width: 1080px) {
   .navbar {
     --side-offset: 20px;
@@ -165,6 +190,16 @@
     width: 38px;
     height: 38px;
   }
+
+  .settingsButton {
+    width: 46px;
+    height: 46px;
+  }
+
+  .settingsButton svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -187,6 +222,16 @@
     width: 36px;
     height: 36px;
     font-size: 1.2rem;
+  }
+
+  .settingsButton {
+    width: 42px;
+    height: 42px;
+  }
+
+  .settingsButton svg {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -223,5 +268,15 @@
     width: 26px;
     height: 26px;
     font-size: 1rem;
+  }
+
+  .settingsButton {
+    width: 34px;
+    height: 34px;
+  }
+
+  .settingsButton svg {
+    width: 18px;
+    height: 18px;
   }
 }

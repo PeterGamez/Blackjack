@@ -60,6 +60,10 @@ export default class UserService {
     LocalStorage.setItem("coins", data.coins.toString());
     LocalStorage.setItem("tokens", data.tokens.toString());
 
+    const currentCardSkin = LocalStorage.getItem("cardSkin") || "default";
+    const currentChipSkin = LocalStorage.getItem("chipSkin") || "default";
+    const currentTableSkin = LocalStorage.getItem("tableSkin") || "default";
+
     ShopService.getProducts().then((products) => {
       const ownedProducts = data.inventory.map((item) => {
         const product = products.find((p) => p.id === item.productId);
@@ -69,13 +73,26 @@ export default class UserService {
         };
       });
 
-      const cardSkin = ownedProducts.find((p) => p.type === "card" && p.path) || { path: "default" };
-      const chipSkin = ownedProducts.find((p) => p.type === "chip" && p.path) || { path: "default" };
-      const tableSkin = ownedProducts.find((p) => p.type === "table" && p.path) || { path: "default" };
+      const resolveSkinPath = (
+        type: "card" | "chip" | "table",
+        selectedId: number | null | undefined,
+        currentSkin: string
+      ): string => {
+        if (selectedId === null || selectedId === 0) {
+          return "default";
+        }
 
-      LocalStorage.setItem("cardSkin", cardSkin.path);
-      LocalStorage.setItem("chipSkin", chipSkin.path);
-      LocalStorage.setItem("tableSkin", tableSkin.path);
+        if (typeof selectedId === "number" && selectedId > 0) {
+          const selectedProduct = ownedProducts.find((p) => p.type === type && p.id === selectedId && p.path);
+          return selectedProduct?.path || currentSkin;
+        }
+
+        return currentSkin;
+      };
+
+      LocalStorage.setItem("cardSkin", resolveSkinPath("card", data.cardId, currentCardSkin));
+      LocalStorage.setItem("chipSkin", resolveSkinPath("chip", data.chipId, currentChipSkin));
+      LocalStorage.setItem("tableSkin", resolveSkinPath("table", data.tableId, currentTableSkin));
     });
   }
 

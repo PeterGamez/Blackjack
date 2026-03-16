@@ -90,6 +90,7 @@ export default function InventoryPage() {
   const [selectedSkins, setSelectedSkins] = useState<SelectedSkinsState>({ card: "default", chip: "default", table: "default" });
   const [ownedSkinsByType, setOwnedSkinsByType] = useState<OwnedSkinsState>({ card: [], chip: [], table: [] });
   const [hovered, setHovered] = useState<string | null>(null);
+  const [equipMessage, setEquipMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const resetToDefaultSkins = useCallback(() => {
     setOwnedSkinsByType({ card: [], chip: [], table: [] });
@@ -194,12 +195,26 @@ export default function InventoryPage() {
 
       setSelectedSkins((prev) => ({ ...prev, [type]: skinId }));
       LocalStorage.setItem(storageKey, skinId);
+      setEquipMessage(null);
 
       try {
         await AuthService.updateCurrentUser({ [payloadKey]: productId ?? 0 });
-      } catch {
+        setEquipMessage({ ok: true, text: "Skin equipped" });
+
+        // Best-effort sync from server; do not roll back a successful equip when sync fails.
+        const latestUser = await UserService.getUser();
+        if (latestUser) {
+          setSelectedSkins({
+            card: getCardSkin(),
+            chip: getChipSkin(),
+            table: getTableSkin(),
+          });
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to equip skin. Please try again.";
         setSelectedSkins((prev) => ({ ...prev, [type]: previousSkin }));
         LocalStorage.setItem(storageKey, previousSkin);
+        setEquipMessage({ ok: false, text: errorMessage });
       }
     },
     [selectedSkins]
@@ -219,6 +234,7 @@ export default function InventoryPage() {
       <div className={styles.Title}>
         <h2>Inventory</h2>
       </div>
+      {equipMessage && <div style={{ color: equipMessage.ok ? "#2f6b2f" : "#a00", fontWeight: 700, marginTop: 8 }}>{equipMessage.text}</div>}
 
       <div className={styles.main}>
         <div className={styles.sidebar}>

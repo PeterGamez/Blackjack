@@ -10,5 +10,6 @@ export interface UserInterface extends InterfaceBase {
     isVerified: boolean;
     cardId: number;
     chipId: number;
-    themeId: number;
+    themeId?: number | null;
+    tableId?: number | null;
 }

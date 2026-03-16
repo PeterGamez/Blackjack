@@ -222,7 +222,7 @@ function StorePageContent() {
                     ) : p.image ? (
                       <Image src={p.image} alt={p.name} width={100} height={100} unoptimized style={{ objectFit: "contain", maxWidth: "80%", maxHeight: "80%" }} />
                     ) : (
-                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : "Theme"}</strong>
+                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : p.type === "table" ? "Table" : "Theme"}</strong>
                     )}
                   </div>
                   <div className={styles.productInfo}>

@@ -79,6 +79,22 @@ export default class UserModel {
         }
     }
 
+    public static async updateTableSelection(id: number, value: number | null): Promise<void> {
+        try {
+            await this.updateUser(id, "themeId", value);
+            return;
+        } catch (error) {
+            const dbError = error as { code?: string; sqlMessage?: string };
+            const missingThemeColumn = dbError.code === "ER_BAD_FIELD_ERROR" && (dbError.sqlMessage || "").includes("themeId");
+
+            if (!missingThemeColumn) {
+                throw error;
+            }
+        }
+
+        await this.updateUser(id, "tableId", value);
+    }
+
     public static async increaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
         const connection = await this.DB.getConnection();

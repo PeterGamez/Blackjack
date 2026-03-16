@@ -90,16 +90,44 @@ export default class AuthService {
   }
 
   public static async updateCurrentUser(payload: { cardId?: number; chipId?: number; tableId?: number }): Promise<void> {
-    const token = LocalStorage.getItem("accessToken");
+    const patchCurrentUser = async (token: string): Promise<Response> => {
+      return fetch(`${config.apiUrl}/user/me`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    };
+
+    let token = LocalStorage.getItem("accessToken");
     if (!token) {
-      throw new Error("Not authenticated");
+      const hasRefreshed = await this.refreshAccessToken();
+      if (!hasRefreshed) {
+        throw new Error("Not authenticated");
+      }
+
+      token = LocalStorage.getItem("accessToken");
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
     }
 
-    const res = await fetch(`${config.apiUrl}/user/me`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    let res = await patchCurrentUser(token);
+
+    if (res.status === 401) {
+      LocalStorage.removeItem("accessToken");
+
+      const hasRefreshed = await this.refreshAccessToken();
+      if (!hasRefreshed) {
+        throw new Error("Session expired");
+      }
+
+      const refreshedToken = LocalStorage.getItem("accessToken");
+      if (!refreshedToken) {
+        throw new Error("Session expired");
+      }
+
+      res = await patchCurrentUser(refreshedToken);
+    }
 
     const data: { error?: string; message?: string } = await res.json();
     if (!res.ok) {

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import AuthService from "@/lib/AuthService";
 
-import styles from "../recovery.module.css";
+import styles from "./forgot.module.css";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();

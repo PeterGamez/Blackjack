@@ -6,7 +6,7 @@ import { Suspense, useState } from "react";
 
 import AuthService from "@/lib/AuthService";
 
-import styles from "../recovery.module.css";
+import styles from "./reset.module.css";
 
 function EyeIcon({ closed }: { closed: boolean }) {
   return (

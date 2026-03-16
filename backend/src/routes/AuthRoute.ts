@@ -12,6 +12,7 @@ export default class AuthRoute implements RouteInterface {
 
     private static readonly USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
     private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    private static readonly PASSWORD_MIN_LENGTH = 8;
 
     constructor(server: Server) {
         this.app = new Hono();
@@ -46,6 +47,10 @@ export default class AuthRoute implements RouteInterface {
 
                 if (!AuthRoute.EMAIL_REGEX.test(email)) {
                     return c.json({ error: "Invalid email address" }, 400);
+                }
+
+                if (password.length < AuthRoute.PASSWORD_MIN_LENGTH) {
+                    return c.json({ error: `Password must be at least ${AuthRoute.PASSWORD_MIN_LENGTH} characters` }, 400);
                 }
 
                 const [existingUser, hashedPassword] = await Promise.all([UserModel.selectUserExistsByUsernameOrEmail(username, email), this.server.Password.hash(password)]);
@@ -231,7 +236,7 @@ export default class AuthRoute implements RouteInterface {
                     }
 
                     try {
-                        await this.server.Email.sendPasswordResetEmail(user.id, email);
+                        await this.server.Email.sendPasswordResetEmail(user.id, user.email);
                     } catch (emailError) {
                         this.server.error("EMAIL", `Failed to send password reset email: ${emailError}`);
                         return c.json({ error: "Failed to send password reset email" }, 500);

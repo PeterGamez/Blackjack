@@ -1,6 +1,6 @@
-import config from "@/config";
-
 import { UserInterface } from "@interfaces/API/UserInterface";
+
+import config from "@/config";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";

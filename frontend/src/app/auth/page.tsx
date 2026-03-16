@@ -71,6 +71,10 @@ export default function AuthPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegMessage("");
+    if (regPassword.length < 8) {
+      setRegMessage("Password must be at least 8 characters");
+      return;
+    }
     if (regPassword !== regConfirm) {
       setRegMessage("Passwords do not match");
       return;
@@ -113,7 +117,7 @@ export default function AuthPage() {
               <div className={styles.field}>
                 <label className={styles.fieldLabelLarge}>Username</label>
                 <div className={styles.inputWrap}>
-                  <input autoFocus type="text" placeholder="username/email" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required className={styles.input} />
+                  <input autoFocus type="text" placeholder="Username" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} required className={styles.input} />
                 </div>
               </div>
 
@@ -122,7 +126,7 @@ export default function AuthPage() {
                 <div className={styles.inputWrap}>
                   <input
                     type={showLoginPassword ? "text" : "password"}
-                    placeholder="password"
+                    placeholder="Password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
@@ -140,7 +144,7 @@ export default function AuthPage() {
                 {loginLoading ? "SIGNING IN..." : "SIGN IN"}
               </button>
 
-              <button type="button" onClick={() => router.push("/comingsoon")} className={styles.linkButton}>
+              <button type="button" onClick={() => router.push("/auth/forgot-password")} className={styles.linkButton}>
                 Forgot Password
               </button>
             </form>
@@ -150,7 +154,7 @@ export default function AuthPage() {
                 <div className={styles.field}>
                   <label className={styles.fieldLabelLarge}>Username</label>
                   <div className={styles.inputWrap}>
-                    <input autoFocus placeholder="username/email" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required className={styles.input} />
+                    <input autoFocus placeholder="Username" value={regUsername} onChange={(e) => setRegUsername(e.target.value)} required className={styles.input} />
                   </div>
                 </div>
 
@@ -162,9 +166,10 @@ export default function AuthPage() {
                   <div className={styles.inputWrap}>
                     <input
                       type={showRegPassword ? "text" : "password"}
-                      placeholder="password"
+                      placeholder="Password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
+                      minLength={8}
                       required
                       className={`${styles.input} ${styles.inputWithIcon}`}
                     />
@@ -186,9 +191,10 @@ export default function AuthPage() {
                   <div className={styles.inputWrap}>
                     <input
                       type={showRegConfirm ? "text" : "password"}
-                      placeholder="password"
+                      placeholder="Confirm Password"
                       value={regConfirm}
                       onChange={(e) => setRegConfirm(e.target.value)}
+                      minLength={8}
                       required
                       className={`${styles.input} ${styles.inputWithIcon}`}
                     />

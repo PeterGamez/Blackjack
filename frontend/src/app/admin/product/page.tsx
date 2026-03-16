@@ -85,13 +85,7 @@ export default function AdminProductsPage() {
 
           <div>
             <h2 className={styles.sectionTitle}>All Products ({products.length})</h2>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search by name, type, or path..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <input type="text" className={styles.searchInput} placeholder="Search by name, type, or path..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 
             <div className={styles.itemList}>
               {products.length === 0 ? (
@@ -102,15 +96,13 @@ export default function AdminProductsPage() {
                     const normalized = searchTerm.trim().toLowerCase();
                     if (!normalized) return true;
 
-                    return (
-                      item.name.toLowerCase().includes(normalized) ||
-                      item.type.toLowerCase().includes(normalized) ||
-                      item.path.toLowerCase().includes(normalized)
-                    );
+                    return item.name.toLowerCase().includes(normalized) || item.type.toLowerCase().includes(normalized) || item.path.toLowerCase().includes(normalized);
                   })
                   .map((item) => (
                     <button key={item.id} type="button" className={styles.itemRow} onClick={() => router.push(`/admin/product/${item.id}`)}>
-                      <span>#{item.id} • {item.name}</span>
+                      <span>
+                        #{item.id} • {item.name}
+                      </span>
                       <span className={styles.itemMeta}>
                         {item.type} • {item.isRecommend ? "recommended" : "normal"} • {item.isActive ? "active" : "inactive"}
                       </span>

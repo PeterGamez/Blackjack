@@ -164,11 +164,6 @@ export default function AdminProductCreatePage() {
             </label>
 
             <label className={styles.label}>
-              Description
-              <input className={styles.input} value={draft.description} onChange={(e) => setDraft((prev) => ({ ...prev, description: e.target.value }))} />
-            </label>
-
-            <label className={styles.label}>
               <input className={styles.toggleInput} type="checkbox" checked={draft.isRecommend} onChange={(e) => setDraft((prev) => ({ ...prev, isRecommend: e.target.checked }))} />
               Recommended
               <div className={`${styles.toggleTrack}${draft.isRecommend ? ` ${styles.toggleTrackOn}` : ""}`}>
@@ -182,6 +177,11 @@ export default function AdminProductCreatePage() {
               <div className={`${styles.toggleTrack}${draft.isActive ? ` ${styles.toggleTrackOn}` : ""}`}>
                 <div className={`${styles.toggleThumb}${draft.isActive ? ` ${styles.toggleThumbOn}` : ""}`} />
               </div>
+            </label>
+
+            <label className={styles.label} style={{ gridColumn: "1 / -1" }}>
+              Description
+              <input className={styles.input} value={draft.description} onChange={(e) => setDraft((prev) => ({ ...prev, description: e.target.value }))} />
             </label>
           </div>
 

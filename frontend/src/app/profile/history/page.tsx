@@ -9,7 +9,7 @@ import styles from "./page.module.css";
 
 type GameHistoryEntry = {
   role: "player" | "dealer";
-  result: "win" | "lose" | "draw";
+  result: "win" | "lose" | "draw" | "blackjack";
   score: number;
   opponentScore: number;
   bet: number;
@@ -64,7 +64,7 @@ export default function ProfileHistoryPage() {
   }, [router]);
 
   const stats = useMemo(() => {
-    const wins = history.filter((game) => game.result === "win").length;
+    const wins = history.filter((game) => game.result === "win" || game.result === "blackjack").length;
     const losses = history.filter((game) => game.result === "lose").length;
     const draws = history.filter((game) => game.result === "draw").length;
     const totalBet = history.reduce((sum, game) => sum + game.bet, 0);
@@ -79,6 +79,14 @@ export default function ProfileHistoryPage() {
       netReward,
     };
   }, [history]);
+
+  const formatResultLabel = (result: GameHistoryEntry["result"]) => {
+    if (result === "blackjack") {
+      return "BJ";
+    }
+
+    return result.toUpperCase();
+  };
 
   if (isLoading) {
     return <div className={styles.page} />;
@@ -153,7 +161,7 @@ export default function ProfileHistoryPage() {
                         {entry.reward.toLocaleString()}
                       </td>
                       <td>
-                        <span className={`${styles.resultBadge} ${styles[`result-${entry.result}`]}`.trim()}>{entry.result.toUpperCase()}</span>
+                        <span className={`${styles.resultBadge} ${styles[`result-${entry.result}`]}`.trim()}>{formatResultLabel(entry.result)}</span>
                       </td>
                     </tr>
                   ))}

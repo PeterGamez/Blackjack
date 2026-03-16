@@ -119,7 +119,7 @@ export default class UserService {
   public static async getGameHistory(): Promise<
     Array<{
       role: "player" | "dealer";
-      result: "win" | "lose" | "draw";
+      result: "win" | "lose" | "draw" | "blackjack";
       score: number;
       opponentScore: number;
       bet: number;
@@ -137,7 +137,7 @@ export default class UserService {
 
       return (await response.json()) as Array<{
         role: "player" | "dealer";
-        result: "win" | "lose" | "draw";
+        result: "win" | "lose" | "draw" | "blackjack";
         score: number;
         opponentScore: number;
         bet: number;

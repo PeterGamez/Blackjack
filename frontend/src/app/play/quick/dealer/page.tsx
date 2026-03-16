@@ -357,14 +357,16 @@ export default function Dealer() {
 
             {gameStatus === "betting" && (
               <div className={styles.bettingOverlay}>
-                <p className={styles.bettingTitle}>PLACE YOUR BET</p>
-                <div className={styles.pendingBet}>{pendingBet > 0 ? pendingBet.toLocaleString() : "—"}</div>
-                <div className={styles.chipRow}>
-                  {CHIP_VALUES.map((v) => (
-                    <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
-                      <Image src={getChipImagePath(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
-                    </button>
-                  ))}
+                <div className={styles.bettingPanel}>
+                  <p className={styles.bettingTitle}>PLACE YOUR BET</p>
+                  <div className={styles.pendingBet}>{pendingBet > 0 ? pendingBet.toLocaleString() : "—"}</div>
+                  <div className={styles.chipRow}>
+                    {CHIP_VALUES.map((v) => (
+                      <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
+                        <Image src={getChipImagePath(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 {message && <p className={styles.inlineError}>{message}</p>}
               </div>

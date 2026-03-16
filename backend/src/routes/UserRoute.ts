@@ -172,7 +172,7 @@ export default class UserRoute implements RouteInterface {
 
     private resolveGameResult(result: GameHistoryInterface["result"], isPlayer: boolean): GameHistoryInterface["result"] {
         if (result === "draw") return "draw";
-        if (result === "blackjack") return isPlayer ? "win" : "lose";
+        if (result === "blackjack") return isPlayer ? "blackjack" : "lose";
         if (isPlayer) return result;
         return result === "win" ? "lose" : "win";
     }

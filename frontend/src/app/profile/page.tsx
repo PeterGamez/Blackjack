@@ -20,7 +20,7 @@ type UserProfile = {
 };
 
 type GameHistoryEntry = {
-  result: "win" | "lose" | "draw";
+  result: "win" | "lose" | "draw" | "blackjack";
 };
 
 type RoleTheme = {
@@ -85,7 +85,7 @@ export default function ProfilePage() {
     );
   }
 
-  const wins = history.filter((game) => game.result === "win").length;
+  const wins = history.filter((game) => game.result === "win" || game.result === "blackjack").length;
   const losses = history.filter((game) => game.result === "lose").length;
   const draws = history.filter((game) => game.result === "draw").length;
   const gamesPlayed = history.length;

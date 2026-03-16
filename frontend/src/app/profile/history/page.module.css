@@ -162,6 +162,11 @@
   color: #ffeec0;
 }
 
+.result-blackjack {
+  background: rgba(255, 214, 102, 0.3);
+  color: #fff2b3;
+}
+
 .positive {
   color: #9df3b2;
 }

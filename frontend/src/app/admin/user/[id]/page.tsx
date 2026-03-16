@@ -140,11 +140,7 @@ export default function AdminUserEditPage() {
         <div className={styles.card}>
           <div className={styles.headerRow}>
             <h1 className={styles.title}>Edit User{user ? `: ${user.username}` : ""}</h1>
-            {user && (
-              <span className={user.isVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
-                {user.isVerified ? "Verified" : "Unverified"}
-              </span>
-            )}
+            {user && <span className={user.isVerified ? styles.verifiedBadge : styles.unverifiedBadge}>{user.isVerified ? "Verified" : "Unverified"}</span>}
           </div>
 
           {error && <p className={styles.error}>{error}</p>}

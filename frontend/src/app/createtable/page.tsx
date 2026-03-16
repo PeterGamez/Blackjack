@@ -1,5 +1,143 @@
-import ComingSoonPage from "@components/ComingSoonPage";
+"use client";
 
-export default function CreateTable() {
-  return <ComingSoonPage message="Create Table feature is under development." backPath="/" backLabel="Back to home" />;
+import Navbar from "@components/Navbar";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import styles from "./table.module.css";
+
+export default function TableSettingPage() {
+
+  const router = useRouter();
+
+  const [roomId, setRoomId] = useState("");
+  const [roomPassword, setRoomPassword] = useState("");
+  const [startingMoney, setStartingMoney] = useState(1000);
+  const [minimumBet, setMinimumBet] = useState(50);
+
+  const createTable = () => {
+    console.log({
+      roomId,
+      roomPassword,
+      startingMoney,
+      minimumBet,
+    });
+  };
+
+  return (
+    <div className={styles.container}>
+
+      <Navbar />
+
+      {/* Back Button */}
+      <button
+        className={styles.backButton}
+        onClick={() => router.push("/")}
+      >
+        ← Lobby
+      </button>
+
+      {/* Title */}
+      <div className={styles.Title}>
+        <h2>Table Setting</h2>
+      </div>
+
+      {/* Main Content */}
+      <div className={styles.content}>
+
+        {/* Row 1 */}
+        <div className={styles.row}>
+
+          <div className={styles.inputGroup}>
+            <label>Room ID</label>
+            <input
+              type="text"
+              placeholder="XXXXXXXX"
+              value={roomId}
+              onChange={(e)=>setRoomId(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>Room Password</label>
+            <input
+              type="password"
+              placeholder="XXXXXX"
+              value={roomPassword}
+              onChange={(e)=>setRoomPassword(e.target.value)}
+            />
+          </div>
+
+        </div>
+
+        {/* Row 2 */}
+        <div className={styles.row}>
+
+          {/* Starting Money */}
+          <div className={styles.inputGroup}>
+            <label>Starting Money</label>
+
+            <div className={styles.inputWithSelect}>
+
+              <img
+                src="/icons/chip.png"
+                alt="chip"
+                className={styles.inputIcon}
+              />
+
+              <input
+                type="number"
+                value={startingMoney}
+                onChange={(e)=>setStartingMoney(Number(e.target.value))}
+              />
+
+              <select>
+                <option>Chips</option>
+                <option>Token</option>
+              </select>
+
+            </div>
+          </div>
+
+          {/* Minimum Bet */}
+          <div className={styles.inputGroup}>
+            <label>Minimum Bet</label>
+
+            <div className={styles.inputWithSelect}>
+
+              <img
+                src="/icons/chip.png"
+                alt="chip"
+                className={styles.inputIcon}
+              />
+
+              <input
+                type="number"
+                value={minimumBet}
+                onChange={(e)=>setMinimumBet(Number(e.target.value))}
+              />
+
+              <select>
+                <option>Chips</option>
+                <option>Token</option>
+              </select>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Create Button */}
+      <div className={styles.createButtonWrapper}>
+        <button
+          className={styles.createButton}
+          onClick={createTable}
+        >
+          CREATE TABLE
+        </button>
+      </div>
+
+    </div>
+  );
 }

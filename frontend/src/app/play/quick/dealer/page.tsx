@@ -75,13 +75,34 @@ export default function Dealer() {
   const [timer, setTimer] = useState<number>(10);
   const [dealerRevealIndex, setDealerRevealIndex] = useState<number | null>(null);
   const [isDealerDrawing, setIsDealerDrawing] = useState(false);
-  const [cardSkin] = useState<string>(getCardSkin);
-  const [chipSkin] = useState<string>(getChipSkin);
-  const [tableSkin] = useState<string>(getTableSkin);
+  const [cardSkin, setCardSkin] = useState<string>("default");
+  const [chipSkin, setChipSkin] = useState<string>("default");
+  const [tableSkin, setTableSkin] = useState<string>("default");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const standResolveRef = useRef(false);
 
   const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  useEffect(() => {
+    const syncSkins = () => {
+      setCardSkin(getCardSkin());
+      setChipSkin(getChipSkin());
+      setTableSkin(getTableSkin());
+    };
+
+    syncSkins();
+
+    const handleStorageChange = (event: Event) => {
+      const storageEvent = event as CustomEvent<{ key?: string | null }>;
+      const key = storageEvent.detail?.key;
+      if (!key || key === "cardSkin" || key === "chipSkin" || key === "tableSkin") {
+        syncSkins();
+      }
+    };
+
+    window.addEventListener("local-storage-change", handleStorageChange);
+    return () => window.removeEventListener("local-storage-change", handleStorageChange);
+  }, []);
 
   const getChipStacks = (amount: number): ChipStack[] => {
     const chipValues = [1000, 500, 100, 25, 10, 5, 1];

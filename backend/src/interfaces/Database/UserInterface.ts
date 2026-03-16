@@ -9,7 +9,9 @@ export interface UserInterface extends InterfaceBase {
     coins: number;
     isVerified: boolean;
     cardId: number;
-    chipId: number;
+    chipId?: number | null;
+    chipsId?: number | null;
+    chipSkinId?: number | null;
     themeId?: number | null;
     tableId?: number | null;
 }

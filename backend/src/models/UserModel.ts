@@ -95,6 +95,34 @@ export default class UserModel {
         await this.updateUser(id, "tableId", value);
     }
 
+    public static async updateChipSelection(id: number, value: number | null): Promise<void> {
+        try {
+            await this.updateUser(id, "chipId", value);
+            return;
+        } catch (error) {
+            const dbError = error as { code?: string; sqlMessage?: string };
+            const missingChipColumn = dbError.code === "ER_BAD_FIELD_ERROR" && (dbError.sqlMessage || "").includes("chipId");
+
+            if (!missingChipColumn) {
+                throw error;
+            }
+        }
+
+        try {
+            await this.updateUser(id, "chipsId", value);
+            return;
+        } catch (error) {
+            const dbError = error as { code?: string; sqlMessage?: string };
+            const missingChipsColumn = dbError.code === "ER_BAD_FIELD_ERROR" && (dbError.sqlMessage || "").includes("chipsId");
+
+            if (!missingChipsColumn) {
+                throw error;
+            }
+        }
+
+        await this.updateUser(id, "chipSkinId", value);
+    }
+
     public static async increaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
         const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
         const connection = await this.DB.getConnection();

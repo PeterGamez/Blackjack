@@ -40,7 +40,7 @@ export default class UserRoute implements RouteInterface {
                 tokens: user.tokens,
                 coins: user.coins,
                 cardId: user.cardId,
-                chipId: user.chipId,
+                chipId: user.chipId ?? user.chipsId ?? user.chipSkinId ?? null,
                 tableId: user.themeId ?? user.tableId ?? null,
                 inventory: userInventory.map((item) => {
                     return {
@@ -80,7 +80,7 @@ export default class UserRoute implements RouteInterface {
                 await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
             }
             if (chipId !== undefined) {
-                await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
+                await UserModel.updateChipSelection(user.id, chipId === 0 ? null : chipId);
             }
             if (tableId !== undefined) {
                 await UserModel.updateTableSelection(user.id, tableId === 0 ? null : tableId);

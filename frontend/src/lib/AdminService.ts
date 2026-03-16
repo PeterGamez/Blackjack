@@ -60,6 +60,7 @@ interface CreateAdminCodePayload {
   amount: number;
   type: "coins" | "tokens";
   maxUses: number;
+  isActive: boolean;
   expiredDate: string;
 }
 

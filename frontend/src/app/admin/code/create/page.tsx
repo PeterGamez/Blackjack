@@ -14,6 +14,7 @@ type CreateCodeDraft = {
   amount: string;
   type: "coins" | "tokens";
   maxUses: string;
+  isActive: boolean;
   expiredDate: string;
 };
 
@@ -22,6 +23,7 @@ const defaultDraft: CreateCodeDraft = {
   amount: "",
   type: "coins",
   maxUses: "",
+  isActive: true,
   expiredDate: "",
 };
 
@@ -84,6 +86,7 @@ export default function AdminCodeCreatePage() {
         amount,
         type: draft.type,
         maxUses,
+        isActive: draft.isActive,
         expiredDate: new Date(draft.expiredDate).toISOString(),
       });
 
@@ -143,6 +146,14 @@ export default function AdminCodeCreatePage() {
             <label className={styles.label}>
               Expired Date
               <input className={styles.input} type="date" value={draft.expiredDate} onChange={(e) => setDraft((prev) => ({ ...prev, expiredDate: e.target.value }))} />
+            </label>
+
+            <label className={styles.label}>
+              <input className={styles.toggleInput} type="checkbox" checked={draft.isActive} onChange={(e) => setDraft((prev) => ({ ...prev, isActive: e.target.checked }))} />
+              Active
+              <div className={`${styles.toggleTrack}${draft.isActive ? ` ${styles.toggleTrackOn}` : ""}`}>
+                <div className={`${styles.toggleThumb}${draft.isActive ? ` ${styles.toggleThumbOn}` : ""}`} />
+              </div>
             </label>
           </div>
 

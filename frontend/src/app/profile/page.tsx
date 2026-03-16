@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
       return counts;
     },
-    { card: 1, chip: 1, table: 1 }
+    { card: 0, chip: 0, table: 0 }
   );
 
   const primaryRole = user.role.toUpperCase();

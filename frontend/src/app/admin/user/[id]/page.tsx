@@ -28,7 +28,6 @@ export default function AdminUserEditPage() {
   const [draft, setDraft] = useState<AdminUserDraft | null>(null);
 
   const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -103,21 +102,7 @@ export default function AdminUserEditPage() {
   };
 
   const handleDelete = async () => {
-    if (!user) return;
-
-    const confirmed = window.confirm(`Delete player ${user.username}? This action cannot be undone.`);
-    if (!confirmed) return;
-
-    setIsDeleting(true);
-    setError("");
-
-    try {
-      await AdminService.deleteUser(userId);
-      router.push("/admin/user");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to delete user");
-      setIsDeleting(false);
-    }
+    // Deleted handler removed
   };
 
   if (status === "loading") {
@@ -178,11 +163,8 @@ export default function AdminUserEditPage() {
               </div>
 
               <div className={styles.actionRow}>
-                <button type="button" className={styles.saveButton} onClick={handleSave} disabled={isSaving || isDeleting}>
+                <button type="button" className={styles.saveButton} onClick={handleSave} disabled={isSaving}>
                   {isSaving ? "Saving..." : "Save User"}
-                </button>
-                <button type="button" className={styles.deleteButton} onClick={handleDelete} disabled={isSaving || isDeleting || user?.id === authUserId}>
-                  {isDeleting ? "Deleting..." : "Delete User"}
                 </button>
               </div>
             </>

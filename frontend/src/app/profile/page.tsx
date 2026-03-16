@@ -1,13 +1,13 @@
 "use client";
 
+import Navbar from "@components/Navbar";
+import ProfileAvatar from "@components/ProfileAvatar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 
-import Navbar from "../components/Navbar";
-import ProfileAvatar from "../components/ProfileAvatar";
 import styles from "./page.module.css";
 
 export default function ProfilePage() {

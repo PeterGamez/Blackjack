@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -11,7 +12,6 @@ import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getC
 
 import config from "@/config";
 
-import Navbar from "../../../components/Navbar";
 import styles from "./page.module.css";
 
 interface Card {

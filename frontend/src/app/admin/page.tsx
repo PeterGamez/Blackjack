@@ -1,12 +1,12 @@
 "use client";
 
+import Navbar from "@components/Navbar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserService from "@lib/UserService";
 
-import Navbar from "../components/Navbar";
 import styles from "./page.module.css";
 
 export default function AdminPage() {

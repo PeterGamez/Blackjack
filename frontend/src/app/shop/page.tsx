@@ -34,6 +34,18 @@ const CARD_PREVIEW_STYLE = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
 };
 
+function getProductPayment(product: ProductInterface): { type: "coins" | "tokens"; amount: number } | null {
+  if (product.coins > 0) {
+    return { type: "coins", amount: product.coins };
+  }
+
+  if (product.tokens > 0) {
+    return { type: "tokens", amount: product.tokens };
+  }
+
+  return null;
+}
+
 function StorePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,6 +56,7 @@ function StorePageContent() {
   const [buying, setBuying] = useState<number | null>(null);
   const [message, setMessage] = useState<{ id: number; text: string; ok: boolean } | null>(null);
   const [coins, setCoins] = useState<number>(0);
+  const [tokens, setTokens] = useState<number>(0);
 
   const active = hovered || selected;
 
@@ -66,6 +79,10 @@ function StorePageContent() {
 
       if (typeof data.coins === "number" && !cancelled) {
         setCoins(data.coins);
+      }
+
+      if (typeof data.tokens === "number" && !cancelled) {
+        setTokens(data.tokens);
       }
 
       const inventorySet = new Set<number>((data.inventory ?? []).map((item) => item.productId));
@@ -119,17 +136,33 @@ function StorePageContent() {
   }, [owned, products, selected]);
 
   const buy = async (p: ProductInterface) => {
+    const payment = getProductPayment(p);
+    if (!payment) {
+      setMessage({ id: p.id, text: "This product is not purchasable", ok: false });
+      return;
+    }
+
     setBuying(p.id);
     setMessage(null);
 
     try {
-      await ShopService.buyProduct(p.id, "coins");
+      await ShopService.buyProduct(p.id, payment.type);
       setOwned((prev) => new Set([...prev, p.id]));
-      setCoins((prev) => {
-        const nextCoins = prev - p.coins;
-        LocalStorage.setItem("coins", nextCoins.toString());
-        return nextCoins;
-      });
+
+      if (payment.type === "coins") {
+        setCoins((prev) => {
+          const nextCoins = prev - payment.amount;
+          LocalStorage.setItem("coins", nextCoins.toString());
+          return nextCoins;
+        });
+      } else {
+        setTokens((prev) => {
+          const nextTokens = prev - payment.amount;
+          LocalStorage.setItem("tokens", nextTokens.toString());
+          return nextTokens;
+        });
+      }
+
       setMessage({ id: p.id, text: "Purchased!", ok: true });
     } catch (error) {
       const messageText = error instanceof Error ? error.message : "Network error";
@@ -167,6 +200,12 @@ function StorePageContent() {
               const isOwned = owned.has(p.id);
               const isLoading = buying === p.id;
               const msg = message?.id === p.id ? message : null;
+              const payment = getProductPayment(p);
+              const isTokenPayment = payment?.type === "tokens";
+              const balance = isTokenPayment ? tokens : coins;
+              const canAfford = Boolean(payment) && balance >= (payment?.amount ?? 0);
+              const currencyLabel = isTokenPayment ? "token" : "coin";
+              const priceText = payment ? `${NUMBER_FORMATTER.format(payment.amount)} ${currencyLabel}` : "Not for sale";
 
               return (
                 <div key={p.id} className={styles.product}>
@@ -192,19 +231,19 @@ function StorePageContent() {
                       <span style={{ color: "#2f6b2f", fontWeight: 700 }}>Owned</span>
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                        <span>🪙 {NUMBER_FORMATTER.format(p.coins)}</span>
+                        <span>{isTokenPayment ? "🎟️" : "🪙"} {priceText}</span>
                         <button
                           onClick={() => void buy(p)}
-                          disabled={isLoading || coins < p.coins}
+                          disabled={isLoading || !canAfford}
                           style={{
                             marginTop: 2,
                             padding: "4px 18px",
                             borderRadius: 12,
                             border: "none",
-                            background: coins < p.coins ? "#aaa" : "#1F2A44",
+                            background: canAfford ? "#1F2A44" : "#aaa",
                             color: "#fff",
                             fontWeight: 700,
-                            cursor: coins < p.coins ? "not-allowed" : "pointer",
+                            cursor: canAfford ? "pointer" : "not-allowed",
                             fontSize: 13,
                           }}>
                           {isLoading ? "..." : "Buy"}

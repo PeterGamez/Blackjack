@@ -1,5 +1,6 @@
 export default {
     site: {
+        name: process.env.SITE_NAME || "Blackjack",
         url: process.env.SITE_URL || "http://localhost:3000",
     },
     api: {
@@ -25,7 +26,6 @@ export default {
             user: process.env.EMAIL_USER || "",
             pass: process.env.EMAIL_PASS || "",
         },
-        from: process.env.EMAIL_FROM || "",
 
         verifyExpiresIn: 30, // minutes
         resetPasswordExpiresIn: 30, // minutes

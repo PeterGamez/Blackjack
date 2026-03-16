@@ -57,7 +57,7 @@ export class Email {
         const verificationUrl = `${this.server.config.site.url}/auth/verify?token=${verificationToken}`;
 
         await this.transporter.sendMail({
-            from: this.server.config.email.from,
+            from: `noreply ${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
             to: email,
             subject: "Verify Your Email - Blackjack",
             html: this.htmlVerifyEmail(verificationUrl),
@@ -86,7 +86,7 @@ export class Email {
         const resetUrl = `${this.server.config.site.url}/auth/reset-password?token=${resetToken}`;
 
         await this.transporter.sendMail({
-            from: this.server.config.email.from,
+            from: `noreply ${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
             to: email,
             subject: "Password Reset - Blackjack",
             html: this.htmlResetPasswordEmail(resetUrl),

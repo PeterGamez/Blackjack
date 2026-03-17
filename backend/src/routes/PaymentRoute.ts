@@ -23,16 +23,22 @@ export default class PaymentRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
 
         this.app.get("/packages", async (c) => {
-            const packages = await PackageModel.selectAllActivePackages();
+            try {
+                const packages = await PackageModel.selectAllActivePackages();
 
-            const response = packages.map((pack) => ({
-                id: pack.id,
-                image: pack.image,
-                price: pack.price,
-                tokens: pack.tokens,
-            }));
+                const response = packages.map((pack) => ({
+                    id: pack.id,
+                    image: pack.image,
+                    price: pack.price,
+                    tokens: pack.tokens,
+                }));
 
-            return c.json(response);
+                return c.json(response);
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error fetching packages:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
         });
 
         this.app.post("/bank", async (c) => {
@@ -73,7 +79,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 const data = response.data;
 
-                if (pack.price != data.paidLocalAmount) {
+                if (pack.price !== data.paidLocalAmount) {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
@@ -113,7 +119,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Package not found" }, 404);
                 }
 
-                if (verifyResponse.status.code != "SUCCESS") {
+                if (verifyResponse.status.code !== "SUCCESS") {
                     const statusErrors: Record<string, string> = {
                         INVALID_INPUT: "Invalid voucher URL",
                         VOUCHER_OUT_OF_STOCK: "Voucher has already been redeemed",
@@ -123,17 +129,17 @@ export default class PaymentRoute implements RouteInterface {
                 }
 
                 const voucher = verifyResponse.data.voucher;
-                if (voucher.member != 1) {
+                if (voucher.member !== 1) {
                     return c.json({ error: "Must have exactly 1 recipient" }, 400);
                 }
 
                 const redeemAmount = parseFloat(voucher.amount_baht);
-                if (pack.price != redeemAmount) {
+                if (pack.price !== redeemAmount) {
                     return c.json({ error: "Redeemed amount does not match package price" }, 400);
                 }
 
                 const redeemResponse = await this.server.Truemoney.request(url);
-                if (redeemResponse.status.code != "SUCCESS") {
+                if (redeemResponse.status.code !== "SUCCESS") {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 

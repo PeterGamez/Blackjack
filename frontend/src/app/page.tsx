@@ -32,8 +32,8 @@ const activityItems = [
   },
   {
     key: "high-stake",
-    title: "High Stake Table",
-    subtitle: "High stake table is now open",
+    title: "Prove your LUCK",
+    subtitle: "Get 21 at start? That's Blackjack — earn 1.5x reward!",
     action: "Play Now",
     badge: "LIVE",
     path: "/play",

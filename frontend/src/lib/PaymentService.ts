@@ -67,6 +67,17 @@ export default class PaymentService {
     return data as PaymentPackageInterface[];
   }
 
+  public static async getPackageById(packageId: number): Promise<PaymentPackageInterface> {
+    const packages = await this.getPackages();
+    const selectedPackage = packages.find((pkg) => pkg.id === packageId);
+
+    if (!selectedPackage) {
+      throw new Error("Package not found");
+    }
+
+    return selectedPackage;
+  }
+
   public static async payByBankSlip(packageId: number, image: File): Promise<void> {
     const body = new FormData();
     body.append("image", image);

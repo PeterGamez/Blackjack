@@ -3,10 +3,11 @@
 import Navbar from "@components/Navbar";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
+import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
 
@@ -14,16 +15,57 @@ function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const packageId = Number(searchParams.get("packageId"));
-  const buyTokens = searchParams.get("tokens");
-  const price = searchParams.get("price");
+  const packageId = useMemo(() => Number(searchParams.get("packageId")), [searchParams]);
 
   const [method, setMethod] = useState("");
   const [truemoneyUrl, setTruemoneyUrl] = useState("");
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPackage, setIsLoadingPackage] = useState(true);
+  const [selectedPackage, setSelectedPackage] = useState<PaymentPackageInterface | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    const initPaymentPage = async () => {
+      setErrorMessage("");
+
+      if (!packageId || Number.isNaN(packageId)) {
+        setErrorMessage("Invalid package. Please return and select a package again.");
+        setIsLoadingPackage(false);
+        return;
+      }
+
+      try {
+        const user = await UserService.getUser();
+        if (!user) {
+          router.replace("/auth");
+          return;
+        }
+
+        const paymentPackage = await PaymentService.getPackageById(packageId);
+        setSelectedPackage(paymentPackage);
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : "Failed to load package");
+      } finally {
+        setIsLoadingPackage(false);
+      }
+    };
+
+    initPaymentPage();
+  }, [packageId, router]);
+
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      router.push("/topup");
+    }, 2500);
+
+    return () => window.clearTimeout(timeout);
+  }, [successMessage, router]);
 
   const handleConfirmPayment = async () => {
     setErrorMessage("");
@@ -31,6 +73,11 @@ function PaymentContent() {
 
     if (!packageId || Number.isNaN(packageId)) {
       setErrorMessage("Invalid package. Please return and select a package again.");
+      return;
+    }
+
+    if (!selectedPackage) {
+      setErrorMessage("Package not loaded. Please try again.");
       return;
     }
 
@@ -61,13 +108,16 @@ function PaymentContent() {
       }
 
       await UserService.getUser();
-      setSuccessMessage("Payment successful. Your tokens have been updated.");
+      setSuccessMessage("Payment successful. Your tokens have been updated. Redirecting...");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Payment failed");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const displayTokens = selectedPackage?.tokens ?? 0;
+  const displayPrice = selectedPackage?.price ?? 0;
 
   return (
     <div className={styles.page}>
@@ -88,24 +138,24 @@ function PaymentContent() {
             <div className={styles.summaryBody}>
               <div className={styles.summaryRow}>
                 <span>Package</span>
-                <span>{Number(buyTokens).toLocaleString()} Tokens</span>
+                <span>{isLoadingPackage ? "Loading..." : `${displayTokens.toLocaleString()} Tokens`}</span>
               </div>
 
               <div className={`${styles.summaryRow} ${styles.summaryRowSpaced}`}>
                 <span>Price</span>
-                <span>{price} THB</span>
+                <span>{isLoadingPackage ? "Loading..." : `${displayPrice} THB`}</span>
               </div>
 
               <hr className={styles.summaryDivider} />
 
               <div className={styles.summaryTotal}>
                 <span>Total</span>
-                <span>{price} THB</span>
+                <span>{isLoadingPackage ? "Loading..." : `${displayPrice} THB`}</span>
               </div>
             </div>
           </div>
 
-          <button className={styles.confirmButton} onClick={handleConfirmPayment} disabled={isSubmitting}>
+          <button className={styles.confirmButton} onClick={handleConfirmPayment} disabled={isSubmitting || isLoadingPackage || !selectedPackage}>
             {isSubmitting ? "PROCESSING..." : "CONFIRM PAYMENT"}
           </button>
 

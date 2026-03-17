@@ -4,17 +4,20 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminProduct } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { ProductInterface } from "@/interfaces/Admin/ProductInterface";
+import { CurrencyType } from "@/interfaces/CurrencyType";
 
 import styles from "../page.module.css";
 
-type AdminProductDraft = Omit<AdminProduct, "tokens" | "coins"> & {
+type AdminProductDraft = Omit<ProductInterface, CurrencyType> & {
   tokens: string;
   coins: string;
 };
 
-const mapProductToDraft = (product: AdminProduct): AdminProductDraft => ({
+const mapProductToDraft = (product: ProductInterface): AdminProductDraft => ({
   ...product,
   tokens: product.tokens.toString(),
   coins: product.coins.toString(),
@@ -26,7 +29,7 @@ export default function AdminProductEditPage() {
   const productId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [product, setProduct] = useState<AdminProduct>(null);
+  const [product, setProduct] = useState<ProductInterface>(null);
   const [draft, setDraft] = useState<AdminProductDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");

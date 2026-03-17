@@ -10,7 +10,7 @@ import LocalStorage from "./LocalStorage";
 interface UpdateAdminUserPayload {
   username?: string;
   email?: string;
-  role?: "user" | "vip" | "admin";
+  role?: UserInterface["role"];
   tokens?: number;
   coins?: number;
   isVerified?: boolean;
@@ -28,7 +28,7 @@ interface CreateAdminCodePayload {
 interface UpdateAdminCodePayload {
   code?: string;
   amount?: number;
-  type?: "coins" | "tokens";
+  type?: CodeInterface["type"];
   maxUses?: number;
   isActive?: boolean;
   expiredDate?: string;
@@ -55,7 +55,7 @@ interface CreateAdminProductPayload {
   path: string;
   tokens: number;
   coins: number;
-  type: "card" | "chip" | "table";
+  type: ProductInterface["type"];
   isRecommend: boolean;
   isActive: boolean;
 }
@@ -67,7 +67,7 @@ interface UpdateAdminProductPayload {
   path?: string;
   tokens?: number;
   coins?: number;
-  type?: "card" | "chip" | "table";
+  type?: ProductInterface["type"];
   isRecommend?: boolean;
   isActive?: boolean;
 }

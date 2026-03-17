@@ -1,6 +1,9 @@
 import { UserInterface } from "@interfaces/API/UserInterface";
 
 import config from "@/config";
+import { GameHistoryInterface } from "@/interfaces/API/GameHistoryInterface";
+import { PaymentHistoryInterface } from "@/interfaces/API/PaymentHistoryInterface";
+import { CurrencyType } from "@/interfaces/CurrencyType";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
@@ -112,18 +115,7 @@ export default class UserService {
     return null;
   }
 
-  public static async getGameHistory(): Promise<
-    Array<{
-      role: "player" | "dealer";
-      result: "win" | "lose" | "draw" | "blackjack";
-      score: number;
-      opponentScore: number;
-      bet: number;
-      mode: number;
-      reward: number;
-      createdAt: string;
-    }>
-  > {
+  public static async getGameHistory(): Promise<GameHistoryInterface[]> {
     try {
       const response = await this.authenticatedFetch("/user/game-history", { cache: "no-store" });
 
@@ -131,19 +123,44 @@ export default class UserService {
         return [];
       }
 
-      return (await response.json()) as Array<{
-        role: "player" | "dealer";
-        result: "win" | "lose" | "draw" | "blackjack";
-        score: number;
-        opponentScore: number;
-        bet: number;
-        mode: number;
-        reward: number;
-        createdAt: string;
-      }>;
+      return await response.json();
     } catch (error) {
       console.error("Fetch game history error:", error);
       return [];
+    }
+  }
+
+  public static async getPaymentHistorys(): Promise<PaymentHistoryInterface[]> {
+    try {
+      const response = await this.authenticatedFetch("/user/payment-history", { cache: "no-store" });
+
+      if (!response?.ok) {
+        return [];
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Fetch payment history error:", error);
+      return [];
+    }
+  }
+
+  public static async redeemCode(code: string): Promise<{ message: string; amount: number; type: CurrencyType }> {
+    try {
+      const response = await this.authenticatedFetch("/user/redeem-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!response?.ok) {
+        throw new Error("Redeem code failed");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Redeem code error:", error);
+      throw error;
     }
   }
 }

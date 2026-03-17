@@ -76,6 +76,9 @@ export default function Dealer() {
   }, [playerChips]);
   const [message, setMessage] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [showWinPopup, setShowWinPopup] = useState(false);
+  const [showLosePopup, setShowLosePopup] = useState(false);
+  const [showDrawPopup, setShowDrawPopup] = useState(false);
   const [gameId, setGameId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
@@ -90,6 +93,7 @@ export default function Dealer() {
   const [forceNextHitCard, setForceNextHitCard] = useState<boolean>(false);
   const [forcedSuit, setForcedSuit] = useState<string>("♠");
   const [forcedRank, setForcedRank] = useState<string>("A");
+
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const standResolveRef = useRef(false);
 
@@ -264,6 +268,39 @@ export default function Dealer() {
       socketRef.current?.disconnect();
     };
   }, [router]);
+  
+  useEffect(() => {
+  const lower = result.toLowerCase();
+
+  setShowWinPopup(false);
+  setShowLosePopup(false);
+
+ if (lower.includes("you win")) {
+    setShowWinPopup(true);
+  } else if (lower.includes("lose") || lower.includes("dealer wins") || lower.includes("bust")) {
+    setShowLosePopup(true);
+  }
+}, [result]);
+
+  useEffect(() => {
+  const lower = result.toLowerCase();
+
+  setShowWinPopup(false);
+  setShowLosePopup(false);
+  setShowDrawPopup(false);
+
+  if (lower.includes("you win")) {
+    setShowWinPopup(true);
+  } else if (lower.includes("draw")) {
+    setShowDrawPopup(true);
+  } else if (
+    lower.includes("lose") ||
+    lower.includes("dealer wins") ||
+    lower.includes("bust")
+  ) {
+    setShowLosePopup(true);
+  }
+}, [result]);
 
   const startGame = (betAmount: number) => {
     if (betAmount <= 0 || betAmount > playerChips) {
@@ -500,6 +537,142 @@ export default function Dealer() {
 
             {result && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
           </div>
+          {result && !showWinPopup && (
+  <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>
+    {result}
+  </div>
+)}
+
+{showWinPopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.winTitle}>You Win!</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: +{bet} chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+        <div className={styles.divider}></div>
+        
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowWinPopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          PLAY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showLosePopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.loseTitle}>You Lose</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: -{bet} chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowLosePopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          TRY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showDrawPopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.drawTitle}>Draw</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: 0 chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowDrawPopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          PLAY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
           {isAdmin && gameStatus === "playing" && (
             <div className={styles.adminHitDock}>

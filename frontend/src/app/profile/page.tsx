@@ -129,6 +129,9 @@ export default function ProfilePage() {
             <button type="button" onClick={() => router.push("/profile/history")} className={`${styles.sideButton} ${styles.historyButton}`}>
               History
             </button>
+            <button type="button" onClick={() => router.push("/profile/change-password")} className={`${styles.sideButton} ${styles.passwordButton}`}>
+              Change Password
+            </button>
             {user.role === "admin" && (
               <button type="button" onClick={() => router.push("/admin")} className={`${styles.sideButton} ${styles.adminButton}`}>
                 Admin Panel

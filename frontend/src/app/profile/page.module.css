@@ -103,6 +103,10 @@
   background: linear-gradient(180deg, #6ea0dc 0%, #4d74b6 100%);
 }
 
+.passwordButton {
+  background: linear-gradient(180deg, #de9b61 0%, #b86b34 100%);
+}
+
 .adminButton {
   background: linear-gradient(180deg, #5bbd73 0%, #358a4d 100%);
 }

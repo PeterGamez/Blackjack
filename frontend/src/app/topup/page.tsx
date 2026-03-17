@@ -33,6 +33,7 @@ export default function TopupPage() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.pageTopBar} aria-hidden="true" />
       <Navbar />
 
       <button onClick={() => router.push("/")} className={styles.backButton}>

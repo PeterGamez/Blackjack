@@ -136,15 +136,13 @@
 .placeholderWrap {
   flex: 1;
   display: flex;
-  align-items: flex-start;
-  padding-top: clamp(28px, 8vh, 100px);
-  padding-left: 6px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .activityBoard {
   width: 270px;
-  height: min(500px, calc(100vh - 340px));
-  min-height: 380px;
+  height: 500px;
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(17, 26, 42, 0.9) 0%, rgba(12, 18, 31, 0.92) 100%);
   border: 1px solid rgba(224, 189, 112, 0.4);
@@ -354,13 +352,19 @@
 
 @media (max-width: 480px) {
   .content {
-    padding: 80px 16px 40px;
+    position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 60px 56px;
   }
 
   .placeholderWrap {
-    padding-top: 0;
-    justify-content: center;
-    align-items: flex-start;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .activityBoard {

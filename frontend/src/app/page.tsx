@@ -17,24 +17,24 @@ const activityItems = [
   {
     key: "new-skin",
     title: "New Skin Drop",
-    subtitle: "ปลดล็อกสกินใหม่ในร้านค้า",
-    action: "ดูสกิน",
+    subtitle: "Unlock new skins in the shop",
+    action: "View Skins",
     badge: "NEW",
-    path: "/skin",
+    path: "/shop",
   },
   {
     key: "topup-bonus",
     title: "Topup x2",
-    subtitle: "เติมเงินวันนี้ รับโบนัสคูณ 2",
-    action: "เติมเลย",
+    subtitle: "Top up today and get double bonus",
+    action: "Top Up Now",
     badge: "HOT",
     path: "/topup",
   },
   {
     key: "high-stake",
     title: "High Stake Table",
-    subtitle: "โต๊ะเดิมพันสูงเปิดแล้ว",
-    action: "ไปเล่น",
+    subtitle: "High stake table is now open",
+    action: "Play Now",
     badge: "LIVE",
     path: "/play",
   },
@@ -58,7 +58,7 @@ export default function Home() {
           <section className={styles.activityBoard} aria-label="กิจกรรมเด่น">
             <div className={styles.activityHeader}>
               <p className={styles.activityEyebrow}>Lobby Board</p>
-              <h2 className={styles.activityTitle}>กิจกรรมแนะนำ</h2>
+              <h2 className={styles.activityTitle}>Featured Activities</h2>
             </div>
 
             <div className={styles.activityList}>

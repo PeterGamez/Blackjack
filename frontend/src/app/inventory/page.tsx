@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
 import AuthService from "@/lib/AuthService";
 import ShopService from "@/lib/ShopService";
@@ -17,17 +17,16 @@ import ShopService from "@/lib/ShopService";
 import styles from "./page.module.css";
 
 interface SkinItem {
-  path: string; // folder name used in /cards/{id}/
+  path: string;
   name: string;
-  preview: string; // image path for preview
   productId: number;
   type: ProductInterface["type"];
 }
 
 const BUILT_IN_SKINS: Record<ProductInterface["type"], SkinItem[]> = {
-  card: [{ path: "default", name: "Default Card", preview: "/cards/default/backcard.png", productId: 0, type: "card" }],
-  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chips100.png", productId: 0, type: "chip" }],
-  table: [{ path: "default", name: "Default Table", preview: "/tables/default/table.png", productId: 0, type: "table" }],
+  card: [{ path: "default", name: "Default Card", productId: 0, type: "card" }],
+  chip: [{ path: "default", name: "Default Chip", productId: 0, type: "chip" }],
+  table: [{ path: "default", name: "Default Table", productId: 0, type: "table" }],
 };
 
 const TABS: ProductInterface["type"][] = ["card", "chip", "table"];
@@ -148,7 +147,6 @@ export default function InventoryPage() {
             ownedByType.card.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "card",
             });
@@ -159,7 +157,6 @@ export default function InventoryPage() {
             ownedByType.chip.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "chip",
             });
@@ -170,7 +167,6 @@ export default function InventoryPage() {
             ownedByType.table.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "table",
             });
@@ -321,7 +317,7 @@ export default function InventoryPage() {
                       </div>
                     ) : (
                       <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-                        <Image src={skin.preview} alt={skin.name} width={120} height={120} unoptimized style={{ objectFit: "contain", maxWidth: "90%", maxHeight: "90%" }} />
+                        <Image src={getTableImage(skin.path)} alt={skin.name} width={120} height={120} unoptimized style={{ objectFit: "contain", maxWidth: "90%", maxHeight: "90%" }} />
                       </div>
                     )}
                   </div>

@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getChipImage } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getChipImage, getTableImage } from "@lib/skinUtils";
 
 import ShopService from "@/lib/ShopService";
 
@@ -282,17 +282,15 @@ function StorePageContent() {
                           );
                         })}
                       </div>
-                    ) : p.image ? (
+                    ) : (
                       <Image
-                        src={p.image}
+                        src={getTableImage(p.path)}
                         alt={p.name}
                         width={isRecommendTab ? 180 : 100}
                         height={isRecommendTab ? 180 : 100}
                         unoptimized
                         style={{ objectFit: "contain", maxWidth: isRecommendTab ? "90%" : "80%", maxHeight: isRecommendTab ? "90%" : "80%" }}
                       />
-                    ) : (
-                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "table" ? "Table" : "Theme"}</strong>
                     )}
                   </div>
                   <div className={styles.productInfo}>

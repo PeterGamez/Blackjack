@@ -45,7 +45,7 @@ export default function TopupPage() {
       <div className={styles.gridShell}>
         <div className={styles.grid}>
           {PACKAGES.map((pkg) => (
-            <div key={pkg.tokens} className={styles.packageCard} onClick={() => router.push(`/payment?tokens=${pkg.tokens}&price=${pkg.price}`)}>
+            <div key={pkg.tokens} className={styles.packageCard} onClick={() => router.push(`/topup/payment?tokens=${pkg.tokens}&price=${pkg.price}`)}>
               <div className={styles.packageInfo}>
                 {pkg.tokens.toLocaleString()} Token
                 <br />

@@ -90,6 +90,7 @@ export class SlipOK {
     public async request(file: File): Promise<SlipOKResponse & ErrorResponse> {
         const formData = new FormData();
         formData.append("files", file);
+        formData.append("log", "true");
 
         const response = await fetch(`${this.API_URL}/api/line/apikey/${this.server.config.slipok.branch}`, {
             method: "POST",

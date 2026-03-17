@@ -476,7 +476,6 @@ export default class AdminRoute implements RouteInterface {
                     id: product.id,
                     name: product.name,
                     description: product.description,
-                    image: product.image,
                     path: product.path,
                     tokens: product.tokens,
                     coins: product.coins,
@@ -496,16 +495,15 @@ export default class AdminRoute implements RouteInterface {
 
         this.app.post("/product", async (c) => {
             try {
-                let body: { name: string; description: string; image: string; path: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
+                let body: { name: string; description: string; path: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
                 try {
                     body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
+                const { name, description, path, tokens, coins, type, isRecommend, isActive } = body;
 
-                const { name, description, image, path, tokens, coins, type, isRecommend, isActive } = body;
-
-                if (!name || !description || !image || !path || tokens === undefined || coins === undefined || !type || isRecommend === undefined || isActive === undefined) {
+                if (!name || !description || !path || tokens === undefined || coins === undefined || !type || typeof isRecommend !== "boolean" || typeof isActive !== "boolean") {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
@@ -525,7 +523,7 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "isActive must be a boolean" }, 400);
                 }
 
-                await ProductModel.insertProduct(name, description, image, path, tokens, coins, type, isRecommend, isActive);
+                await ProductModel.insertProduct(name, description, path, tokens, coins, type, isRecommend, isActive);
 
                 return c.json({ message: "Product created successfully" });
             } catch (error) {
@@ -551,7 +549,6 @@ export default class AdminRoute implements RouteInterface {
                     id: product.id,
                     name: product.name,
                     description: product.description,
-                    image: product.image,
                     path: product.path,
                     tokens: product.tokens,
                     coins: product.coins,
@@ -576,17 +573,7 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Invalid product ID" }, 400);
                 }
 
-                let body: {
-                    name?: string;
-                    description?: string;
-                    image?: string;
-                    path?: string;
-                    tokens?: number;
-                    coins?: number;
-                    type?: ProductInterface["type"];
-                    isRecommend?: boolean;
-                    isActive?: boolean;
-                };
+                let body: { name?: string; description?: string; path?: string; tokens?: number; coins?: number; type?: ProductInterface["type"]; isRecommend?: boolean; isActive?: boolean; };
 
                 try {
                     body = await c.req.json();
@@ -594,9 +581,9 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
 
-                const { name, description, image, path, tokens, coins, type, isRecommend, isActive } = body;
+                const { name, description, path, tokens, coins, type, isRecommend, isActive } = body;
 
-                if (!name && !description && !image && !path && tokens === undefined && coins === undefined && !type && isRecommend === undefined && isActive === undefined) {
+                if (!name && !description && !path && tokens === undefined && coins === undefined && !type && isRecommend === undefined && isActive === undefined) {
                     return c.json({ error: "No update fields provided" }, 400);
                 }
 
@@ -632,9 +619,6 @@ export default class AdminRoute implements RouteInterface {
                 }
                 if (description) {
                     await ProductModel.updateProduct(productId, "description", description);
-                }
-                if (image) {
-                    await ProductModel.updateProduct(productId, "image", image);
                 }
                 if (path) {
                     await ProductModel.updateProduct(productId, "path", path);

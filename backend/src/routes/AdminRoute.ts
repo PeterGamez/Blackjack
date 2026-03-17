@@ -573,7 +573,7 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Invalid product ID" }, 400);
                 }
 
-                let body: { name?: string; description?: string; path?: string; tokens?: number; coins?: number; type?: ProductInterface["type"]; isRecommend?: boolean; isActive?: boolean; };
+                let body: { name?: string; description?: string; path?: string; tokens?: number; coins?: number; type?: ProductInterface["type"]; isRecommend?: boolean; isActive?: boolean };
 
                 try {
                     body = await c.req.json();

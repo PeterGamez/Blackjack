@@ -124,7 +124,7 @@ export default class GameController {
         };
     }
 
-    public static async hitGame(gameId: number, userId: number): Promise<HitResult> {
+    public static async hitGame(gameId: number, userId: number, forcedCard?: { suit: string; rank: string }): Promise<HitResult> {
         const gameState = await GameState.getGameState(gameId);
         if (!gameState || gameState.userId !== userId) {
             return { ok: false, message: "Game not found or unauthorized" };
@@ -139,7 +139,24 @@ export default class GameController {
             return { ok: false, message: "Deck is empty" };
         }
 
-        playerHand.push(deck.shift()!);
+        let nextCard: Card;
+        if (forcedCard) {
+            const user = await UserModel.selectUser(userId);
+            if (!user || user.role !== "admin") {
+                return { ok: false, message: "Forced hit card is admin-only" };
+            }
+
+            const forcedCardIndex = deck.findIndex((card) => card.suit === forcedCard.suit && card.rank === forcedCard.rank);
+            if (forcedCardIndex === -1) {
+                return { ok: false, message: "Selected card is not available in current deck" };
+            }
+
+            nextCard = deck.splice(forcedCardIndex, 1)[0];
+        } else {
+            nextCard = deck.shift()!;
+        }
+
+        playerHand.push(nextCard);
         const playerValue = this.server.Blackjack.calcValue(playerHand);
         gameState.playerHand = JSON.stringify(playerHand);
         gameState.playerValue = playerValue;

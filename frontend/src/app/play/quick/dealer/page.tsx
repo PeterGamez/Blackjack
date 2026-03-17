@@ -26,6 +26,11 @@ interface ChipStack {
   image: string;
 }
 
+interface ForcedCardPayload {
+  suit: string;
+  rank: string;
+}
+
 interface GameStartAck {
   ok?: boolean;
   message?: string;
@@ -53,6 +58,8 @@ interface GameActionAck {
 type GameStatus = "betting" | "playing" | "game-over";
 
 const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
+const FORCED_CARD_SUITS = ["♠", "♥", "♦", "♣"];
+const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 export default function Dealer() {
   const router = useRouter();
@@ -78,6 +85,11 @@ export default function Dealer() {
   const [cardSkin, setCardSkin] = useState<string>("default");
   const [chipSkin, setChipSkin] = useState<string>("default");
   const [tableSkin, setTableSkin] = useState<string>("default");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdminHitDropdownOpen, setIsAdminHitDropdownOpen] = useState<boolean>(false);
+  const [forceNextHitCard, setForceNextHitCard] = useState<boolean>(false);
+  const [forcedSuit, setForcedSuit] = useState<string>("♠");
+  const [forcedRank, setForcedRank] = useState<string>("A");
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const standResolveRef = useRef(false);
 
@@ -162,6 +174,7 @@ export default function Dealer() {
 
       setUserId(user.id);
       setPlayerChips(user.coins);
+      setIsAdmin(user.role === "admin");
 
       LocalStorage.setItem("coins", user.coins.toString());
 
@@ -304,11 +317,19 @@ export default function Dealer() {
   const hit = () => {
     if (isLoading || !socketRef.current || !gameId || !userId) return;
     setIsLoading(true);
-    socketRef.current.emit("game:hit", { gameId, userId }, (ack: GameActionAck) => {
+    const payload: { gameId: number; userId: number; forcedCard?: ForcedCardPayload } = { gameId, userId };
+    if (isAdmin && forceNextHitCard) {
+      payload.forcedCard = { suit: forcedSuit, rank: forcedRank };
+    }
+
+    socketRef.current.emit("game:hit", payload, (ack: GameActionAck) => {
       setIsLoading(false);
       if (!ack?.ok) {
         setMessage(ack?.message || "Failed to hit");
         return;
+      }
+      if (isAdmin && forceNextHitCard) {
+        setForceNextHitCard(false);
       }
       setPlayerHand(ack.playerHand);
       if (ack.bust) {
@@ -479,6 +500,39 @@ export default function Dealer() {
 
             {result && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
           </div>
+
+          {isAdmin && gameStatus === "playing" && (
+            <div className={styles.adminHitDock}>
+              <button type="button" className={styles.adminHitDropdownButton} onClick={() => setIsAdminHitDropdownOpen((prev) => !prev)}>
+                Admin Hit Control {isAdminHitDropdownOpen ? "▴" : "▾"}
+              </button>
+
+              {isAdminHitDropdownOpen && (
+                <div className={styles.adminHitPanel}>
+                  <label className={styles.adminToggleRow}>
+                    <input type="checkbox" checked={forceNextHitCard} onChange={(e) => setForceNextHitCard(e.target.checked)} />
+                    Force next hit card
+                  </label>
+                  <div className={styles.adminSelectRow}>
+                    <select className={styles.adminSelect} value={forcedRank} onChange={(e) => setForcedRank(e.target.value)}>
+                      {FORCED_CARD_RANKS.map((rank) => (
+                        <option key={rank} value={rank}>
+                          {rank}
+                        </option>
+                      ))}
+                    </select>
+                    <select className={styles.adminSelect} value={forcedSuit} onChange={(e) => setForcedSuit(e.target.value)}>
+                      {FORCED_CARD_SUITS.map((suit) => (
+                        <option key={suit} value={suit}>
+                          {suit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className={styles.controls}>
@@ -497,14 +551,16 @@ export default function Dealer() {
           )}
 
           {gameStatus === "playing" && (
-            <div className={`${styles.controlsRow} ${styles.playingRow}`.trim()}>
-              <button onClick={hit} disabled={isLoading} className={`${styles.controlButton} ${styles.hitButton}`.trim()}>
-                HIT
-              </button>
-              <button onClick={stand} disabled={isLoading} className={`${styles.controlButton} ${styles.standButton}`.trim()}>
-                STAND
-              </button>
-            </div>
+            <>
+              <div className={`${styles.controlsRow} ${styles.playingRow}`.trim()}>
+                <button onClick={hit} disabled={isLoading} className={`${styles.controlButton} ${styles.hitButton}`.trim()}>
+                  HIT
+                </button>
+                <button onClick={stand} disabled={isLoading} className={`${styles.controlButton} ${styles.standButton}`.trim()}>
+                  STAND
+                </button>
+              </div>
+            </>
           )}
 
           {gameStatus === "game-over" && (

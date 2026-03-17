@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 14, 2026 at 10:49 AM
+-- Generation Time: Mar 17, 2026 at 07:13 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2
 -- PHP Version: 8.2.30
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `blackjack_dev`
+-- Database: `blackjack`
 --
 
 -- --------------------------------------------------------
@@ -117,6 +117,7 @@ CREATE TABLE `product` (
   `name` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
   `image` varchar(255) NOT NULL,
+  `path` varchar(10) NOT NULL,
   `tokens` int(11) NOT NULL,
   `coins` int(11) NOT NULL,
   `type` varchar(10) NOT NULL,
@@ -143,7 +144,7 @@ CREATE TABLE `user` (
   `isVerified` tinyint(1) NOT NULL DEFAULT 0,
   `cardId` int(11) DEFAULT NULL,
   `chipId` int(11) DEFAULT NULL,
-  `themeId` int(11) DEFAULT NULL,
+  `tableId` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

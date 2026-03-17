@@ -1,7 +1,18 @@
 .page {
+  position: relative;
   background: #e9edf3;
   min-height: 150vh;
   padding-top: 200px;
+}
+
+.pageTopBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 184px;
+  background: #1f2532;
+  z-index: 1;
 }
 
 .header {

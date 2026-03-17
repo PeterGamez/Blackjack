@@ -129,7 +129,7 @@ export default class UserRoute implements RouteInterface {
             }
         });
 
-        this.app.post("/me/password", async (c) => {
+        this.app.post("/password", async (c) => {
             try {
                 let body: { currentPassword: string; newPassword: string };
                 try {

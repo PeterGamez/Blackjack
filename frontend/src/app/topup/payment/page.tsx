@@ -5,16 +5,69 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import PaymentService from "@lib/PaymentService";
+import UserService from "@lib/UserService";
+
 import styles from "./page.module.css";
 
 function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const packageId = Number(searchParams.get("packageId"));
   const buyTokens = searchParams.get("tokens");
   const price = searchParams.get("price");
 
   const [method, setMethod] = useState("");
+  const [truemoneyUrl, setTruemoneyUrl] = useState("");
+  const [slipFile, setSlipFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleConfirmPayment = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!packageId || Number.isNaN(packageId)) {
+      setErrorMessage("Invalid package. Please return and select a package again.");
+      return;
+    }
+
+    if (!method) {
+      setErrorMessage("Please select a payment method.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      if (method === "qr") {
+        if (!slipFile) {
+          setErrorMessage("Please upload a payment slip image.");
+          return;
+        }
+
+        await PaymentService.payByBankSlip(packageId, slipFile);
+      }
+
+      if (method === "truemoney") {
+        if (!truemoneyUrl.trim()) {
+          setErrorMessage("Please paste your TrueMoney envelope URL.");
+          return;
+        }
+
+        await PaymentService.payByTrueMoney(packageId, truemoneyUrl.trim());
+      }
+
+      await UserService.getUser();
+      setSuccessMessage("Payment successful. Your tokens have been updated.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Payment failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -52,7 +105,12 @@ function PaymentContent() {
             </div>
           </div>
 
-          <button className={styles.confirmButton}>CONFIRM PAYMENT</button>
+          <button className={styles.confirmButton} onClick={handleConfirmPayment} disabled={isSubmitting}>
+            {isSubmitting ? "PROCESSING..." : "CONFIRM PAYMENT"}
+          </button>
+
+          {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+          {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
         </div>
 
         <div className={styles.methods}>
@@ -69,7 +127,16 @@ function PaymentContent() {
             <div className={`${styles.qrBody} ${method === "qr" ? styles.qrBodyOpen : ""}`}>
               <div className={styles.qrInner}>
                 <div className={styles.qrPreview}>QR Code</div>
-                <button className={styles.uploadButton}>⬆ UPLOAD SLIP</button>
+                <label className={styles.uploadButton}>
+                  ⬆ UPLOAD SLIP
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)}
+                    className={styles.hiddenFileInput}
+                  />
+                </label>
+                <div className={styles.selectedFileName}>{slipFile ? slipFile.name : "No file selected"}</div>
               </div>
             </div>
           </div>
@@ -83,7 +150,13 @@ function PaymentContent() {
                 <div className={styles.methodHint}>Paste The Gift Envelope Link</div>
 
                 <div className={`${styles.linkBody} ${method === "truemoney" ? styles.linkBodyOpen : ""}`}>
-                  <input placeholder="https://gift.truemoney.com/..." onClick={(e) => e.stopPropagation()} className={styles.linkInput} />
+                  <input
+                    placeholder="https://gift.truemoney.com/..."
+                    onClick={(e) => e.stopPropagation()}
+                    className={styles.linkInput}
+                    value={truemoneyUrl}
+                    onChange={(event) => setTruemoneyUrl(event.target.value)}
+                  />
                 </div>
               </div>
             </div>

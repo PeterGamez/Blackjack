@@ -18,6 +18,7 @@ type AdminPackageDraft = Omit<PackageInterface, "price" | "tokens"> & {
 
 const mapPackageToDraft = (pkg: PackageInterface): AdminPackageDraft => ({
   ...pkg,
+  image: pkg.image ?? "",
   price: pkg.price.toString(),
   tokens: pkg.tokens.toString(),
 });
@@ -138,7 +139,7 @@ export default function AdminPackageEditPage() {
               <div className={styles.grid} style={{ marginTop: 18 }}>
                 <label className={styles.label}>
                   Image URL
-                  <input className={styles.input} value={draft.image} onChange={(e) => handleDraftChange("image", e.target.value)} />
+                  <input className={styles.input} value={draft.image ?? ""} onChange={(e) => handleDraftChange("image", e.target.value)} />
                 </label>
 
                 <label className={styles.label}>

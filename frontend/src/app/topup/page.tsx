@@ -2,33 +2,35 @@
 
 import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
+import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
 
-interface Package {
-  tokens: number;
-  price: number;
-}
-
-const PACKAGES: Package[] = [
-  { tokens: 350, price: 35 },
-  { tokens: 1100, price: 99 },
-  { tokens: 2100, price: 179 },
-  { tokens: 4500, price: 349 },
-  { tokens: 10000, price: 729 },
-  { tokens: 28000, price: 1800 },
-];
-
 export default function TopupPage() {
   const router = useRouter();
+  const [packages, setPackages] = useState<PaymentPackageInterface[]>([]);
 
   useEffect(() => {
-    UserService.getUser().then((data) => {
-      if (!data) router.replace("/auth");
-    });
+    const initPage = async () => {
+      const user = await UserService.getUser();
+      if (!user) {
+        router.replace("/auth");
+        return;
+      }
+
+      try {
+        const paymentPackages = await PaymentService.getPackages();
+        setPackages(paymentPackages);
+      } catch (error) {
+        console.error("Failed to load payment packages:", error);
+      }
+    };
+
+    initPage();
   }, [router]);
 
   return (
@@ -44,8 +46,8 @@ export default function TopupPage() {
 
       <div className={styles.gridShell}>
         <div className={styles.grid}>
-          {PACKAGES.map((pkg) => (
-            <div key={pkg.tokens} className={styles.packageCard} onClick={() => router.push(`/topup/payment?tokens=${pkg.tokens}&price=${pkg.price}`)}>
+          {packages.map((pkg) => (
+            <div key={pkg.id} className={styles.packageCard} onClick={() => router.push(`/topup/payment?packageId=${pkg.id}&tokens=${pkg.tokens}&price=${pkg.price}`)}>
               <div className={styles.packageInfo}>
                 {pkg.tokens.toLocaleString()} Token
                 <br />

@@ -59,23 +59,19 @@ export default class UserRoute implements RouteInterface {
                 return c.json({ error: "User not found" }, 404);
             }
 
-            let body: { password?: string; cardId?: number; chipId?: number; tableId?: number };
+            let body: { cardId?: number; chipId?: number; tableId?: number };
             try {
                 body = await c.req.json();
             } catch {
                 return c.json({ error: "Invalid request body" }, 400);
             }
 
-            const { password, cardId, chipId, tableId } = body;
+            const { cardId, chipId, tableId } = body;
 
-            if (!password && cardId === undefined && chipId === undefined && tableId === undefined) {
+            if (cardId === undefined && chipId === undefined && tableId === undefined) {
                 return c.json({ error: "No update fields provided" }, 400);
             }
 
-            if (password) {
-                const hashedPassword = await this.server.Password.hash(password);
-                await UserModel.updateUser(user.id, "password", hashedPassword);
-            }
             if (cardId !== undefined) {
                 await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
             }
@@ -118,6 +114,40 @@ export default class UserRoute implements RouteInterface {
             } catch (error) {
                 this.server.error("UserRoute", `Error deleting user: ${(error as Error).message}`);
                 return c.json({ error: "Internal server error" }, 500);
+            }
+        });
+
+        this.app.post("/password", async (c) => {
+            try {
+                let body: { currentPassword: string; newPassword: string };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
+
+                const { currentPassword, newPassword } = body;
+                if (!currentPassword || !newPassword) {
+                    return c.json({ error: "Current password and new password are required" }, 400);
+                }
+
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                const passwordMatch = await this.server.Password.compare(currentPassword, user.password);
+                if (!passwordMatch) {
+                    return c.json({ error: "Incorrect current password" }, 401);
+                }
+
+                const hashedNewPassword = await this.server.Password.hash(newPassword);
+                await UserModel.updateUser(user.id, "password", hashedNewPassword);
+
+                return c.json({ ok: true });
+            } catch (error) {
+                this.server.error("UserRoute", `Error parsing request body: ${(error as Error).message}`);
+                return c.json({ error: "Invalid request body" }, 400);
             }
         });
 

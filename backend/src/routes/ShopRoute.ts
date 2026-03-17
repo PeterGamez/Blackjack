@@ -23,21 +23,27 @@ export default class ShopRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
 
         this.app.get("/list", async (c) => {
-            const products = await ProductModel.selectAllActiveProducts();
+            try {
+                const products = await ProductModel.selectAllActiveProducts();
 
-            const response = products.map((product) => ({
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                image: product.image,
-                path: product.path,
-                tokens: product.tokens,
-                coins: product.coins,
-                type: product.type,
-                isRecommend: product.isRecommend,
-            }));
+                const response = products.map((product) => ({
+                    id: product.id,
+                    name: product.name,
+                    description: product.description,
+                    image: product.image,
+                    path: product.path,
+                    tokens: product.tokens,
+                    coins: product.coins,
+                    type: product.type,
+                    isRecommend: product.isRecommend,
+                }));
 
-            return c.json(response);
+                return c.json(response);
+            } catch (error) {
+                this.server.error("ShopRoute", `Error fetching product list:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
         });
 
         this.app.post("/buy", async (c) => {
@@ -70,12 +76,18 @@ export default class ShopRoute implements RouteInterface {
                 }
 
                 if (payment === "tokens") {
+                    if (product.tokens == 0) {
+                        return c.json({ error: "Product is not available for tokens payment" }, 400);
+                    }
                     if (user.tokens < product.tokens) {
                         return c.json({ error: "Insufficient tokens" }, 400);
                     }
 
                     await UserModel.decreaseBalance(user.id, "tokens", product.tokens);
                 } else if (payment === "coins") {
+                    if (product.coins == 0) {
+                        return c.json({ error: "Product is not available for coins payment" }, 400);
+                    }
                     if (user.coins < product.coins) {
                         return c.json({ error: "Insufficient coins" }, 400);
                     }

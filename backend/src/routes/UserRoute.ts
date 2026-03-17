@@ -25,68 +25,80 @@ export default class UserRoute implements RouteInterface {
         this.app.use("*", this.server.Middleware.auth());
 
         this.app.get("/me", async (c) => {
-            const user = await this.server.Middleware.getUser(c);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
+            try {
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                const userInventory = await UserInventoryModel.selectAllUserInventoryByUserId(user.id);
+
+                const response = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                    tokens: user.tokens,
+                    coins: user.coins,
+                    cardId: user.cardId,
+                    chipId: user.chipId,
+                    tableId: user.tableId,
+                    inventory: userInventory.map((item) => {
+                        return {
+                            productId: item.productId,
+                            type: item.type,
+                        };
+                    }),
+                };
+
+                return c.json(response);
+            } catch (error) {
+                this.server.error("UserRoute", `Error fetching user: ${(error as Error).message}`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
             }
-
-            const userInventory = await UserInventoryModel.selectAllUserInventoryByUserId(user.id);
-
-            const response = {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                tokens: user.tokens,
-                coins: user.coins,
-                cardId: user.cardId,
-                chipId: user.chipId,
-                tableId: user.tableId,
-                inventory: userInventory.map((item) => {
-                    return {
-                        productId: item.productId,
-                        type: item.type,
-                    };
-                }),
-            };
-
-            return c.json(response);
         });
 
         this.app.patch("/me", async (c) => {
-            const user = await this.server.Middleware.getUser(c);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
-            }
-
-            let body: { password?: string; cardId?: number; chipId?: number; tableId?: number };
             try {
-                body = await c.req.json();
-            } catch {
-                return c.json({ error: "Invalid request body" }, 400);
-            }
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
 
-            const { password, cardId, chipId, tableId } = body;
+                let body: { password?: string; cardId?: number; chipId?: number; tableId?: number };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
 
-            if (!password && cardId === undefined && chipId === undefined && tableId === undefined) {
-                return c.json({ error: "No update fields provided" }, 400);
-            }
+                const { password, cardId, chipId, tableId } = body;
 
-            if (password) {
-                const hashedPassword = await this.server.Password.hash(password);
-                await UserModel.updateUser(user.id, "password", hashedPassword);
-            }
-            if (cardId !== undefined) {
-                await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
-            }
-            if (chipId !== undefined) {
-                await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
-            }
-            if (tableId !== undefined) {
-                await UserModel.updateUser(user.id, "tableId", tableId === 0 ? null : tableId);
-            }
+                if (!password && cardId === undefined && chipId === undefined && tableId === undefined) {
+                    return c.json({ error: "No update fields provided" }, 400);
+                }
 
-            return c.json({ ok: true });
+                if (password) {
+                    const hashedPassword = await this.server.Password.hash(password);
+                    await UserModel.updateUser(user.id, "password", hashedPassword);
+                }
+                if (cardId !== undefined) {
+                    await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
+                }
+                if (chipId !== undefined) {
+                    await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
+                }
+                if (tableId !== undefined) {
+                    await UserModel.updateUser(user.id, "tableId", tableId === 0 ? null : tableId);
+                }
+
+                return c.json({ ok: true });
+            } catch (error) {
+                this.server.error("UserRoute", `Error updating user: ${(error as Error).message}`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
         });
 
         this.app.delete("/me", async (c) => {
@@ -122,51 +134,63 @@ export default class UserRoute implements RouteInterface {
         });
 
         this.app.get("/payment-history", async (c) => {
-            const user = await this.server.Middleware.getUser(c);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
+            try {
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                const paymentHistory = await PaymentModel.selectAllPaymentsByUserId(user.id);
+
+                const response = paymentHistory.map((payment) => ({
+                    receiptRef: payment.receiptRef,
+                    type: payment.type,
+                    amount: payment.amount,
+                    createdAt: payment.createdAt,
+                }));
+
+                return c.json(response);
+            } catch (error) {
+                this.server.error("UserRoute", `Error fetching payment history: ${(error as Error).message}`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
             }
-
-            const paymentHistory = await PaymentModel.selectAllPaymentsByUserId(user.id);
-
-            const response = paymentHistory.map((payment) => ({
-                receiptRef: payment.receiptRef,
-                type: payment.type,
-                amount: payment.amount,
-                createdAt: payment.createdAt,
-            }));
-
-            return c.json(response);
         });
 
         this.app.get("/game-history", async (c) => {
-            const user = await this.server.Middleware.getUser(c);
-            if (!user) {
-                return c.json({ error: "User not found" }, 404);
+            try {
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                const gameHistory = await GameHistoryModel.selectAllGameHistoryByUserId(user.id);
+
+                const response = gameHistory.map((game) => {
+                    const isPlayer = game.playerId === user.id;
+                    const result = this.resolveGameResult(game.result, isPlayer);
+                    const reward = isPlayer ? game.playerPayout : game.dealerPayout;
+                    const score = isPlayer ? game.playerScore : game.dealerScore;
+                    const opponentScore = isPlayer ? game.dealerScore : game.playerScore;
+
+                    return {
+                        role: isPlayer ? "player" : "dealer",
+                        result,
+                        score,
+                        opponentScore,
+                        bet: game.bet,
+                        mode: game.mode,
+                        reward,
+                        createdAt: game.createdAt,
+                    };
+                });
+
+                return c.json(response);
+            } catch (error) {
+                this.server.error("UserRoute", `Error fetching game history: ${(error as Error).message}`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
             }
-
-            const gameHistory = await GameHistoryModel.selectAllGameHistoryByUserId(user.id);
-
-            const response = gameHistory.map((game) => {
-                const isPlayer = game.playerId === user.id;
-                const result = this.resolveGameResult(game.result, isPlayer);
-                const reward = isPlayer ? game.playerPayout : game.dealerPayout;
-                const score = isPlayer ? game.playerScore : game.dealerScore;
-                const opponentScore = isPlayer ? game.dealerScore : game.playerScore;
-
-                return {
-                    role: isPlayer ? "player" : "dealer",
-                    result,
-                    score,
-                    opponentScore,
-                    bet: game.bet,
-                    mode: game.mode,
-                    reward,
-                    createdAt: game.createdAt,
-                };
-            });
-
-            return c.json(response);
         });
     }
 

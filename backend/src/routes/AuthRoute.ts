@@ -138,13 +138,13 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Username/email or password is incorrect" }, 401);
                 }
 
+                if (!user.isVerified) {
+                    return c.json({ error: "Please verify your email before logging in" }, 403);
+                }
+
                 const isValidPassword = await this.server.Password.compare(password, user.password);
                 if (!isValidPassword) {
                     return c.json({ error: "Username/email or password is incorrect" }, 401);
-                }
-
-                if (!user.isVerified) {
-                    return c.json({ error: "Please verify your email before logging in" }, 403);
                 }
 
                 const accessToken = this.server.JWT.generateAccessToken(user);

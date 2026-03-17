@@ -250,7 +250,7 @@
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
 | API-USER-02 | `PATCH` | `/user/me` | `{password?, cardId?, chipId?, tableId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
-| API-USER-03 | `DELETE` | `/user/me` | None | Bearer | ลบบัญชีผู้ใช้ของตนเอง (soft delete หรือ permanent ตามที่ระบบกำหนด) |
+| API-USER-03 | `DELETE` | `/user/me` | `{password}` | Bearer | ลบบัญชีผู้ใช้ |
 | API-USER-04 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
 | API-USER-05 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
 

@@ -249,6 +249,16 @@
   background: #6c7fa3;
   color: #fff;
   cursor: pointer;
+  display: inline-flex;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.selectedFileName {
+  margin-top: 8px;
+  font-size: 12px;
 }
 
 .linkBody {
@@ -277,4 +287,18 @@
 
 .radio {
   margin-top: 4px;
+}
+
+.errorMessage {
+  margin-top: 12px;
+  color: #8c1e1e;
+  font-weight: 600;
+  text-align: center;
+}
+
+.successMessage {
+  margin-top: 12px;
+  color: #175f1a;
+  font-weight: 600;
+  text-align: center;
 }

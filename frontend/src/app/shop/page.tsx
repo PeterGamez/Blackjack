@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getChipImage } from "@lib/skinUtils";
 
 import ShopService from "@/lib/ShopService";
 
@@ -27,6 +27,16 @@ const TAB_LABELS: Record<ShopTab, string> = {
 };
 
 const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
+const CHIP_PREVIEW_VALUES = [1000, 500, 100, 25, 10, 5, 1];
+const CHIP_STACK_LAYOUT = [
+  { x: 0.18, y: 0.62, layers: 9, tilt: -9 },
+  { x: 0.42, y: 0.56, layers: 10, tilt: -2 },
+  { x: 0.67, y: 0.62, layers: 8, tilt: 8 },
+  { x: 0.3, y: 0.75, layers: 7, tilt: -6 },
+  { x: 0.56, y: 0.7, layers: 8, tilt: 4 },
+  { x: 0.78, y: 0.8, layers: 6, tilt: 10 },
+  { x: 0.47, y: 0.86, layers: 5, tilt: 0 },
+];
 
 const CARD_PREVIEW_STYLE = {
   borderRadius: 6,
@@ -168,6 +178,8 @@ function StorePageContent() {
     }
   };
 
+  const isRecommendTab = selected === "recommend";
+
   return (
     <div className={styles.container}>
       <div className={styles.pageTopBar} aria-hidden="true" />
@@ -188,9 +200,16 @@ function StorePageContent() {
           ))}
         </div>
 
-        <div className={styles.content}>
+        <div className={`${styles.content} ${isRecommendTab ? styles.recommendContent : ""}`}>
           {visibleProducts.length === 0 ? (
-            <div style={{ gridColumn: "1/-1", color: "#fff", opacity: 0.65, fontSize: 18, padding: "60px 0", textAlign: "center" }}>No products available.</div>
+            <div
+              style={
+                isRecommendTab
+                  ? { color: "#fff", opacity: 0.65, fontSize: 18, padding: "60px 0", textAlign: "center", width: "100%" }
+                  : { gridColumn: "1/-1", color: "#fff", opacity: 0.65, fontSize: 18, padding: "60px 0", textAlign: "center" }
+              }>
+              No products available.
+            </div>
           ) : (
             visibleProducts.map((p) => {
               const isOwned = owned.has(p.id);
@@ -202,23 +221,78 @@ function StorePageContent() {
               const canAfford = Boolean(payment) && balance >= (payment?.amount ?? 0);
               const currencyLabel = isTokenPayment ? "token" : "coin";
               const priceText = payment ? `${NUMBER_FORMATTER.format(payment.amount)} ${currencyLabel}` : "Not for sale";
+              const cardPreviewWidth = isRecommendTab ? 220 : 140;
+              const cardPreviewHeight = isRecommendTab ? 160 : 110;
+              const cardWidth = isRecommendTab ? 110 : 75;
+              const cardHeight = isRecommendTab ? 160 : 110;
+              const cardTopOffset = isRecommendTab ? 0 : 10;
+              const chipSize = isRecommendTab ? 68 : 48;
+              const chipPreviewWidth = isRecommendTab ? 260 : 185;
+              const chipPreviewHeight = isRecommendTab ? 200 : 140;
+              const chipLayerOffset = isRecommendTab ? 6 : 4;
 
               return (
-                <div key={p.id} className={styles.product}>
+                <div key={p.id} className={`${styles.product} ${isRecommendTab ? styles.recommendProduct : ""}`}>
                   <div className={styles.productPreview}>
                     {p.type === "card" ? (
-                      <div style={{ position: "relative", width: 140, height: 110, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ position: "absolute", left: 0, top: 10, transform: "rotate(-8deg)", zIndex: 1 }}>
-                          <Image src={getCardBackImage(p.path)} alt="back" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
+                      <div style={{ position: "relative", width: cardPreviewWidth, height: cardPreviewHeight, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ position: "absolute", left: 0, top: cardTopOffset, transform: "rotate(-8deg)", zIndex: 1 }}>
+                          <Image src={getCardBackImage(p.path)} alt="back" width={cardWidth} height={cardHeight} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
-                        <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                          <Image src={getCardImage({ suit: "♥", rank: "K" }, p.path)} alt="king" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
+                        <div style={{ position: "absolute", right: 0, top: cardTopOffset, transform: "rotate(8deg)", zIndex: 2 }}>
+                          <Image src={getCardImage({ suit: "♥", rank: "K" }, p.path)} alt="king" width={cardWidth} height={cardHeight} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
                       </div>
+                    ) : p.type === "chip" ? (
+                      <div style={{ position: "relative", width: chipPreviewWidth, height: chipPreviewHeight }}>
+                        {CHIP_PREVIEW_VALUES.map((value, index) => {
+                          const layout = CHIP_STACK_LAYOUT[index];
+                          const centerX = layout.x * chipPreviewWidth;
+                          const bottomCenterY = layout.y * chipPreviewHeight;
+                          const layerCount = isRecommendTab ? layout.layers : Math.max(3, layout.layers - 2);
+                          const tilt = isRecommendTab ? layout.tilt : layout.tilt * 0.7;
+
+                          return (
+                            <div key={`${p.id}-stack-${value}`} style={{ position: "absolute", inset: 0 }}>
+                              {Array.from({ length: layerCount }).map((_, layerIndex) => {
+                                const y = bottomCenterY - layerIndex * chipLayerOffset;
+
+                                return (
+                                  <Image
+                                    key={`${p.id}-chip-${value}-${layerIndex}`}
+                                    src={getChipImage(value, p.path)}
+                                    alt={`${p.name} chip ${value}`}
+                                    width={chipSize}
+                                    height={chipSize}
+                                    unoptimized
+                                    style={{
+                                      position: "absolute",
+                                      left: centerX - chipSize / 2,
+                                      top: y - chipSize / 2,
+                                      transform: `rotate(${tilt}deg)`,
+                                      transformOrigin: "center center",
+                                      zIndex: 100 + index * 10 + layerIndex,
+                                      objectFit: "contain",
+                                      filter: "drop-shadow(0 3px 5px rgba(0,0,0,0.3))",
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
                     ) : p.image ? (
-                      <Image src={p.image} alt={p.name} width={100} height={100} unoptimized style={{ objectFit: "contain", maxWidth: "80%", maxHeight: "80%" }} />
+                      <Image
+                        src={p.image}
+                        alt={p.name}
+                        width={isRecommendTab ? 180 : 100}
+                        height={isRecommendTab ? 180 : 100}
+                        unoptimized
+                        style={{ objectFit: "contain", maxWidth: isRecommendTab ? "90%" : "80%", maxHeight: isRecommendTab ? "90%" : "80%" }}
+                      />
                     ) : (
-                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : p.type === "table" ? "Table" : "Theme"}</strong>
+                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "table" ? "Table" : "Theme"}</strong>
                     )}
                   </div>
                   <div className={styles.productInfo}>

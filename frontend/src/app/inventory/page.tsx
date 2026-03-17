@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getCardSkin, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipSkin, getTableSkin } from "@lib/skinUtils";
 
 import AuthService from "@/lib/AuthService";
 import ShopService from "@/lib/ShopService";
@@ -120,7 +120,7 @@ export default function InventoryPage() {
       }
 
       try {
-        const products: ProductInterface[] = await ShopService.getProducts();
+        const products = await ShopService.getProducts();
         if (cancelled) {
           return;
         }
@@ -137,7 +137,7 @@ export default function InventoryPage() {
             ownedByType.card.push({
               path: product.path,
               name: product.name,
-              preview: product.image || getCardBackImage(product.path),
+              preview: product.image,
               productId: product.id,
               type: "card",
             });
@@ -148,7 +148,7 @@ export default function InventoryPage() {
             ownedByType.chip.push({
               path: product.path,
               name: product.name,
-              preview: product.image || `/chips/${product.path}/chips100.png`,
+              preview: product.image,
               productId: product.id,
               type: "chip",
             });
@@ -159,7 +159,7 @@ export default function InventoryPage() {
             ownedByType.table.push({
               path: product.path,
               name: product.name,
-              preview: product.image || getTableImage(product.path),
+              preview: product.image,
               productId: product.id,
               type: "table",
             });
@@ -263,7 +263,7 @@ export default function InventoryPage() {
                           <Image src={getCardBackImage(skin.path)} alt="back" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                         </div>
                         <div style={CARD_FRONT_WRAPPER_STYLE}>
-                          <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
+                          <Image src={getCardImage({ suit: "♥", rank: "K" }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                         </div>
                       </div>
                     ) : (

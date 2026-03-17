@@ -1,9 +1,10 @@
-type LocalKey = "accessToken" | "refreshToken" | "userId" | "username" | "coins" | "tokens" | "cardSkin" | "chipSkin" | "tableSkin";
+type LocalKey = "accessToken" | "refreshToken" | "userId" | "username" | "coins" | "tokens" | "cardSkin" | "chipSkin" | "tableSkin" | `musicVolume` | `effectVolume`;
 
 export default class LocalStorage {
   private static isBrowser() {
     return typeof window !== "undefined";
   }
+
   public static setItem(key: LocalKey, value: string) {
     if (this.isBrowser()) {
       localStorage.setItem(key, value);
@@ -28,7 +29,15 @@ export default class LocalStorage {
 
   public static clear() {
     if (this.isBrowser()) {
-      localStorage.clear();
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("username");
+      localStorage.removeItem("coins");
+      localStorage.removeItem("tokens");
+      localStorage.removeItem("cardSkin");
+      localStorage.removeItem("chipSkin");
+      localStorage.removeItem("tableSkin");
       window.dispatchEvent(new CustomEvent("local-storage-change", { detail: { key: null, value: null } }));
     }
   }

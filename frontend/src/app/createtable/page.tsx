@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@components/Navbar";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -14,12 +15,18 @@ export default function TableSettingPage() {
   const [startingMoney, setStartingMoney] = useState(1000);
   const [minimumBet, setMinimumBet] = useState(50);
 
+  // เพิ่ม State สำหรับจัดการตัวเลือกสกุลเงิน
+  const [startingMoneyType, setStartingMoneyType] = useState("Coin");
+  const [minimumBetType, setMinimumBetType] = useState("Coin");
+
   const createTable = () => {
     console.log({
       roomId,
       roomPassword,
       startingMoney,
+      startingMoneyType,
       minimumBet,
+      minimumBetType,
     });
   };
 
@@ -59,13 +66,13 @@ export default function TableSettingPage() {
             <label>Starting Money</label>
 
             <div className={styles.inputWithSelect}>
-              <img src="/icons/chip.png" alt="chip" className={styles.inputIcon} />
+              <Image src={startingMoneyType === "Token" ? "/icons/token.png" : "/icons/coin.png"} alt={startingMoneyType.toLowerCase()} className={styles.inputIcon} width={24} height={24} />
 
               <input type="number" value={startingMoney} onChange={(e) => setStartingMoney(Number(e.target.value))} />
 
-              <select>
-                <option>Chips</option>
-                <option>Token</option>
+              <select value={startingMoneyType} onChange={(e) => setStartingMoneyType(e.target.value)}>
+                <option value="Coin">Coin</option>
+                <option value="Token">Token</option>
               </select>
             </div>
           </div>
@@ -75,13 +82,13 @@ export default function TableSettingPage() {
             <label>Minimum Bet</label>
 
             <div className={styles.inputWithSelect}>
-              <img src="/icons/chip.png" alt="chip" className={styles.inputIcon} />
+              <Image src={minimumBetType === "Token" ? "/icons/token.png" : "/icons/coin.png"} alt={minimumBetType.toLowerCase()} className={styles.inputIcon} width={24} height={24} />
 
               <input type="number" value={minimumBet} onChange={(e) => setMinimumBet(Number(e.target.value))} />
 
-              <select>
-                <option>Chips</option>
-                <option>Token</option>
+              <select value={minimumBetType} onChange={(e) => setMinimumBetType(e.target.value)}>
+                <option value="Coin">Coin</option>
+                <option value="Token">Token</option>
               </select>
             </div>
           </div>

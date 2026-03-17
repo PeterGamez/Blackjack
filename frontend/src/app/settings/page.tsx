@@ -139,16 +139,16 @@ export default function SettingsPage() {
   }, [router]);
 
   useEffect(() => {
-    setMusicVolume(parseVolume(window.localStorage.getItem("musicVolume"), 70));
-    setEffectVolume(parseVolume(window.localStorage.getItem("effectVolume"), 75));
+    setMusicVolume(parseVolume(LocalStorage.getItem("musicVolume"), 70));
+    setEffectVolume(parseVolume(LocalStorage.getItem("effectVolume"), 75));
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("musicVolume", musicVolume.toString());
+    LocalStorage.setItem("musicVolume", musicVolume.toString());
   }, [musicVolume]);
 
   useEffect(() => {
-    window.localStorage.setItem("effectVolume", effectVolume.toString());
+    LocalStorage.setItem("effectVolume", effectVolume.toString());
   }, [effectVolume]);
 
   const loadTransactions = useCallback(async () => {

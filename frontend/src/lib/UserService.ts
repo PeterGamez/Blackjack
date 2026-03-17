@@ -73,11 +73,7 @@ export default class UserService {
         };
       });
 
-      const resolveSkinPath = (
-        type: "card" | "chip" | "table",
-        selectedId: number | null | undefined,
-        currentSkin: string
-      ): string => {
+      const resolveSkinPath = (type: "card" | "chip" | "table", selectedId: number | null | undefined, currentSkin: string): string => {
         if (selectedId === null || selectedId === 0) {
           return "default";
         }

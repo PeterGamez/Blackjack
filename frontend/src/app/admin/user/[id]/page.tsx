@@ -108,10 +108,6 @@ export default function AdminUserEditPage() {
     }
   };
 
-  const handleDelete = async () => {
-    // Deleted handler removed
-  };
-
   if (status === "loading") {
     return (
       <div className={styles.page}>

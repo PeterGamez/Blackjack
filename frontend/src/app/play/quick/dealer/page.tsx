@@ -8,7 +8,7 @@ import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
 import config from "@/config";
 
@@ -112,7 +112,7 @@ export default function Dealer() {
       if (remaining < value) continue;
       const count = Math.floor(remaining / value);
       remaining -= count * value;
-      stacks.push({ value, count, image: getChipImagePath(value, chipSkin) });
+      stacks.push({ value, count, image: getChipImage(value, chipSkin) });
     }
     return stacks;
   };
@@ -423,7 +423,7 @@ export default function Dealer() {
                     <div
                       className={`${styles.cardFrame} ${dealerRevealIndex === i ? "" : styles.dealCard} ${styles.dealToDealer} ${dealerRevealIndex === i ? styles.cardFlip : ""}`.trim()}
                       style={getDealerDealStyle(i)}>
-                      <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                      <Image src={getCardImage(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                     </div>
                   </div>
                 ))}
@@ -454,7 +454,7 @@ export default function Dealer() {
                 playerHand.map((card, i) => (
                   <div key={i} className={styles.cardSlot} style={getCardSlotStyle(i, playerHand.length)}>
                     <div className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToPlayer}`.trim()} style={getPlayerDealStyle(i)}>
-                      <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                      <Image src={getCardImage(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
                     </div>
                   </div>
                 ))}
@@ -468,7 +468,7 @@ export default function Dealer() {
                   <div className={styles.chipRow}>
                     {CHIP_VALUES.map((v) => (
                       <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
-                        <Image src={getChipImagePath(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
+                        <Image src={getChipImage(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
                       </button>
                     ))}
                   </div>

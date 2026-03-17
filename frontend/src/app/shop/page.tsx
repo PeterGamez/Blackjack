@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage } from "@lib/skinUtils";
 
 import ShopService from "@/lib/ShopService";
 
@@ -212,7 +212,7 @@ function StorePageContent() {
                           <Image src={getCardBackImage(p.path)} alt="back" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
                         <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                          <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, p.path)} alt="king" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
+                          <Image src={getCardImage({ suit: "♥", rank: "K" }, p.path)} alt="king" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
                       </div>
                     ) : p.image ? (

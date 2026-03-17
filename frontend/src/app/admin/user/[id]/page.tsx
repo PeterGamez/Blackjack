@@ -4,16 +4,18 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminUser } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
+
+import { UserInterface } from "@/interfaces/Admin/UserInterface";
 
 import styles from "../page.module.css";
 
 type AdminUserDraft = {
   username: string;
   email: string;
-  role: "user" | "admin";
+  role: UserInterface["role"];
   tokens: string;
   coins: string;
 };
@@ -25,7 +27,7 @@ export default function AdminUserEditPage() {
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
   const [authUserId, setAuthUserId] = useState<number>(null);
-  const [user, setUser] = useState<AdminUser>(null);
+  const [user, setUser] = useState<UserInterface>(null);
   const [draft, setDraft] = useState<AdminUserDraft>(null);
 
   const [isSaving, setIsSaving] = useState(false);

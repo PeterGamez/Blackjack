@@ -1,8 +1,8 @@
 import config from "@/config";
-import { ProductInterface } from "@/interfaces/API/ProductInterface";
-import { UserInterface } from "@/interfaces/API/UserInterface";
 import { CodeInterface } from "@/interfaces/Admin/CodeInterface";
 import { PackageInterface } from "@/interfaces/Admin/PackageInterface";
+import { ProductInterface } from "@/interfaces/Admin/ProductInterface";
+import { UserInterface } from "@/interfaces/Admin/UserInterface";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
@@ -10,7 +10,7 @@ import LocalStorage from "./LocalStorage";
 interface UpdateAdminUserPayload {
   username?: string;
   email?: string;
-  role?: "user" | "admin";
+  role?: "user" | "vip" | "admin";
   tokens?: number;
   coins?: number;
   isVerified?: boolean;

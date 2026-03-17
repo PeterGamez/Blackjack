@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
 
-import styles from "../page.module.css";
 import { CodeInterface } from "@/interfaces/Admin/CodeInterface";
+
+import styles from "../page.module.css";
 
 type AdminCodeDraft = Omit<CodeInterface, "amount" | "maxUses"> & {
   amount: string;

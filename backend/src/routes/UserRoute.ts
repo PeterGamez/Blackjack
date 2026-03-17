@@ -41,7 +41,7 @@ export default class UserRoute implements RouteInterface {
                 coins: user.coins,
                 cardId: user.cardId,
                 chipId: user.chipId,
-                tableId: user.themeId,
+                tableId: user.tableId,
                 inventory: userInventory.map((item) => {
                     return {
                         productId: item.productId,
@@ -83,7 +83,7 @@ export default class UserRoute implements RouteInterface {
                 await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
             }
             if (tableId !== undefined) {
-                await UserModel.updateUser(user.id, "themeId", tableId === 0 ? null : tableId);
+                await UserModel.updateUser(user.id, "tableId", tableId === 0 ? null : tableId);
             }
 
             return c.json({ ok: true });
@@ -172,7 +172,7 @@ export default class UserRoute implements RouteInterface {
 
     private resolveGameResult(result: GameHistoryInterface["result"], isPlayer: boolean): GameHistoryInterface["result"] {
         if (result === "draw") return "draw";
-        if (result === "blackjack") return isPlayer ? "win" : "lose";
+        if (result === "blackjack") return isPlayer ? "blackjack" : "lose";
         if (isPlayer) return result;
         return result === "win" ? "lose" : "win";
     }

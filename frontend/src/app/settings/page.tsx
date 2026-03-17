@@ -4,39 +4,18 @@ import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
-import AuthService from "@lib/AuthService";
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 
-import config from "@/config";
-
 import styles from "./settings.module.css";
 
-interface PaymentHistoryItem {
-  receiptRef: string;
-  type: "bank" | "truemoney";
-  amount: number;
-  createdAt: string;
-}
-
-interface TransactionItem {
+type TransactionItem = {
   id: string;
   date: string;
   format: string;
   amount: number;
-  status: "completed";
-}
-
-interface ApiError {
-  error?: string;
-  message?: string;
-}
-
-interface RedeemResponse {
-  message: string;
-  amount: number;
-  type: "coins" | "tokens";
-}
+  status: string;
+};
 
 const dateFormatter = new Intl.DateTimeFormat("th-TH", {
   dateStyle: "medium",
@@ -48,7 +27,7 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
-const parseVolume = (value: string | null, fallback: number): number => {
+const parseVolume = (value: string, fallback: number): number => {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed)) return fallback;
@@ -62,61 +41,6 @@ const normalizeError = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
-async function parseError(response: Response): Promise<string> {
-  try {
-    const data = (await response.json()) as ApiError;
-    return data.error || data.message || "Request failed";
-  } catch {
-    return "Request failed";
-  }
-}
-
-async function authenticatedFetch(path: string, init?: RequestInit): Promise<Response> {
-  let token = LocalStorage.getItem("accessToken");
-
-  if (!token) {
-    const hasRefreshed = await AuthService.refreshAccessToken();
-    if (!hasRefreshed) {
-      throw new Error("Not authenticated");
-    }
-    token = LocalStorage.getItem("accessToken");
-  }
-
-  if (!token) {
-    throw new Error("Not authenticated");
-  }
-
-  const doFetch = async (accessToken: string): Promise<Response> => {
-    const headers = new Headers(init?.headers);
-    headers.set("Authorization", `Bearer ${accessToken}`);
-
-    return fetch(`${config.apiUrl}${path}`, {
-      ...init,
-      headers,
-    });
-  };
-
-  let response = await doFetch(token);
-
-  if (response.status === 401) {
-    LocalStorage.removeItem("accessToken");
-
-    const hasRefreshed = await AuthService.refreshAccessToken();
-    if (!hasRefreshed) {
-      throw new Error("Session expired");
-    }
-
-    const newToken = LocalStorage.getItem("accessToken");
-    if (!newToken) {
-      throw new Error("Session expired");
-    }
-
-    response = await doFetch(newToken);
-  }
-
-  return response;
-}
-
 export default function SettingsPage() {
   const router = useRouter();
 
@@ -124,10 +48,10 @@ export default function SettingsPage() {
   const [effectVolume, setEffectVolume] = useState(75);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
-  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
 
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [historyError, setHistoryError] = useState<string>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
   useEffect(() => {
@@ -139,16 +63,16 @@ export default function SettingsPage() {
   }, [router]);
 
   useEffect(() => {
-    setMusicVolume(parseVolume(window.localStorage.getItem("musicVolume"), 70));
-    setEffectVolume(parseVolume(window.localStorage.getItem("effectVolume"), 75));
+    setMusicVolume(parseVolume(LocalStorage.getItem("musicVolume"), 70));
+    setEffectVolume(parseVolume(LocalStorage.getItem("effectVolume"), 75));
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("musicVolume", musicVolume.toString());
+    LocalStorage.setItem("musicVolume", musicVolume.toString());
   }, [musicVolume]);
 
   useEffect(() => {
-    window.localStorage.setItem("effectVolume", effectVolume.toString());
+    LocalStorage.setItem("effectVolume", effectVolume.toString());
   }, [effectVolume]);
 
   const loadTransactions = useCallback(async () => {
@@ -156,13 +80,7 @@ export default function SettingsPage() {
     setHistoryError(null);
 
     try {
-      const paymentResponse = await authenticatedFetch("/user/payment-history", { method: "GET", cache: "no-store" });
-
-      if (!paymentResponse.ok) {
-        throw new Error(await parseError(paymentResponse));
-      }
-
-      const paymentHistory = (await paymentResponse.json()) as PaymentHistoryItem[];
+      const paymentHistory = await UserService.getPaymentHistorys();
 
       const paymentTransactions: TransactionItem[] = paymentHistory.map((payment) => ({
         id: `payment-${payment.receiptRef}-${payment.createdAt}`,
@@ -173,7 +91,6 @@ export default function SettingsPage() {
       }));
 
       const topupTransactions = paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
       setTransactions(topupTransactions);
     } catch (error) {
       setHistoryError(normalizeError(error, "Failed to load transaction history"));
@@ -199,19 +116,7 @@ export default function SettingsPage() {
     setRedeemFeedback(null);
 
     try {
-      const response = await authenticatedFetch("/code/redeem", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: cleanCode }),
-      });
-
-      if (!response.ok) {
-        throw new Error(await parseError(response));
-      }
-
-      const data = (await response.json()) as RedeemResponse;
+      const data = await UserService.redeemCode(cleanCode);
       setRedeemFeedback({
         type: "success",
         text: `${data.message} (+${amountFormatter.format(data.amount)} ${data.type})`,

@@ -4,17 +4,19 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminPackage } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { PackageInterface } from "@/interfaces/Admin/PackageInterface";
 
 import styles from "../page.module.css";
 
-type AdminPackageDraft = Omit<AdminPackage, "price" | "tokens"> & {
+type AdminPackageDraft = Omit<PackageInterface, "price" | "tokens"> & {
   price: string;
   tokens: string;
 };
 
-const mapPackageToDraft = (pkg: AdminPackage): AdminPackageDraft => ({
+const mapPackageToDraft = (pkg: PackageInterface): AdminPackageDraft => ({
   ...pkg,
   price: pkg.price.toString(),
   tokens: pkg.tokens.toString(),
@@ -26,8 +28,8 @@ export default function AdminPackageEditPage() {
   const packageId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [pkg, setPkg] = useState<AdminPackage | null>(null);
-  const [draft, setDraft] = useState<AdminPackageDraft | null>(null);
+  const [pkg, setPkg] = useState<PackageInterface>(null);
+  const [draft, setDraft] = useState<AdminPackageDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 

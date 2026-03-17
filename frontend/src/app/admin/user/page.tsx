@@ -4,15 +4,17 @@ import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminUser } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { UserInterface } from "@/interfaces/Admin/UserInterface";
 
 import styles from "./page.module.css";
 
 export default function AdminUsersPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<UserInterface[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

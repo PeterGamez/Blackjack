@@ -12,7 +12,7 @@ import ProfileAvatar from "./ProfileAvatar";
 export default function Navbar() {
   const router = useRouter();
 
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>(null);
   const [coins, setCoins] = useState(0);
   const [tokens, setTokens] = useState(0);
 

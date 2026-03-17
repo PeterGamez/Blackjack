@@ -1,13 +1,16 @@
 import { UserInterface } from "@interfaces/API/UserInterface";
 
 import config from "@/config";
+import { GameHistoryInterface } from "@/interfaces/API/GameHistoryInterface";
+import { PaymentHistoryInterface } from "@/interfaces/API/PaymentHistoryInterface";
+import { CurrencyType } from "@/interfaces/CurrencyType";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
 import ShopService from "./ShopService";
 
 export default class UserService {
-  private static async authenticatedFetch(path: string, init?: RequestInit): Promise<Response | null> {
+  private static async authenticatedFetch(path: string, init?: RequestInit): Promise<Response> {
     let token = LocalStorage.getItem("accessToken");
 
     if (!token) {
@@ -60,6 +63,10 @@ export default class UserService {
     LocalStorage.setItem("coins", data.coins.toString());
     LocalStorage.setItem("tokens", data.tokens.toString());
 
+    const currentCardSkin = LocalStorage.getItem("cardSkin") || "default";
+    const currentChipSkin = LocalStorage.getItem("chipSkin") || "default";
+    const currentTableSkin = LocalStorage.getItem("tableSkin") || "default";
+
     ShopService.getProducts().then((products) => {
       const ownedProducts = data.inventory.map((item) => {
         const product = products.find((p) => p.id === item.productId);
@@ -69,13 +76,22 @@ export default class UserService {
         };
       });
 
-      const cardSkin = ownedProducts.find((p) => p.type === "card" && p.path) || { path: "default" };
-      const chipSkin = ownedProducts.find((p) => p.type === "chip" && p.path) || { path: "default" };
-      const tableSkin = ownedProducts.find((p) => p.type === "table" && p.path) || { path: "default" };
+      const resolveSkinPath = (type: "card" | "chip" | "table", selectedId: number, currentSkin: string): string => {
+        if (selectedId === null || selectedId === 0) {
+          return "default";
+        }
 
-      LocalStorage.setItem("cardSkin", cardSkin.path);
-      LocalStorage.setItem("chipSkin", chipSkin.path);
-      LocalStorage.setItem("tableSkin", tableSkin.path);
+        if (typeof selectedId === "number" && selectedId > 0) {
+          const selectedProduct = ownedProducts.find((p) => p.type === type && p.id === selectedId && p.path);
+          return selectedProduct?.path || currentSkin;
+        }
+
+        return currentSkin;
+      };
+
+      LocalStorage.setItem("cardSkin", resolveSkinPath("card", data.cardId, currentCardSkin));
+      LocalStorage.setItem("chipSkin", resolveSkinPath("chip", data.chipId, currentChipSkin));
+      LocalStorage.setItem("tableSkin", resolveSkinPath("table", data.tableId, currentTableSkin));
     });
   }
 
@@ -99,18 +115,7 @@ export default class UserService {
     return null;
   }
 
-  public static async getGameHistory(): Promise<
-    Array<{
-      role: "player" | "dealer";
-      result: "win" | "lose" | "draw";
-      score: number;
-      opponentScore: number;
-      bet: number;
-      mode: number;
-      reward: number;
-      createdAt: string;
-    }>
-  > {
+  public static async getGameHistory(): Promise<GameHistoryInterface[]> {
     try {
       const response = await this.authenticatedFetch("/user/game-history", { cache: "no-store" });
 
@@ -118,19 +123,44 @@ export default class UserService {
         return [];
       }
 
-      return (await response.json()) as Array<{
-        role: "player" | "dealer";
-        result: "win" | "lose" | "draw";
-        score: number;
-        opponentScore: number;
-        bet: number;
-        mode: number;
-        reward: number;
-        createdAt: string;
-      }>;
+      return await response.json();
     } catch (error) {
       console.error("Fetch game history error:", error);
       return [];
+    }
+  }
+
+  public static async getPaymentHistorys(): Promise<PaymentHistoryInterface[]> {
+    try {
+      const response = await this.authenticatedFetch("/user/payment-history", { cache: "no-store" });
+
+      if (!response?.ok) {
+        return [];
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Fetch payment history error:", error);
+      return [];
+    }
+  }
+
+  public static async redeemCode(code: string): Promise<{ message: string; amount: number; type: CurrencyType }> {
+    try {
+      const response = await this.authenticatedFetch("/user/redeem-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!response?.ok) {
+        throw new Error("Redeem code failed");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Redeem code error:", error);
+      throw error;
     }
   }
 }

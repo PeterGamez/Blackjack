@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getCardSkin, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipSkin, getTableSkin } from "@lib/skinUtils";
 
 import AuthService from "@/lib/AuthService";
 import ShopService from "@/lib/ShopService";
@@ -26,7 +26,7 @@ interface SkinItem {
 
 const BUILT_IN_SKINS: Record<ProductInterface["type"], SkinItem[]> = {
   card: [{ path: "default", name: "Default Card", preview: "/cards/default/backcard.png", productId: 0, type: "card" }],
-  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chip100.png", productId: 0, type: "chip" }],
+  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chips100.png", productId: 0, type: "chip" }],
   table: [{ path: "default", name: "Default Table", preview: "/tables/default/table.png", productId: 0, type: "table" }],
 };
 
@@ -89,7 +89,8 @@ export default function InventoryPage() {
   const [activeTab, setActiveTab] = useState<ProductInterface["type"]>("card");
   const [selectedSkins, setSelectedSkins] = useState<SelectedSkinsState>({ card: "default", chip: "default", table: "default" });
   const [ownedSkinsByType, setOwnedSkinsByType] = useState<OwnedSkinsState>({ card: [], chip: [], table: [] });
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string>(null);
+  const [equipMessage, setEquipMessage] = useState<{ ok: boolean; text: string }>(null);
 
   const resetToDefaultSkins = useCallback(() => {
     setOwnedSkinsByType({ card: [], chip: [], table: [] });
@@ -119,7 +120,7 @@ export default function InventoryPage() {
       }
 
       try {
-        const products: ProductInterface[] = await ShopService.getProducts();
+        const products = await ShopService.getProducts();
         if (cancelled) {
           return;
         }
@@ -136,7 +137,7 @@ export default function InventoryPage() {
             ownedByType.card.push({
               path: product.path,
               name: product.name,
-              preview: product.image || getCardBackImage(product.path),
+              preview: product.image,
               productId: product.id,
               type: "card",
             });
@@ -147,7 +148,7 @@ export default function InventoryPage() {
             ownedByType.chip.push({
               path: product.path,
               name: product.name,
-              preview: product.image || `/chips/${product.path}/chip100.png`,
+              preview: product.image,
               productId: product.id,
               type: "chip",
             });
@@ -158,7 +159,7 @@ export default function InventoryPage() {
             ownedByType.table.push({
               path: product.path,
               name: product.name,
-              preview: product.image || getTableImage(product.path),
+              preview: product.image,
               productId: product.id,
               type: "table",
             });
@@ -194,12 +195,26 @@ export default function InventoryPage() {
 
       setSelectedSkins((prev) => ({ ...prev, [type]: skinId }));
       LocalStorage.setItem(storageKey, skinId);
+      setEquipMessage(null);
 
       try {
         await AuthService.updateCurrentUser({ [payloadKey]: productId ?? 0 });
-      } catch {
+        setEquipMessage({ ok: true, text: "Skin equipped" });
+
+        // Best-effort sync from server; do not roll back a successful equip when sync fails.
+        const latestUser = await UserService.getUser();
+        if (latestUser) {
+          setSelectedSkins({
+            card: getCardSkin(),
+            chip: getChipSkin(),
+            table: getTableSkin(),
+          });
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to equip skin. Please try again.";
         setSelectedSkins((prev) => ({ ...prev, [type]: previousSkin }));
         LocalStorage.setItem(storageKey, previousSkin);
+        setEquipMessage({ ok: false, text: errorMessage });
       }
     },
     [selectedSkins]
@@ -219,6 +234,7 @@ export default function InventoryPage() {
       <div className={styles.Title}>
         <h2>Inventory</h2>
       </div>
+      {equipMessage && <div style={{ color: equipMessage.ok ? "#2f6b2f" : "#a00", fontWeight: 700, marginTop: 8 }}>{equipMessage.text}</div>}
 
       <div className={styles.main}>
         <div className={styles.sidebar}>
@@ -247,7 +263,7 @@ export default function InventoryPage() {
                           <Image src={getCardBackImage(skin.path)} alt="back" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                         </div>
                         <div style={CARD_FRONT_WRAPPER_STYLE}>
-                          <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
+                          <Image src={getCardImage({ suit: "♥", rank: "K" }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                         </div>
                       </div>
                     ) : (

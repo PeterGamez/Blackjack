@@ -4,15 +4,17 @@ import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminCode } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { CodeInterface } from "@/interfaces/Admin/CodeInterface";
 
 import styles from "./page.module.css";
 
 export default function AdminCodesPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [codes, setCodes] = useState<AdminCode[]>([]);
+  const [codes, setCodes] = useState<CodeInterface[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

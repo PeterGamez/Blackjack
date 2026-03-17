@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage } from "@lib/skinUtils";
 
 import ShopService from "@/lib/ShopService";
 
@@ -34,7 +34,7 @@ const CARD_PREVIEW_STYLE = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
 };
 
-function getProductPayment(product: ProductInterface): { type: "coins" | "tokens"; amount: number } | null {
+function getProductPayment(product: ProductInterface): { type: "coins" | "tokens"; amount: number } {
   if (product.coins > 0) {
     return { type: "coins", amount: product.coins };
   }
@@ -50,11 +50,11 @@ function StorePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState<ShopTab>("recommend");
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string>(null);
   const [products, setProducts] = useState<ProductInterface[]>([]);
   const [owned, setOwned] = useState<Set<number>>(new Set());
-  const [buying, setBuying] = useState<number | null>(null);
-  const [message, setMessage] = useState<{ id: number; text: string; ok: boolean } | null>(null);
+  const [buying, setBuying] = useState<number>(null);
+  const [message, setMessage] = useState<{ id: number; text: string; ok: boolean }>(null);
   const [coins, setCoins] = useState<number>(0);
   const [tokens, setTokens] = useState<number>(0);
 
@@ -150,17 +150,13 @@ function StorePageContent() {
       setOwned((prev) => new Set([...prev, p.id]));
 
       if (payment.type === "coins") {
-        setCoins((prev) => {
-          const nextCoins = prev - payment.amount;
-          LocalStorage.setItem("coins", nextCoins.toString());
-          return nextCoins;
-        });
+        const nextCoins = coins - payment.amount;
+        setCoins(nextCoins);
+        LocalStorage.setItem("coins", nextCoins.toString());
       } else {
-        setTokens((prev) => {
-          const nextTokens = prev - payment.amount;
-          LocalStorage.setItem("tokens", nextTokens.toString());
-          return nextTokens;
-        });
+        const nextTokens = tokens - payment.amount;
+        setTokens(nextTokens);
+        LocalStorage.setItem("tokens", nextTokens.toString());
       }
 
       setMessage({ id: p.id, text: "Purchased!", ok: true });
@@ -216,13 +212,13 @@ function StorePageContent() {
                           <Image src={getCardBackImage(p.path)} alt="back" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
                         <div style={{ position: "absolute", right: 0, top: 10, transform: "rotate(8deg)", zIndex: 2 }}>
-                          <Image src={getCardImagePath({ suit: "♥", rank: "K", value: 10 }, p.path)} alt="king" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
+                          <Image src={getCardImage({ suit: "♥", rank: "K" }, p.path)} alt="king" width={75} height={110} unoptimized style={CARD_PREVIEW_STYLE} />
                         </div>
                       </div>
                     ) : p.image ? (
                       <Image src={p.image} alt={p.name} width={100} height={100} unoptimized style={{ objectFit: "contain", maxWidth: "80%", maxHeight: "80%" }} />
                     ) : (
-                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : "Theme"}</strong>
+                      <strong style={{ color: "#e6eaf2", fontSize: 18 }}>{p.type === "chip" ? "Chips" : p.type === "table" ? "Table" : "Theme"}</strong>
                     )}
                   </div>
                   <div className={styles.productInfo}>

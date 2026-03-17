@@ -3,12 +3,12 @@
 import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImagePath, getCardSkin, getChipImagePath, getChipSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
 import config from "@/config";
 
@@ -56,7 +56,7 @@ const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
 
 export default function Dealer() {
   const router = useRouter();
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<Socket>(null);
   const [gameStatus, setGameStatus] = useState<GameStatus>("betting");
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
@@ -73,9 +73,36 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [cardSkin] = useState<string>(getCardSkin);
-  const [chipSkin] = useState<string>(getChipSkin);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [dealerRevealIndex, setDealerRevealIndex] = useState<number>(null);
+  const [isDealerDrawing, setIsDealerDrawing] = useState(false);
+  const [cardSkin, setCardSkin] = useState<string>("default");
+  const [chipSkin, setChipSkin] = useState<string>("default");
+  const [tableSkin, setTableSkin] = useState<string>("default");
+  const timerRef = useRef<ReturnType<typeof setInterval>>(null);
+  const standResolveRef = useRef(false);
+
+  const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  useEffect(() => {
+    const syncSkins = () => {
+      setCardSkin(getCardSkin());
+      setChipSkin(getChipSkin());
+      setTableSkin(getTableSkin());
+    };
+
+    syncSkins();
+
+    const handleStorageChange = (event: Event) => {
+      const storageEvent = event as CustomEvent<{ key?: string }>;
+      const key = storageEvent.detail?.key;
+      if (!key || key === "cardSkin" || key === "chipSkin" || key === "tableSkin") {
+        syncSkins();
+      }
+    };
+
+    window.addEventListener("local-storage-change", handleStorageChange);
+    return () => window.removeEventListener("local-storage-change", handleStorageChange);
+  }, []);
 
   const getChipStacks = (amount: number): ChipStack[] => {
     const chipValues = [1000, 500, 100, 25, 10, 5, 1];
@@ -85,7 +112,7 @@ export default function Dealer() {
       if (remaining < value) continue;
       const count = Math.floor(remaining / value);
       remaining -= count * value;
-      stacks.push({ value, count, image: getChipImagePath(value, chipSkin) });
+      stacks.push({ value, count, image: getChipImage(value, chipSkin) });
     }
     return stacks;
   };
@@ -152,22 +179,61 @@ export default function Dealer() {
       });
 
       socket.on("game:bust", (data: { playerHand: Card[]; playerValue: number }) => {
+        standResolveRef.current = false;
         stopTimer();
         setPlayerHand(data.playerHand);
         setResult("BUST! Dealer wins");
         setGameStatus("game-over");
+        setDealerRevealIndex(null);
+        setIsDealerDrawing(false);
         setIsLoading(false);
       });
 
       socket.on(
         "game:finished",
-        (data: { playerHand: Card[]; dealerHand: Card[]; playerValue: number; dealerValue: number; result: "win" | "lose" | "draw"; reward: number; balance?: number; coins?: number }) => {
+        async (data: { playerHand: Card[]; dealerHand: Card[]; playerValue: number; dealerValue: number; result: "win" | "lose" | "draw"; reward: number; balance?: number; coins?: number }) => {
           stopTimer();
           setPlayerHand(data.playerHand);
-          setDealerHand(data.dealerHand);
           const msg = data.result === "win" ? "You win! 🎉" : data.result === "draw" ? "Draw!" : "Dealer wins";
-          setResult(msg);
           const nextChips = typeof data.balance === "number" ? data.balance : typeof data.coins === "number" ? data.coins : playerChipsRef.current;
+
+          if (standResolveRef.current) {
+            standResolveRef.current = false;
+            setResult("");
+
+            const finalDealerHand = data.dealerHand;
+
+            if (finalDealerHand.length >= 2) {
+              setDealerHand(finalDealerHand.slice(0, 2));
+              setDealerRevealIndex(1);
+              await wait(650);
+              await wait(300);
+            } else {
+              setDealerHand(finalDealerHand);
+            }
+
+            if (finalDealerHand.length > 2) {
+              setIsDealerDrawing(true);
+              for (let i = 3; i <= finalDealerHand.length; i++) {
+                setDealerHand(finalDealerHand.slice(0, i));
+                await wait(420);
+              }
+              setIsDealerDrawing(false);
+            }
+
+            await wait(240);
+            setResult(msg);
+            setPlayerChips(nextChips);
+            LocalStorage.setItem("coins", nextChips.toString());
+            setGameStatus("game-over");
+            setIsLoading(false);
+            return;
+          }
+
+          setDealerRevealIndex(null);
+          setIsDealerDrawing(false);
+          setDealerHand(data.dealerHand);
+          setResult(msg);
           setPlayerChips(nextChips);
           LocalStorage.setItem("coins", nextChips.toString());
           setGameStatus("game-over");
@@ -221,10 +287,15 @@ export default function Dealer() {
         const msg = ack.result === "win" ? (ack.blackjack ? "Blackjack! 🎉 You win!" : "You win! 🎉") : ack.result === "draw" ? "Draw! Both Blackjack" : "Dealer Blackjack — Dealer wins";
         setResult(msg);
         setGameStatus("game-over");
+        setDealerRevealIndex(null);
+        setIsDealerDrawing(false);
         stopTimer();
       } else {
         setResult("");
         setGameStatus("playing");
+        setDealerRevealIndex(null);
+        setIsDealerDrawing(false);
+        standResolveRef.current = false;
         startTimer();
       }
     });
@@ -244,6 +315,8 @@ export default function Dealer() {
         stopTimer();
         setResult("BUST! Dealer wins");
         setGameStatus("game-over");
+        setDealerRevealIndex(null);
+        setIsDealerDrawing(false);
       } else if (ack.result !== undefined) {
         // Player hit exactly 21 — dealer resolved automatically
         stopTimer();
@@ -254,6 +327,8 @@ export default function Dealer() {
         setPlayerChips(nextChips);
         LocalStorage.setItem("coins", nextChips.toString());
         setGameStatus("game-over");
+        setDealerRevealIndex(null);
+        setIsDealerDrawing(false);
       } else {
         startTimer();
       }
@@ -264,8 +339,10 @@ export default function Dealer() {
     if (isLoading || !socketRef.current || !gameId || !userId) return;
     setIsLoading(true);
     stopTimer();
+    standResolveRef.current = true;
     socketRef.current.emit("game:stand", { gameId, userId }, (ack: GameActionAck) => {
       if (!ack?.ok) {
+        standResolveRef.current = false;
         setIsLoading(false);
         setMessage(ack?.message || "Failed to stand");
       }
@@ -285,6 +362,20 @@ export default function Dealer() {
   const chipStacks = getChipStacks(bet);
   const resultClassName = result.includes("win") ? styles.resultWin : result.includes("Draw") ? styles.resultDraw : styles.resultLose;
 
+  const getDealerDealStyle = (cardIndex: number): CSSProperties => ({
+    animationDelay: `${cardIndex * 0.12}s`,
+  });
+
+  const getPlayerDealStyle = (cardIndex: number): CSSProperties => ({
+    animationDelay: gameStatus === "playing" && cardIndex >= 2 ? "0.02s" : `${cardIndex * 0.12 + 0.08}s`,
+  });
+
+  const getCardSlotStyle = (cardIndex: number, totalCards: number, spacing = 95): CSSProperties =>
+    ({
+      ["--card-offset" as string]: `${(cardIndex - (totalCards - 1) / 2) * spacing}px`,
+      zIndex: cardIndex + 1,
+    }) as CSSProperties;
+
   return (
     <div className={styles.page}>
       <Navbar />
@@ -294,6 +385,7 @@ export default function Dealer() {
             ← Back
           </button>
           <div className={styles.table}>
+            <Image src={getTableImage(tableSkin)} alt="game table" fill style={{ objectFit: "fill", zIndex: 0 }} unoptimized />
             <div className={styles.innerShadow} />
 
             {gameStatus !== "betting" && (
@@ -317,16 +409,29 @@ export default function Dealer() {
               </div>
             )}
 
+            {gameStatus !== "betting" && (
+              <div className={styles.deckZone} aria-hidden="true">
+                <Image src={getCardBackImage(cardSkin)} alt="Deck" width={85} height={125} unoptimized className={`${styles.deckCard} ${styles.deckCardBottom}`.trim()} />
+                <Image src={getCardBackImage(cardSkin)} alt="Deck" width={85} height={125} unoptimized className={`${styles.deckCard} ${styles.deckCardTop}`.trim()} />
+              </div>
+            )}
+
             <div className={styles.dealerRow}>
               {gameStatus !== "betting" &&
                 dealerHand.map((card, i) => (
-                  <div key={i} className={`${styles.cardFrame} ${styles.card} ${gameStatus === "game-over" ? styles.cardFlip : ""}`.trim()}>
-                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                  <div key={i} className={styles.cardSlot} style={getCardSlotStyle(i, dealerHand.length, 108)}>
+                    <div
+                      className={`${styles.cardFrame} ${dealerRevealIndex === i ? "" : styles.dealCard} ${styles.dealToDealer} ${dealerRevealIndex === i ? styles.cardFlip : ""}`.trim()}
+                      style={getDealerDealStyle(i)}>
+                      <Image src={getCardImage(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    </div>
                   </div>
                 ))}
-              {gameStatus === "playing" && (
-                <div className={`${styles.cardFrame} ${styles.cardBack}`.trim()}>
-                  <Image src={getCardBackImage(cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
+              {gameStatus === "playing" && dealerRevealIndex === null && !isDealerDrawing && dealerHand.length < 2 && (
+                <div className={styles.cardSlot} style={getCardSlotStyle(dealerHand.length, dealerHand.length + 1, 108)}>
+                  <div className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToDealer}`.trim()} style={getDealerDealStyle(dealerHand.length)}>
+                    <Image src={getCardBackImage(cardSkin)} alt="Card back" width={85} height={125} unoptimized className={styles.cardImage} />
+                  </div>
                 </div>
               )}
             </div>
@@ -347,22 +452,26 @@ export default function Dealer() {
             <div className={styles.playerRow}>
               {gameStatus !== "betting" &&
                 playerHand.map((card, i) => (
-                  <div key={i} className={`${styles.cardFrame} ${styles.card}`.trim()}>
-                    <Image src={getCardImagePath(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                  <div key={i} className={styles.cardSlot} style={getCardSlotStyle(i, playerHand.length)}>
+                    <div className={`${styles.cardFrame} ${styles.dealCard} ${styles.dealToPlayer}`.trim()} style={getPlayerDealStyle(i)}>
+                      <Image src={getCardImage(card, cardSkin)} alt={`${card.rank}${card.suit}`} width={85} height={125} unoptimized className={styles.cardImage} />
+                    </div>
                   </div>
                 ))}
             </div>
 
             {gameStatus === "betting" && (
               <div className={styles.bettingOverlay}>
-                <p className={styles.bettingTitle}>PLACE YOUR BET</p>
-                <div className={styles.pendingBet}>{pendingBet > 0 ? pendingBet.toLocaleString() : "—"}</div>
-                <div className={styles.chipRow}>
-                  {CHIP_VALUES.map((v) => (
-                    <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
-                      <Image src={getChipImagePath(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
-                    </button>
-                  ))}
+                <div className={styles.bettingPanel}>
+                  <p className={styles.bettingTitle}>PLACE YOUR BET</p>
+                  <div className={styles.pendingBet}>{pendingBet > 0 ? pendingBet.toLocaleString() : "—"}</div>
+                  <div className={styles.chipRow}>
+                    {CHIP_VALUES.map((v) => (
+                      <button key={v} className={styles.chipButton} onClick={() => addChipToBet(v)} title={`+${v}`}>
+                        <Image src={getChipImage(v, chipSkin)} alt={`${v}`} width={52} height={52} unoptimized className={styles.chipButtonImage} />
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 {message && <p className={styles.inlineError}>{message}</p>}
               </div>
@@ -407,6 +516,9 @@ export default function Dealer() {
                 setResult("");
                 setMessage("");
                 setPendingBet(0);
+                setDealerRevealIndex(null);
+                setIsDealerDrawing(false);
+                standResolveRef.current = false;
               }}
               disabled={playerChips <= 0}
               className={`${styles.controlButton} ${styles.playAgainButton}`.trim()}>

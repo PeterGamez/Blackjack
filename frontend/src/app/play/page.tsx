@@ -10,8 +10,8 @@ import styles from "./play.module.css";
 
 export default function Home() {
   const router = useRouter();
-  const [hovered, setHovered] = useState<string | null>(null);
-  const stageRef = useRef<HTMLDivElement | null>(null);
+  const [hovered, setHovered] = useState<string>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     UserService.getUser().then((data) => {

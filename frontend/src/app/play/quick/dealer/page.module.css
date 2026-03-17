@@ -101,7 +101,7 @@
 
 .tableWrap {
   position: relative;
-  width: 820px;
+  width: 1020px;
   max-width: 98vw;
 }
 
@@ -128,12 +128,12 @@
 }
 
 .table {
-  width: 820px;
+  width: 1020px;
   max-width: 98vw;
-  height: 460px;
-  background: #c8922a;
-  border-radius: 0 0 430px 430px / 0 0 460px 460px;
-  box-shadow: 0 0 0 10px #e8b84b, 0 8px 40px rgba(0, 0, 0, 0.6);
+  height: 560px;
+  background: transparent;
+  border-radius: 0 0 560px 560px / 0 0 560px 560px;
+  box-shadow: none;
   position: relative;
   overflow: hidden;
 }
@@ -204,33 +204,79 @@
   top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  width: 100%;
+  height: 125px;
 }
 
 .playerRow {
   position: absolute;
-  bottom: 50px;
+  bottom: 125px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
+  width: 100%;
+  height: 125px;
 }
 
-.card {
-  animation: cardSlideIn 0.45s ease-out;
+.cardSlot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(calc(-50% + var(--card-offset, 0px)));
+  transition: transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.deckZone {
+  position: absolute;
+  left: 140px;
+  top: 185px;
+  width: 90px;
+  height: 130px;
+  pointer-events: none;
+}
+
+.deckCard {
+  position: absolute;
+  width: 85px;
+  height: 125px;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.deckCardBottom {
+  transform: rotate(-8deg) translate(-6px, 8px);
+  opacity: 0.7;
+}
+
+.deckCardTop {
+  transform: rotate(4deg);
+  animation: deckPulse 2.1s ease-in-out infinite;
+}
+
+.dealCard {
+  animation-name: dealFromDeck;
+  animation-duration: 0.52s;
+  animation-timing-function: cubic-bezier(0.2, 0.88, 0.24, 1.04);
+  animation-fill-mode: both;
+  --deal-from-x: -340px;
+  --deal-from-y: 0px;
+  --deal-rot-from: -14deg;
+}
+
+.dealToDealer {
+  --deal-from-x: -360px;
+  --deal-from-y: 160px;
+  --deal-rot-from: -16deg;
+}
+
+.dealToPlayer {
+  --deal-from-x: -360px;
+  --deal-from-y: -250px;
+  --deal-rot-from: 16deg;
 }
 
 .cardFlip {
   animation: cardFlip 0.6s ease-in-out;
-}
-
-.cardBack {
-  animation: cardSlideIn 0.45s ease-out;
 }
 
 .cardFrame {
@@ -296,21 +342,38 @@
   border-radius: inherit;
 }
 
+.bettingPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px 20px;
+  min-width: 340px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.2));
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
 .bettingTitle {
   margin: 0;
   font-weight: 700;
   font-size: 22px;
-  color: rgba(0, 0, 0, 0.55);
+  color: rgba(0, 0, 0, 0.62);
   letter-spacing: 1px;
 }
 
 .pendingBet {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 12px;
   padding: 10px 24px;
   font-weight: 800;
   font-size: 28px;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(0, 0, 0, 0.74);
   min-width: 120px;
   text-align: center;
 }
@@ -467,9 +530,25 @@
   font-size: 14px;
 }
 
-@keyframes cardSlideIn {
-  from { opacity: 0; transform: translateY(-40px) scale(0.85); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes dealFromDeck {
+  from {
+    opacity: 0;
+    transform: translate(var(--deal-from-x), var(--deal-from-y)) rotate(var(--deal-rot-from)) scale(0.78);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes deckPulse {
+  0%,
+  100% {
+    transform: rotate(4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-3px);
+  }
 }
 
 @keyframes cardFlip {

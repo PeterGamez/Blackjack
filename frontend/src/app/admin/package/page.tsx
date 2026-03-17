@@ -4,15 +4,17 @@ import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminPackage } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { PackageInterface } from "@/interfaces/Admin/PackageInterface";
 
 import styles from "./page.module.css";
 
 export default function AdminPackagesPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [packages, setPackages] = useState<AdminPackage[]>([]);
+  const [packages, setPackages] = useState<PackageInterface[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

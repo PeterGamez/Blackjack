@@ -20,7 +20,7 @@ type UserProfile = {
 };
 
 type GameHistoryEntry = {
-  result: "win" | "lose" | "draw";
+  result: "win" | "lose" | "draw" | "blackjack";
 };
 
 type RoleTheme = {
@@ -30,7 +30,7 @@ type RoleTheme = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile>(null);
   const [history, setHistory] = useState<GameHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -85,7 +85,7 @@ export default function ProfilePage() {
     );
   }
 
-  const wins = history.filter((game) => game.result === "win").length;
+  const wins = history.filter((game) => game.result === "win" || game.result === "blackjack").length;
   const losses = history.filter((game) => game.result === "lose").length;
   const draws = history.filter((game) => game.result === "draw").length;
   const gamesPlayed = history.length;

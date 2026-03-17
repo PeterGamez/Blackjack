@@ -4,17 +4,19 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService, { AdminCode } from "@lib/AdminService";
+import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
+
+import { CodeInterface } from "@/interfaces/Admin/CodeInterface";
 
 import styles from "../page.module.css";
 
-type AdminCodeDraft = Omit<AdminCode, "amount" | "maxUses"> & {
+type AdminCodeDraft = Omit<CodeInterface, "amount" | "maxUses"> & {
   amount: string;
   maxUses: string;
 };
 
-const mapCodeToDraft = (code: AdminCode): AdminCodeDraft => ({
+const mapCodeToDraft = (code: CodeInterface): AdminCodeDraft => ({
   ...code,
   amount: code.amount.toString(),
   maxUses: code.maxUses.toString(),
@@ -27,8 +29,8 @@ export default function AdminCodeEditPage() {
   const codeId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [code, setCode] = useState<AdminCode | null>(null);
-  const [draft, setDraft] = useState<AdminCodeDraft | null>(null);
+  const [code, setCode] = useState<CodeInterface>(null);
+  const [draft, setDraft] = useState<AdminCodeDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 

@@ -4,14 +4,11 @@ export interface UserInterface extends InterfaceBase {
     username: string;
     email: string;
     password: string;
-    role: "user" | "admin";
+    role: "user" | "vip" | "admin";
     tokens: number;
     coins: number;
     isVerified: boolean;
     cardId: number;
-    chipId?: number | null;
-    chipsId?: number | null;
-    chipSkinId?: number | null;
-    themeId?: number | null;
-    tableId?: number | null;
+    chipId: number;
+    tableId: number;
 }

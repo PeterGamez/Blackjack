@@ -30,7 +30,7 @@ type RoleTheme = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile>(null);
   const [history, setHistory] = useState<GameHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -26,8 +26,8 @@ export default function AdminPackageEditPage() {
   const packageId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [pkg, setPkg] = useState<AdminPackage | null>(null);
-  const [draft, setDraft] = useState<AdminPackageDraft | null>(null);
+  const [pkg, setPkg] = useState<AdminPackage>(null);
+  const [draft, setDraft] = useState<AdminPackageDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 

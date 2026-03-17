@@ -48,7 +48,7 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
-const parseVolume = (value: string | null, fallback: number): number => {
+const parseVolume = (value: string, fallback: number): number => {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed)) return fallback;
@@ -124,10 +124,10 @@ export default function SettingsPage() {
   const [effectVolume, setEffectVolume] = useState(75);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
-  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
 
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [historyError, setHistoryError] = useState<string>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
   useEffect(() => {

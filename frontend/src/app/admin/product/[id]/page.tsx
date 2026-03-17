@@ -26,8 +26,8 @@ export default function AdminProductEditPage() {
   const productId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [product, setProduct] = useState<AdminProduct | null>(null);
-  const [draft, setDraft] = useState<AdminProductDraft | null>(null);
+  const [product, setProduct] = useState<AdminProduct>(null);
+  const [draft, setDraft] = useState<AdminProductDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 

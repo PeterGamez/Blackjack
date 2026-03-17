@@ -24,9 +24,9 @@ export default function AdminUserEditPage() {
   const userId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [authUserId, setAuthUserId] = useState<number | null>(null);
-  const [user, setUser] = useState<AdminUser | null>(null);
-  const [draft, setDraft] = useState<AdminUserDraft | null>(null);
+  const [authUserId, setAuthUserId] = useState<number>(null);
+  const [user, setUser] = useState<AdminUser>(null);
+  const [draft, setDraft] = useState<AdminUserDraft>(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");

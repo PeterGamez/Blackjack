@@ -34,7 +34,7 @@ const CARD_PREVIEW_STYLE = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
 };
 
-function getProductPayment(product: ProductInterface): { type: "coins" | "tokens"; amount: number } | null {
+function getProductPayment(product: ProductInterface): { type: "coins" | "tokens"; amount: number } {
   if (product.coins > 0) {
     return { type: "coins", amount: product.coins };
   }
@@ -50,11 +50,11 @@ function StorePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState<ShopTab>("recommend");
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string>(null);
   const [products, setProducts] = useState<ProductInterface[]>([]);
   const [owned, setOwned] = useState<Set<number>>(new Set());
-  const [buying, setBuying] = useState<number | null>(null);
-  const [message, setMessage] = useState<{ id: number; text: string; ok: boolean } | null>(null);
+  const [buying, setBuying] = useState<number>(null);
+  const [message, setMessage] = useState<{ id: number; text: string; ok: boolean }>(null);
   const [coins, setCoins] = useState<number>(0);
   const [tokens, setTokens] = useState<number>(0);
 

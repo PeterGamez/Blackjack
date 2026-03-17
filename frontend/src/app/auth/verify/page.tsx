@@ -10,8 +10,8 @@ import styles from "./page.module.css";
 function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string>(null);
+  const [error, setError] = useState<string>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -89,8 +89,8 @@ export default function InventoryPage() {
   const [activeTab, setActiveTab] = useState<ProductInterface["type"]>("card");
   const [selectedSkins, setSelectedSkins] = useState<SelectedSkinsState>({ card: "default", chip: "default", table: "default" });
   const [ownedSkinsByType, setOwnedSkinsByType] = useState<OwnedSkinsState>({ card: [], chip: [], table: [] });
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [equipMessage, setEquipMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [hovered, setHovered] = useState<string>(null);
+  const [equipMessage, setEquipMessage] = useState<{ ok: boolean; text: string }>(null);
 
   const resetToDefaultSkins = useCallback(() => {
     setOwnedSkinsByType({ card: [], chip: [], table: [] });

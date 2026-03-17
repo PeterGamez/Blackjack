@@ -56,7 +56,7 @@ const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
 
 export default function Dealer() {
   const router = useRouter();
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<Socket>(null);
   const [gameStatus, setGameStatus] = useState<GameStatus>("betting");
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
@@ -73,12 +73,12 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [dealerRevealIndex, setDealerRevealIndex] = useState<number | null>(null);
+  const [dealerRevealIndex, setDealerRevealIndex] = useState<number>(null);
   const [isDealerDrawing, setIsDealerDrawing] = useState(false);
   const [cardSkin, setCardSkin] = useState<string>("default");
   const [chipSkin, setChipSkin] = useState<string>("default");
   const [tableSkin, setTableSkin] = useState<string>("default");
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const standResolveRef = useRef(false);
 
   const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -93,7 +93,7 @@ export default function Dealer() {
     syncSkins();
 
     const handleStorageChange = (event: Event) => {
-      const storageEvent = event as CustomEvent<{ key?: string | null }>;
+      const storageEvent = event as CustomEvent<{ key?: string }>;
       const key = storageEvent.detail?.key;
       if (!key || key === "cardSkin" || key === "chipSkin" || key === "tableSkin") {
         syncSkins();

@@ -28,8 +28,8 @@ export default function AdminCodeEditPage() {
   const codeId = parseInt(params.id as string);
 
   const [status, setStatus] = useState<"loading" | "ready">("loading");
-  const [code, setCode] = useState<CodeInterface | null>(null);
-  const [draft, setDraft] = useState<AdminCodeDraft | null>(null);
+  const [code, setCode] = useState<CodeInterface>(null);
+  const [draft, setDraft] = useState<AdminCodeDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 

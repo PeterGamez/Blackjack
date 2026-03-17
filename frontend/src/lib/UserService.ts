@@ -7,7 +7,7 @@ import LocalStorage from "./LocalStorage";
 import ShopService from "./ShopService";
 
 export default class UserService {
-  private static async authenticatedFetch(path: string, init?: RequestInit): Promise<Response | null> {
+  private static async authenticatedFetch(path: string, init?: RequestInit): Promise<Response> {
     let token = LocalStorage.getItem("accessToken");
 
     if (!token) {
@@ -73,7 +73,7 @@ export default class UserService {
         };
       });
 
-      const resolveSkinPath = (type: "card" | "chip" | "table", selectedId: number | null | undefined, currentSkin: string): string => {
+      const resolveSkinPath = (type: "card" | "chip" | "table", selectedId: number, currentSkin: string): string => {
         if (selectedId === null || selectedId === 0) {
           return "default";
         }

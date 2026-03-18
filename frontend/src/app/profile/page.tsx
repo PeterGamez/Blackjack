@@ -2,7 +2,7 @@
 
 import ProfileAvatar from "@components/ProfileAvatar";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
@@ -34,6 +34,11 @@ export default function ProfilePage() {
   const [history, setHistory] = useState<GameHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleLogout = useCallback(() => {
+    UserService.logout();
+    router.push("/auth");
+  }, [router]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -45,7 +50,7 @@ export default function ProfilePage() {
       }
 
       if (!userData) {
-        setIsLoading(false);
+        handleLogout();
         return;
       }
 
@@ -61,12 +66,7 @@ export default function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  const handleLogout = () => {
-    UserService.logout();
-    router.push("/auth");
-  };
+  }, [handleLogout]);
 
   if (isLoading) {
     return <div className={styles.page} />;

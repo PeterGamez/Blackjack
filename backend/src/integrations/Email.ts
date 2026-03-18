@@ -52,14 +52,14 @@ export class Email {
         const verificationToken = await this.generate();
 
         await RedisService.hmset<EmailVerificationData>(`${this.PREFIX_VERIFY}${verificationToken}`, { userId: userId.toString(), email });
-        await RedisService.expire(`${this.PREFIX_VERIFY}${verificationToken}`, this.server.config.email.verifyExpiresIn * 60 * 60);
+        await RedisService.expire(`${this.PREFIX_VERIFY}${verificationToken}`, this.server.config.email.verifyExpiresIn * 60);
 
         const verificationUrl = `${this.server.config.site.url}/auth/verify?token=${verificationToken}`;
 
         await this.transporter.sendMail({
-            from: `noreply ${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
+            from: `${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
             to: email,
-            subject: "Verify Your Email - Blackjack",
+            subject: "Verify Your Email",
             html: this.htmlVerifyEmail(verificationUrl),
         });
     }
@@ -86,9 +86,9 @@ export class Email {
         const resetUrl = `${this.server.config.site.url}/auth/reset-password?token=${resetToken}`;
 
         await this.transporter.sendMail({
-            from: `noreply ${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
+            from: `${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
             to: email,
-            subject: "Password Reset - Blackjack",
+            subject: "Password Reset",
             html: this.htmlResetPasswordEmail(resetUrl),
         });
     }

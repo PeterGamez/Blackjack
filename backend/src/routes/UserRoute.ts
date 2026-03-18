@@ -120,7 +120,7 @@ export default class UserRoute implements RouteInterface {
                     return c.json({ error: "User not found" }, 404);
                 }
 
-                const passwordMatch = await this.server.Password.compare(password, user.password);
+                const passwordMatch = await this.server.Password.verify(password, user.password);
                 if (!passwordMatch) {
                     return c.json({ error: "Incorrect password" }, 401);
                 }

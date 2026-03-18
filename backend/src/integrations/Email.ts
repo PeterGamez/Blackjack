@@ -108,10 +108,13 @@ export class Email {
 
     private async generate(): Promise<string> {
         const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        const length = chars.length;
 
-        const token = Array.from(crypto.randomBytes(32))
-            .map((b) => chars[b % length])
+        const buffer = new Uint8Array(32);
+
+        crypto.getRandomValues(buffer);
+
+        const token = Array.from(buffer)
+            .map((b) => chars[b % chars.length])
             .join("");
 
         return token;

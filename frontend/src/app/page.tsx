@@ -2,6 +2,10 @@
 
 import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import LocalStorage from "@/lib/LocalStorage";
+import UserService from "@/lib/UserService";
 
 import styles from "./page.module.css";
 
@@ -42,6 +46,20 @@ const activityItems = [
 
 export default function Home() {
   const router = useRouter();
+
+  useEffect(() => {
+    async function checkAuth() {
+      const currentUser = await UserService.getUser();
+      if (!currentUser) {
+        UserService.logout();
+        return;
+      }
+    }
+
+    if (LocalStorage.getItem("accessToken")) {
+      void checkAuth();
+    }
+  }, []);
 
   return (
     <div className={styles.page}>

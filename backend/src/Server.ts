@@ -14,7 +14,7 @@ export default class Server {
     public Middleware = new Middleware(this);
 
     public Email = new Email(this);
-    public JWT = new JWT();
+    public JWT = new JWT(this);
     public Password = new Password();
 
     public SlipOK = new SlipOK(this);

@@ -1,35 +1,45 @@
 import { sign, verify } from "hono/jwt";
 
-import config from "../config";
+import type Server from "../Server";
 import type { JWTPayload } from "../interfaces/Auth";
 import type { UserInterface } from "../interfaces/Database";
 
 export class JWT {
+    private readonly ALGORITHM = "HS256";
+    private server: Server;
+
+    public constructor(server: Server) {
+        this.server = server;
+    }
+
     public async generateAccessToken(user: UserInterface): Promise<string> {
         const now = Math.floor(Date.now() / 1000);
+
         const payload: JWTPayload = {
             userId: user.id,
-            exp: now + this.formatTtl(config.auth.accessTokenTtl),
+            exp: now + this.formatTtl(this.server.config.auth.accessTokenTtl),
             iat: now,
         };
 
-        return await sign(payload, config.auth.accessTokenSecret, "HS256");
+        return await sign(payload, this.server.config.auth.accessTokenSecret, this.ALGORITHM);
     }
 
     public async generateRefreshToken(user: UserInterface): Promise<string> {
         const now = Math.floor(Date.now() / 1000);
+
         const payload = {
             userId: user.id,
-            exp: now + this.formatTtl(config.auth.refreshTokenTtl),
+            exp: now + this.formatTtl(this.server.config.auth.refreshTokenTtl),
             iat: now,
         };
 
-        return await sign(payload, config.auth.refreshTokenSecret, "HS256");
+        return await sign(payload, this.server.config.auth.refreshTokenSecret, this.ALGORITHM);
     }
 
     public async verifyAccessToken(token: string): Promise<JWTPayload> {
         try {
-            return (await verify(token, config.auth.accessTokenSecret, "HS256")) as JWTPayload;
+            const payload = (await verify(token, this.server.config.auth.accessTokenSecret, this.ALGORITHM)) as JWTPayload;
+            return payload;
         } catch {
             return null;
         }
@@ -37,7 +47,8 @@ export class JWT {
 
     public async verifyRefreshToken(token: string): Promise<JWTPayload> {
         try {
-            return (await verify(token, config.auth.refreshTokenSecret, "HS256")) as JWTPayload;
+            const payload = (await verify(token, this.server.config.auth.refreshTokenSecret, this.ALGORITHM)) as JWTPayload;
+            return payload;
         } catch {
             return null;
         }

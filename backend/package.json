@@ -1,5 +1,9 @@
 {
+  "name": "backend",
   "module": "dist/index.js",
+  "engines": {
+    "bun": "1.3.x"
+  },
   "scripts": {
     "dev": "bun run build && bun run .",
     "build": "bun run tools/clear.js && tsc",

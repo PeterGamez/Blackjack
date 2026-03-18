@@ -50,7 +50,7 @@ export default class ShopRoute implements RouteInterface {
             try {
                 let body: { productId: number; payment: "tokens" | "coins" };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }

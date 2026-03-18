@@ -116,7 +116,7 @@ export default class AdminRoute implements RouteInterface {
                 let body: { username?: string; email?: string; role?: UserInterface["role"]; tokens?: number; coins?: number };
 
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -184,7 +184,7 @@ export default class AdminRoute implements RouteInterface {
             try {
                 let body: { code: string; amount: number; type: CodeInterface["type"]; maxUses: number; isActive: boolean; expiredDate: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -262,7 +262,7 @@ export default class AdminRoute implements RouteInterface {
                 let body: { code?: string; amount?: number; type?: CodeInterface["type"]; maxUses?: number; isActive?: boolean; expiredDate?: string };
 
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -345,7 +345,7 @@ export default class AdminRoute implements RouteInterface {
             try {
                 let body: { image: string; price: number; tokens: number; isActive: boolean };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -417,7 +417,7 @@ export default class AdminRoute implements RouteInterface {
                 let body: { image?: string; price?: number; tokens?: number; isActive?: boolean };
 
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -498,7 +498,7 @@ export default class AdminRoute implements RouteInterface {
             try {
                 let body: { name: string; description: string; image: string; path: string; tokens: number; coins: number; type: ProductInterface["type"]; isRecommend: boolean; isActive: boolean };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -589,7 +589,7 @@ export default class AdminRoute implements RouteInterface {
                 };
 
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }

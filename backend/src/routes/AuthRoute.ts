@@ -25,7 +25,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { username: string; email: string; password: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -77,7 +77,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { token: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -119,7 +119,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { username: string; password: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -168,7 +168,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { refreshToken: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -213,7 +213,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { email: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
@@ -252,7 +252,7 @@ export default class AuthRoute implements RouteInterface {
             try {
                 let body: { token: string; password: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }

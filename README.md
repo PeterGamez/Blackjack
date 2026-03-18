@@ -265,8 +265,9 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-PAYMENT-01 | `GET` | `/payment/packages` | None | Bearer | ดึงรายการแพ็กเกจเติมเงินทั้งหมด |
-| API-PAYMENT-02 | `POST` | `/payment/bank` | `multipart/form-data: {image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
-| API-PAYMENT-03 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
+| API-PAYMENT-02 | `POST` | `/payment/qr` | `{packageId}` | Bearer | สร้าง QR code สำหรับเติมเงิน |
+| API-PAYMENT-03 | `POST` | `/payment/bank` | `multipart/form-data: {image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
+| API-PAYMENT-04 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
 
 #### 4.2.5 Shop API
 

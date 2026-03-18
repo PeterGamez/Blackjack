@@ -179,6 +179,21 @@
   box-sizing: border-box;
 }
 
+.packageImageWrap {
+  width: 100%;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+}
+
+.packageImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .packageInfo {
   position: absolute;
   bottom: 5px;

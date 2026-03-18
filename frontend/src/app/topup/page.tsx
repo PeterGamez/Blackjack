@@ -4,6 +4,7 @@ import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import config from "@/config";
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
 import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
@@ -13,6 +14,24 @@ import styles from "./page.module.css";
 export default function TopupPage() {
   const router = useRouter();
   const [packages, setPackages] = useState<PaymentPackageInterface[]>([]);
+
+  const resolvePackageImage = (image: string): string => {
+    const imagePath = image.trim();
+
+    if (!imagePath) {
+      return "/icons/token.png";
+    }
+
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:") || imagePath.startsWith("blob:")) {
+      return imagePath;
+    }
+
+    if (imagePath.startsWith("/")) {
+      return `${config.apiUrl}${imagePath}`;
+    }
+
+    return imagePath;
+  };
 
   useEffect(() => {
     const initPage = async () => {
@@ -48,6 +67,9 @@ export default function TopupPage() {
         <div className={styles.grid}>
           {packages.map((pkg) => (
             <div key={pkg.id} className={styles.packageCard} onClick={() => router.push(`/topup/payment?packageId=${pkg.id}&tokens=${pkg.tokens}&price=${pkg.price}`)}>
+              <div className={styles.packageImageWrap}>
+                <img src={resolvePackageImage(pkg.image)} alt={`${pkg.tokens.toLocaleString()} token package`} className={styles.packageImage} loading="lazy" />
+              </div>
               <div className={styles.packageInfo}>
                 {pkg.tokens.toLocaleString()} Token
                 <br />

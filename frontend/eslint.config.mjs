@@ -8,11 +8,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
+    // Ignore all files except those in src/
+    "*",
+    "!src/**"
   ]),
 
   eslintConfigPrettier,

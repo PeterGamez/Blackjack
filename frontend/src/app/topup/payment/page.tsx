@@ -7,6 +7,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
+
 import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
@@ -179,12 +180,7 @@ function PaymentContent() {
                 <div className={styles.qrPreview}>QR Code</div>
                 <label className={styles.uploadButton}>
                   ⬆ UPLOAD SLIP
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)}
-                    className={styles.hiddenFileInput}
-                  />
+                  <input type="file" accept="image/*" onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)} className={styles.hiddenFileInput} />
                 </label>
                 <div className={styles.selectedFileName}>{slipFile ? slipFile.name : "No file selected"}</div>
               </div>

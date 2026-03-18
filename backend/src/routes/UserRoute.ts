@@ -60,12 +60,22 @@ export default class UserRoute implements RouteInterface {
         });
 
         this.app.patch("/me", async (c) => {
+<<<<<<< HEAD
+=======
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+            }
+
+            let body: { cardId?: number; chipId?: number; tableId?: number };
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
             try {
                 const user = await this.server.Middleware.getUser(c);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
                 }
 
+<<<<<<< HEAD
                 let body: { cardId?: number; chipId?: number; tableId?: number };
                 try {
                     body = await c.req.json();
@@ -78,6 +88,23 @@ export default class UserRoute implements RouteInterface {
                 if (cardId === undefined && chipId === undefined && tableId === undefined) {
                     return c.json({ error: "No update fields provided" }, 400);
                 }
+=======
+            const { cardId, chipId, tableId } = body;
+
+            if (cardId === undefined && chipId === undefined && tableId === undefined) {
+                return c.json({ error: "No update fields provided" }, 400);
+            }
+
+            if (cardId !== undefined) {
+                await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
+            }
+            if (chipId !== undefined) {
+                await UserModel.updateUser(user.id, "chipId", chipId === 0 ? null : chipId);
+            }
+            if (tableId !== undefined) {
+                await UserModel.updateUser(user.id, "tableId", tableId === 0 ? null : tableId);
+            }
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 
                 if (cardId !== undefined) {
                     await UserModel.updateUser(user.id, "cardId", cardId === 0 ? null : cardId);
@@ -148,7 +175,11 @@ export default class UserRoute implements RouteInterface {
                     return c.json({ error: "User not found" }, 404);
                 }
 
+<<<<<<< HEAD
                 const passwordMatch = await this.server.Password.verify(currentPassword, user.password);
+=======
+                const passwordMatch = await this.server.Password.compare(currentPassword, user.password);
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
                 if (!passwordMatch) {
                     return c.json({ error: "Incorrect current password" }, 401);
                 }
@@ -160,6 +191,16 @@ export default class UserRoute implements RouteInterface {
             } catch (error) {
                 this.server.error("UserRoute", `Error parsing request body: ${(error as Error).message}`);
                 return c.json({ error: "Invalid request body" }, 400);
+<<<<<<< HEAD
+=======
+            }
+        });
+
+        this.app.get("/payment-history", async (c) => {
+            const user = await this.server.Middleware.getUser(c);
+            if (!user) {
+                return c.json({ error: "User not found" }, 404);
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
             }
         });
 

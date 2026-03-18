@@ -9,7 +9,7 @@ import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipSkin, getTableSkin } from "@lib/skinUtils";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
 
 import AuthService from "@/lib/AuthService";
 import ShopService from "@/lib/ShopService";
@@ -17,17 +17,16 @@ import ShopService from "@/lib/ShopService";
 import styles from "./page.module.css";
 
 interface SkinItem {
-  path: string; // folder name used in /cards/{id}/
+  path: string;
   name: string;
-  preview: string; // image path for preview
   productId: number;
   type: ProductInterface["type"];
 }
 
 const BUILT_IN_SKINS: Record<ProductInterface["type"], SkinItem[]> = {
-  card: [{ path: "default", name: "Default Card", preview: "/cards/default/backcard.png", productId: 0, type: "card" }],
-  chip: [{ path: "default", name: "Default Chip", preview: "/chips/default/chips100.png", productId: 0, type: "chip" }],
-  table: [{ path: "default", name: "Default Table", preview: "/tables/default/table.png", productId: 0, type: "table" }],
+  card: [{ path: "default", name: "Default Card", productId: 0, type: "card" }],
+  chip: [{ path: "default", name: "Default Chip", productId: 0, type: "chip" }],
+  table: [{ path: "default", name: "Default Table", productId: 0, type: "table" }],
 };
 
 const TABS: ProductInterface["type"][] = ["card", "chip", "table"];
@@ -68,6 +67,17 @@ const TAB_LABELS: Record<ProductInterface["type"], string> = {
   chip: "Chip Skins",
   table: "Table Skins",
 };
+
+const CHIP_PREVIEW_VALUES = [1000, 500, 100, 25, 10, 5, 1];
+const CHIP_STACK_LAYOUT = [
+  { x: 0.18, y: 0.62, layers: 9, tilt: -9 },
+  { x: 0.42, y: 0.56, layers: 10, tilt: -2 },
+  { x: 0.67, y: 0.62, layers: 8, tilt: 8 },
+  { x: 0.3, y: 0.75, layers: 7, tilt: -6 },
+  { x: 0.56, y: 0.7, layers: 8, tilt: 4 },
+  { x: 0.78, y: 0.8, layers: 6, tilt: 10 },
+  { x: 0.47, y: 0.86, layers: 5, tilt: 0 },
+];
 
 const STORAGE_KEY_BY_TAB: Record<ProductInterface["type"], "cardSkin" | "chipSkin" | "tableSkin"> = {
   card: "cardSkin",
@@ -137,7 +147,6 @@ export default function InventoryPage() {
             ownedByType.card.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "card",
             });
@@ -148,7 +157,6 @@ export default function InventoryPage() {
             ownedByType.chip.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "chip",
             });
@@ -159,7 +167,6 @@ export default function InventoryPage() {
             ownedByType.table.push({
               path: product.path,
               name: product.name,
-              preview: product.image,
               productId: product.id,
               type: "table",
             });
@@ -251,6 +258,11 @@ export default function InventoryPage() {
           ) : (
             displayedSkins.map((skin) => {
               const isEquipped = selectedSkins[activeTab] === skin.path;
+              const chipSize = 46;
+              const chipPreviewWidth = 185;
+              const chipPreviewHeight = 140;
+              const chipLayerOffset = 4;
+
               return (
                 <div
                   key={`${activeTab}-${skin.productId}-${skin.path}`}
@@ -266,9 +278,46 @@ export default function InventoryPage() {
                           <Image src={getCardImage({ suit: "♥", rank: "K" }, skin.path)} alt="king" width={75} height={110} unoptimized style={CARD_IMAGE_STYLE} />
                         </div>
                       </div>
+                    ) : activeTab === "chip" ? (
+                      <div style={{ position: "relative", width: chipPreviewWidth, height: chipPreviewHeight }}>
+                        {CHIP_PREVIEW_VALUES.map((value, index) => {
+                          const layout = CHIP_STACK_LAYOUT[index];
+                          const centerX = layout.x * chipPreviewWidth;
+                          const bottomCenterY = layout.y * chipPreviewHeight;
+
+                          return (
+                            <div key={`${skin.path}-stack-${value}`} style={{ position: "absolute", inset: 0 }}>
+                              {Array.from({ length: layout.layers }).map((_, layerIndex) => {
+                                const y = bottomCenterY - layerIndex * chipLayerOffset;
+
+                                return (
+                                  <Image
+                                    key={`${skin.path}-chip-${value}-${layerIndex}`}
+                                    src={getChipImage(value, skin.path)}
+                                    alt={`${skin.name} chip ${value}`}
+                                    width={chipSize}
+                                    height={chipSize}
+                                    unoptimized
+                                    style={{
+                                      position: "absolute",
+                                      left: centerX - chipSize / 2,
+                                      top: y - chipSize / 2,
+                                      transform: `rotate(${layout.tilt}deg)`,
+                                      transformOrigin: "center center",
+                                      zIndex: 100 + index * 10 + layerIndex,
+                                      objectFit: "contain",
+                                      filter: "drop-shadow(0 3px 5px rgba(0,0,0,0.3))",
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
                     ) : (
                       <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-                        <Image src={skin.preview} alt={skin.name} width={120} height={120} unoptimized style={{ objectFit: "contain", maxWidth: "90%", maxHeight: "90%" }} />
+                        <Image src={getTableImage(skin.path)} alt={skin.name} width={120} height={120} unoptimized style={{ objectFit: "contain", maxWidth: "90%", maxHeight: "90%" }} />
                       </div>
                     )}
                   </div>

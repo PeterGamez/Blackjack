@@ -41,6 +41,31 @@ export default class PaymentRoute implements RouteInterface {
             }
         });
 
+        this.app.get("package/:id", async (c) => {
+            try {
+                const packageId = parseInt(c.req.param("id"));
+                if (isNaN(packageId)) {
+                    return c.json({ error: "Invalid package ID" }, 400);
+                }
+
+                const pack = await PackageModel.selectPackage(packageId);
+                if (!pack) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
+                return c.json({
+                    id: pack.id,
+                    image: pack.image,
+                    price: pack.price,
+                    tokens: pack.tokens,
+                });
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error fetching package:`);
+                console.error(error);
+                return c.json({ error: "Error fetching package" }, 500);
+            }
+        });
+
         this.app.post("/qr", async (c) => {
             try {
                 let body: { packageId: number };
@@ -68,6 +93,31 @@ export default class PaymentRoute implements RouteInterface {
                 this.server.error("PaymentRoute", `Error processing QR code request:`);
                 console.error(error);
                 return c.json({ error: "Error processing QR code request" }, 500);
+            }
+        });
+
+        this.app.get("package/:id", async (c) => {
+            try {
+                const packageId = parseInt(c.req.param("id"));
+                if (isNaN(packageId)) {
+                    return c.json({ error: "Invalid package ID" }, 400);
+                }
+
+                const pack = await PackageModel.selectPackage(packageId);
+                if (!pack) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
+                return c.json({
+                    id: pack.id,
+                    image: pack.image,
+                    price: pack.price,
+                    tokens: pack.tokens,
+                });
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error fetching package:`);
+                console.error(error);
+                return c.json({ error: "Error fetching package" }, 500);
             }
         });
 

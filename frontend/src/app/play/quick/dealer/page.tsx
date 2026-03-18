@@ -26,6 +26,11 @@ interface ChipStack {
   image: string;
 }
 
+interface ForcedCardPayload {
+  suit: string;
+  rank: string;
+}
+
 interface GameStartAck {
   ok?: boolean;
   message?: string;
@@ -53,6 +58,8 @@ interface GameActionAck {
 type GameStatus = "betting" | "playing" | "game-over";
 
 const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
+const FORCED_CARD_SUITS = ["♠", "♥", "♦", "♣"];
+const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 export default function Dealer() {
   const router = useRouter();
@@ -69,6 +76,9 @@ export default function Dealer() {
   }, [playerChips]);
   const [message, setMessage] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [showWinPopup, setShowWinPopup] = useState(false);
+  const [showLosePopup, setShowLosePopup] = useState(false);
+  const [showDrawPopup, setShowDrawPopup] = useState(false);
   const [gameId, setGameId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
@@ -78,6 +88,12 @@ export default function Dealer() {
   const [cardSkin, setCardSkin] = useState<string>("default");
   const [chipSkin, setChipSkin] = useState<string>("default");
   const [tableSkin, setTableSkin] = useState<string>("default");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdminHitDropdownOpen, setIsAdminHitDropdownOpen] = useState<boolean>(false);
+  const [forceNextHitCard, setForceNextHitCard] = useState<boolean>(false);
+  const [forcedSuit, setForcedSuit] = useState<string>("♠");
+  const [forcedRank, setForcedRank] = useState<string>("A");
+
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const standResolveRef = useRef(false);
 
@@ -162,6 +178,7 @@ export default function Dealer() {
 
       setUserId(user.id);
       setPlayerChips(user.coins);
+      setIsAdmin(user.role === "admin");
 
       LocalStorage.setItem("coins", user.coins.toString());
 
@@ -251,6 +268,39 @@ export default function Dealer() {
       socketRef.current?.disconnect();
     };
   }, [router]);
+  
+  useEffect(() => {
+  const lower = result.toLowerCase();
+
+  setShowWinPopup(false);
+  setShowLosePopup(false);
+
+ if (lower.includes("you win")) {
+    setShowWinPopup(true);
+  } else if (lower.includes("lose") || lower.includes("dealer wins") || lower.includes("bust")) {
+    setShowLosePopup(true);
+  }
+}, [result]);
+
+  useEffect(() => {
+  const lower = result.toLowerCase();
+
+  setShowWinPopup(false);
+  setShowLosePopup(false);
+  setShowDrawPopup(false);
+
+  if (lower.includes("you win")) {
+    setShowWinPopup(true);
+  } else if (lower.includes("draw")) {
+    setShowDrawPopup(true);
+  } else if (
+    lower.includes("lose") ||
+    lower.includes("dealer wins") ||
+    lower.includes("bust")
+  ) {
+    setShowLosePopup(true);
+  }
+}, [result]);
 
   const startGame = (betAmount: number) => {
     if (betAmount <= 0 || betAmount > playerChips) {
@@ -304,11 +354,19 @@ export default function Dealer() {
   const hit = () => {
     if (isLoading || !socketRef.current || !gameId || !userId) return;
     setIsLoading(true);
-    socketRef.current.emit("game:hit", { gameId, userId }, (ack: GameActionAck) => {
+    const payload: { gameId: number; userId: number; forcedCard?: ForcedCardPayload } = { gameId, userId };
+    if (isAdmin && forceNextHitCard) {
+      payload.forcedCard = { suit: forcedSuit, rank: forcedRank };
+    }
+
+    socketRef.current.emit("game:hit", payload, (ack: GameActionAck) => {
       setIsLoading(false);
       if (!ack?.ok) {
         setMessage(ack?.message || "Failed to hit");
         return;
+      }
+      if (isAdmin && forceNextHitCard) {
+        setForceNextHitCard(false);
       }
       setPlayerHand(ack.playerHand);
       if (ack.bust) {
@@ -479,6 +537,175 @@ export default function Dealer() {
 
             {result && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
           </div>
+          {result && !showWinPopup && (
+  <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>
+    {result}
+  </div>
+)}
+
+{showWinPopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.winTitle}>You Win!</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: +{bet} chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+        <div className={styles.divider}></div>
+        
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowWinPopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          PLAY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showLosePopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.loseTitle}>You Lose</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: -{bet} chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowLosePopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          TRY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showDrawPopup && (
+  <div className={styles.winOverlay}>
+    <div className={styles.winContentFull}>
+      <h1 className={styles.drawTitle}>Draw</h1>
+
+      <div className={styles.winContent}>
+        <p>Your Score: {playerValue}</p>
+        <p>Opponent Score: {dealerValue}</p>
+        <p>Bet: {bet} chips</p>
+        <p>Result: 0 chips</p>
+
+        <div className={styles.divider}></div>
+
+        <p>Current Balance: {playerChips.toLocaleString()} coin</p>
+      </div>
+
+      <div className={styles.winButtons}>
+        <button onClick={() => router.push("/play")}>
+          BACK TO LOBBY
+        </button>
+
+        <button
+          onClick={() => {
+            setShowDrawPopup(false);
+
+            setGameStatus("betting");
+            setPlayerHand([]);
+            setDealerHand([]);
+            setResult("");
+            setMessage("");
+            setPendingBet(0);
+            setDealerRevealIndex(null);
+            setIsDealerDrawing(false);
+            standResolveRef.current = false;
+          }}
+        >
+          PLAY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+          {isAdmin && gameStatus === "playing" && (
+            <div className={styles.adminHitDock}>
+              <button type="button" className={styles.adminHitDropdownButton} onClick={() => setIsAdminHitDropdownOpen((prev) => !prev)}>
+                Admin Hit Control {isAdminHitDropdownOpen ? "▴" : "▾"}
+              </button>
+
+              {isAdminHitDropdownOpen && (
+                <div className={styles.adminHitPanel}>
+                  <label className={styles.adminToggleRow}>
+                    <input type="checkbox" checked={forceNextHitCard} onChange={(e) => setForceNextHitCard(e.target.checked)} />
+                    Force next hit card
+                  </label>
+                  <div className={styles.adminSelectRow}>
+                    <select className={styles.adminSelect} value={forcedRank} onChange={(e) => setForcedRank(e.target.value)}>
+                      {FORCED_CARD_RANKS.map((rank) => (
+                        <option key={rank} value={rank}>
+                          {rank}
+                        </option>
+                      ))}
+                    </select>
+                    <select className={styles.adminSelect} value={forcedSuit} onChange={(e) => setForcedSuit(e.target.value)}>
+                      {FORCED_CARD_SUITS.map((suit) => (
+                        <option key={suit} value={suit}>
+                          {suit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className={styles.controls}>
@@ -497,14 +724,16 @@ export default function Dealer() {
           )}
 
           {gameStatus === "playing" && (
-            <div className={`${styles.controlsRow} ${styles.playingRow}`.trim()}>
-              <button onClick={hit} disabled={isLoading} className={`${styles.controlButton} ${styles.hitButton}`.trim()}>
-                HIT
-              </button>
-              <button onClick={stand} disabled={isLoading} className={`${styles.controlButton} ${styles.standButton}`.trim()}>
-                STAND
-              </button>
-            </div>
+            <>
+              <div className={`${styles.controlsRow} ${styles.playingRow}`.trim()}>
+                <button onClick={hit} disabled={isLoading} className={`${styles.controlButton} ${styles.hitButton}`.trim()}>
+                  HIT
+                </button>
+                <button onClick={stand} disabled={isLoading} className={`${styles.controlButton} ${styles.standButton}`.trim()}>
+                  STAND
+                </button>
+              </div>
+            </>
           )}
 
           {gameStatus === "game-over" && (

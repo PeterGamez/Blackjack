@@ -313,6 +313,21 @@
   margin-top: 70px;
 }
 
+.recommendContent {
+  display: flex;
+  gap: 30px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: stretch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.recommendProduct {
+  flex: 0 0 calc((100% - 60px) / 3);
+  min-width: calc((100% - 60px) / 3);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -329,6 +344,10 @@
   align-items: stretch;
   gap: 0;
   overflow: hidden;
+}
+
+.recommendContent .recommendProduct {
+  height: min(650px, calc(100vh - 425px));
 }
 
 .productPreview {
@@ -389,5 +408,14 @@
 
   .backButton {
     margin: 10px 20px;
+  }
+
+  .recommendProduct {
+    flex: 0 0 min(280px, calc(100% - 10px));
+    min-width: min(280px, calc(100% - 10px));
+  }
+
+  .recommendContent .recommendProduct {
+    height: 320px;
   }
 }

@@ -163,4 +163,38 @@ export default class UserService {
       throw error;
     }
   }
+
+  public static async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const trimmedCurrentPassword = currentPassword.trim();
+    const trimmedNewPassword = newPassword.trim();
+
+    if (!trimmedCurrentPassword || !trimmedNewPassword) {
+      throw new Error("Current password and new password are required");
+    }
+
+    const response = await this.authenticatedFetch("/user/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword: trimmedCurrentPassword, newPassword: trimmedNewPassword }),
+    });
+
+    if (!response) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!response.ok) {
+      let errorMessage = "Failed to update password";
+
+      try {
+        const payload = (await response.json()) as { error?: string };
+        if (payload?.error) {
+          errorMessage = payload.error;
+        }
+      } catch {
+        // Keep fallback message when response has no JSON payload.
+      }
+
+      throw new Error(errorMessage);
+    }
+  }
 }

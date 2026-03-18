@@ -19,7 +19,6 @@ export default class ProductModel {
     public static async insertProduct(
         name: string,
         description: string,
-        image: string,
         path: string,
         tokens: number,
         coins: number,
@@ -27,10 +26,10 @@ export default class ProductModel {
         isRecommend: boolean,
         isActive: boolean
     ): Promise<void> {
-        const sql = `INSERT INTO ${this.table} (name, description, image, path, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO ${this.table} (name, description, path, tokens, coins, type, isRecommend, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            await connection.execute<ResultSetHeader>(sql, [name, description, image, path, tokens, coins, type, isRecommend, isActive]);
+            await connection.execute<ResultSetHeader>(sql, [name, description, path, tokens, coins, type, isRecommend, isActive]);
         } finally {
             connection.release();
         }

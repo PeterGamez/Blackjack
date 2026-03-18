@@ -83,13 +83,13 @@ export default class GameSocket {
         });
 
         socket.on("game:hit", async (payload: GameActionPayload, ack?: AckType) => {
-            const { gameId, userId } = payload;
+            const { gameId, userId, forcedCard } = payload;
             if (!gameId || !userId) {
                 ack?.({ ok: false, message: "gameId and userId are required" });
                 return;
             }
             try {
-                const result = await GameController.hitGame(gameId, userId);
+                const result = await GameController.hitGame(gameId, userId, forcedCard);
                 if (result.ok === false) {
                     ack?.({ ok: false, message: result.message });
                     return;

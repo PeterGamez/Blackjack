@@ -249,10 +249,15 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-USER-01 | `GET` | `/user/me` | None | Bearer | ดึงข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินอยู่ รวมถึง Product ที่มี |
-| API-USER-02 | `PATCH` | `/user/me` | `{password?, cardId?, chipId?, tableId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
+| API-USER-02 | `PATCH` | `/user/me` | `{cardId?, chipId?, tableId?}` | Bearer | อัปเดตข้อมูลโปรไฟล์ผู้ใช้ |
+<<<<<<< HEAD
 | API-USER-03 | `DELETE` | `/user/me` | `{password}` | Bearer | ลบบัญชีผู้ใช้ |
+=======
+| API-USER-03 | `DELETE` | `/user/me` | None | Bearer | ลบบัญชีผู้ใช้ของตนเอง (soft delete หรือ permanent ตามที่ระบบกำหนด) |
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 | API-USER-04 | `GET` | `/user/payment-history` | None | Bearer | ดึงประวัติการเติมเงินของผู้ใช้ |
 | API-USER-05 | `GET` | `/user/game-history` | None | Bearer | ดึงประวัติการเล่นเกมของผู้ใช้ |
+| API-USER-06 | `POST` | `/user/password` | `{currentPassword, newPassword}` | Bearer | เปลี่ยนรหัสผ่านผู้ใช้ |
 
 #### 4.2.3 Code API
 
@@ -265,9 +270,15 @@
 | ID | Method | Endpoint | Body | Auth | คำอธิบาย |
 |----|--------|----------|------|------|----------|
 | API-PAYMENT-01 | `GET` | `/payment/packages` | None | Bearer | ดึงรายการแพ็กเกจเติมเงินทั้งหมด |
-| API-PAYMENT-02 | `POST` | `/payment/qr` | `{packageId}` | Bearer | สร้าง QR code สำหรับเติมเงิน |
+| API-PAYMENT-02 | `GET ` | `/payment/package/:id` | None | Bearer | ดึงข้อมูลแพ็กเกจเติมเงินตาม ID |
+<<<<<<< HEAD
+| API-PAYMENT-03 | `POST` | `/payment/qr` | `{packageId}` | Bearer | สร้าง QR code สำหรับเติมเงิน |
+| API-PAYMENT-04 | `POST` | `/payment/bank` | `multipart/form-data: {image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
+| API-PAYMENT-05 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
+=======
 | API-PAYMENT-03 | `POST` | `/payment/bank` | `multipart/form-data: {image, packageId}` | Bearer | เติมเงิน ผ่านเช็คสลิป |
 | API-PAYMENT-04 | `POST` | `/payment/truemoney` | `{url, packageId}` | Bearer | เติมเงินผ่านซองของขวัญ TrueMoney |
+>>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 
 #### 4.2.5 Shop API
 

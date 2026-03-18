@@ -41,6 +41,36 @@ export default class PaymentRoute implements RouteInterface {
             }
         });
 
+        this.app.post("/qr", async (c) => {
+            try {
+                let body: { packageId: number };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
+
+                const { packageId } = body;
+
+                if (!packageId) {
+                    return c.json({ error: "Missing packageId" }, 400);
+                }
+
+                const pack = await PackageModel.selectPackage(packageId);
+                if (!pack) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
+                const imageUrl = `https://promptpay.io/${this.server.config.bank.promptpay}/${pack.price}.png`;
+
+                return c.json({ url: imageUrl });
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error processing QR code request:`);
+                console.error(error);
+                return c.json({ error: "Error processing QR code request" }, 500);
+            }
+        });
+
         this.app.post("/bank", async (c) => {
             try {
                 let body: { image: File; packageId: string };

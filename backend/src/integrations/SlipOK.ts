@@ -92,10 +92,10 @@ export class SlipOK {
         formData.append("files", file);
         formData.append("log", "true");
 
-        const response = await fetch(`${this.API_URL}/api/line/apikey/${this.server.config.slipok.branch}`, {
+        const response = await fetch(`${this.API_URL}/api/line/apikey/${this.server.config.bank.slipok.branch}`, {
             method: "POST",
             headers: {
-                "x-authorization": this.server.config.slipok.authorization,
+                "x-authorization": this.server.config.bank.slipok.authorization,
             },
             body: formData,
         });

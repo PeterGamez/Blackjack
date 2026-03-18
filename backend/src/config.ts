@@ -31,9 +31,12 @@ export default {
         resetPasswordExpiresIn: 30, // minutes
     },
 
-    slipok: {
-        branch: process.env.SLIPOK_BRANCH || "",
-        authorization: process.env.SLIPOK_AUTHORIZATION || "",
+    bank: {
+        promptpay: process.env.BANK_PROMPTPAY || "",
+        slipok: {
+            branch: process.env.SLIPOK_BRANCH || "",
+            authorization: process.env.SLIPOK_AUTHORIZATION || "",
+        },
     },
 
     truemoney: {

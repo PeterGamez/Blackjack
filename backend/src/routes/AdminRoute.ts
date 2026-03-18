@@ -472,7 +472,6 @@ export default class AdminRoute implements RouteInterface {
             try {
                 const products = await ProductModel.selectAllProducts();
 
-<<<<<<< HEAD
                 const response = products.map((product) => ({
                     id: product.id,
                     name: product.name,
@@ -485,20 +484,6 @@ export default class AdminRoute implements RouteInterface {
                     isActive: product.isActive,
                     updatedAt: product.updatedAt,
                 }));
-=======
-            const response = products.map((product) => ({
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                path: product.path,
-                tokens: product.tokens,
-                coins: product.coins,
-                type: product.type,
-                isRecommend: product.isRecommend,
-                isActive: product.isActive,
-                updatedAt: product.updatedAt,
-            }));
->>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 
                 return c.json(response);
             } catch (error) {
@@ -579,49 +564,15 @@ export default class AdminRoute implements RouteInterface {
                 console.error(error);
                 return c.json({ error: "Internal server error" }, 500);
             }
-<<<<<<< HEAD
         });
 
         this.app.patch("/product/:id", async (c) => {
-=======
-
-            const product = await ProductModel.selectProduct(productId);
-            if (!product) {
-                return c.json({ error: "Product not found" }, 404);
-            }
-
-            const response = {
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                path: product.path,
-                tokens: product.tokens,
-                coins: product.coins,
-                type: product.type,
-                isRecommend: product.isRecommend,
-                isActive: product.isActive,
-                updatedAt: product.updatedAt,
-            };
-
-            return c.json(response);
-        });
-
-        this.app.patch("/product/:id", async (c) => {
-            const productId = parseInt(c.req.param("id"));
-            if (isNaN(productId)) {
-                return c.json({ error: "Invalid product ID" }, 400);
-            }
-
-            let body: { name?: string; description?: string; path?: string; tokens?: number; coins?: number; type?: ProductInterface["type"]; isRecommend?: boolean; isActive?: boolean };
-
->>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
             try {
                 const productId = parseInt(c.req.param("id"));
                 if (isNaN(productId)) {
                     return c.json({ error: "Invalid product ID" }, 400);
                 }
 
-<<<<<<< HEAD
                 let body: { name?: string; description?: string; path?: string; tokens?: number; coins?: number; type?: ProductInterface["type"]; isRecommend?: boolean; isActive?: boolean };
 
                 try {
@@ -629,13 +580,6 @@ export default class AdminRoute implements RouteInterface {
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }
-=======
-            const { name, description, path, tokens, coins, type, isRecommend, isActive } = body;
-
-            if (!name && !description && !path && tokens === undefined && coins === undefined && !type && isRecommend === undefined && isActive === undefined) {
-                return c.json({ error: "No update fields provided" }, 400);
-            }
->>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 
                 const { name, description, path, tokens, coins, type, isRecommend, isActive } = body;
 
@@ -659,37 +603,10 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "isActive must be a boolean" }, 400);
                 }
 
-<<<<<<< HEAD
                 const product = await ProductModel.selectProduct(productId);
                 if (!product) {
                     return c.json({ error: "Product not found" }, 404);
                 }
-=======
-            if (name) {
-                await ProductModel.updateProduct(productId, "name", name);
-            }
-            if (description) {
-                await ProductModel.updateProduct(productId, "description", description);
-            }
-            if (path) {
-                await ProductModel.updateProduct(productId, "path", path);
-            }
-            if (tokens !== undefined) {
-                await ProductModel.updateProduct(productId, "tokens", tokens);
-            }
-            if (coins !== undefined) {
-                await ProductModel.updateProduct(productId, "coins", coins);
-            }
-            if (type) {
-                await ProductModel.updateProduct(productId, "type", type);
-            }
-            if (isRecommend !== undefined) {
-                await ProductModel.updateProduct(productId, "isRecommend", isRecommend);
-            }
-            if (isActive !== undefined) {
-                await ProductModel.updateProduct(productId, "isActive", isActive);
-            }
->>>>>>> 973a133836e5c990cc44ae154f487285b76c81d6
 
                 const nextTokens = tokens ?? product.tokens;
                 const nextCoins = coins ?? product.coins;

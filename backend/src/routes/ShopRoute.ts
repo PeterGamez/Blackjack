@@ -26,16 +26,16 @@ export default class ShopRoute implements RouteInterface {
             try {
                 const products = await ProductModel.selectAllActiveProducts();
 
-            const response = products.map((product) => ({
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                path: product.path,
-                tokens: product.tokens,
-                coins: product.coins,
-                type: product.type,
-                isRecommend: product.isRecommend,
-            }));
+                const response = products.map((product) => ({
+                    id: product.id,
+                    name: product.name,
+                    description: product.description,
+                    path: product.path,
+                    tokens: product.tokens,
+                    coins: product.coins,
+                    type: product.type,
+                    isRecommend: product.isRecommend,
+                }));
 
                 return c.json(response);
             } catch (error) {

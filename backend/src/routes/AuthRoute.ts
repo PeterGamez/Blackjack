@@ -147,8 +147,8 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Username/email or password is incorrect" }, 401);
                 }
 
-                const accessToken = this.server.JWT.generateAccessToken(user);
-                const refreshToken = this.server.JWT.generateRefreshToken(user);
+                const accessToken = await this.server.JWT.generateAccessToken(user);
+                const refreshToken = await this.server.JWT.generateRefreshToken(user);
 
                 this.server.log("AUTH", `User logged in: ${user.id} | ${user.username} | ${user.email}`);
 
@@ -179,7 +179,7 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Missing refresh token" }, 400);
                 }
 
-                const payload = this.server.JWT.verifyRefreshToken(refreshToken);
+                const payload = await this.server.JWT.verifyRefreshToken(refreshToken);
                 if (!payload) {
                     return c.json({ error: "Invalid or expired token" }, 400);
                 }
@@ -193,8 +193,8 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Account not verified" }, 403);
                 }
 
-                const newAccessToken = this.server.JWT.generateAccessToken(user);
-                const newRefreshToken = this.server.JWT.generateRefreshToken(user);
+                const newAccessToken = await this.server.JWT.generateAccessToken(user);
+                const newRefreshToken = await this.server.JWT.generateRefreshToken(user);
 
                 this.server.log("AUTH", `Tokens refreshed for: ${user.id}`);
 

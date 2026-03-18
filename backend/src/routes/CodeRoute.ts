@@ -26,7 +26,7 @@ export default class CodeRoute implements RouteInterface {
             try {
                 let body: { code: string };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid or missing JSON body" }, 400);
                 }

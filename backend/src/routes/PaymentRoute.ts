@@ -128,7 +128,7 @@ export default class PaymentRoute implements RouteInterface {
             try {
                 let body: { url: string; packageId: number };
                 try {
-                    body = await c.req.json<typeof body>();
+                    body = await c.req.json();
                 } catch {
                     return c.json({ error: "Invalid request body" }, 400);
                 }

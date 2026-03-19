@@ -428,18 +428,6 @@
   white-space: nowrap;
 }
 
-.resultWin {
-  background: rgba(16, 185, 129, 0.92);
-}
-
-.resultDraw {
-  background: rgba(245, 158, 11, 0.92);
-}
-
-.resultLose {
-  background: rgba(239, 68, 68, 0.92);
-}
-
 .controls {
   margin-top: 28px;
   display: flex;
@@ -648,11 +636,13 @@
 @keyframes popupFade {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: translate(-50%, -50%) scale(0.92);
+    filter: blur(6px);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
   }
 }
 
@@ -661,27 +651,26 @@
 
   top: 58%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); /* สำคัญมาก */
 
- width: 1300px;
-height: 700px;
+  width: 1300px;
+  padding: 50px 80px;
 
-  background: #475569; 
+  background: rgba(71, 85, 105, 0.95);
 
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.18);
 
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.6);
 
   display: flex;
   flex-direction: column;
- justify-content: center;
   align-items: center;
 
   text-align: center;
   color: white;
 
-  animation: popupFade 0.3s ease;
+  animation: popupFade 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 
@@ -689,34 +678,37 @@ height: 700px;
 .winTitle {
   color: #4ade80;
   font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 20px;
+  font-weight: 500;
+  top: -50px;  
+  left: 0px;
 }
 
 .loseTitle {
   color: #f87171;
   font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 20px;
+  font-weight: 500;
+  top: -50px;  
+  left: 0px;
 }
 
 .drawTitle {
-  color: #f59e0b;
+  color: #fab133;
   font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 20px;
+  font-weight: 500;
+  top: -50px;  
+  left: 0px;
 }
 
 
 .winContentFull {
   position: absolute;
 
-  top: 55%;
+  top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
 
   width: 1300px;
-  height: 700px;
+  height: 650px;
 
   background: rgba(71, 85, 105, 0.95);
 
@@ -726,7 +718,7 @@ height: 700px;
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.18);
 
-  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.144);;
 
   display: flex;
   flex-direction: column;
@@ -739,54 +731,59 @@ height: 700px;
   animation: popupFade 0.3s ease;
 }
 
-/* ⭐ เส้น */
+
 .divider {
-  margin: 18px auto;
+  margin: 14px auto;
   width: 800px;
   height: 1px;
-  background: rgba(0, 0, 0, 0.116);
+  background: rgba(0, 0, 0, 0.144);
 }
 
 
+.winTitle,
+.loseTitle,
+.drawTitle {
+  position: relative;
+  display: inline-block;
+}
+
+.winTitle::after,
+.loseTitle::after,
+.drawTitle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  transform: translateX(-50%);
+
+  width: 800px;
+  height: 1px;
+
+  background: rgba(0, 0, 0, 0.144);
+}
 
 
-/* ⭐ ปุ่ม */
 .winButtons {
-  margin-top: 30px;
+  margin-bottom: 5px;
   display: flex;
   justify-content: center;
-  gap: 28px;
+  gap: 150px;
+
+  position: relative;
+  top: 20px;
 }
 
-.winButtons button {
-  width: 160px;
-  height: 36px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-
-  border-radius: 6px;
-
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-
-  cursor: pointer;
-}
 .winButtons button {
   width: 180px;
   height: 40px;
+  
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: #64748b; /* เทาฟ้า */
+  background: #64748b; 
   border: 1px solid rgb(0, 0, 0);
 
   border-radius: 10px;
@@ -808,25 +805,48 @@ height: 700px;
 
 .winContent {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   color: #ffffff;
   line-height: 2.1; 
   text-align: center;
+
+  position: relative;
+  transform: translateY(-20px);
 }
 
 .winContent p {
-  margin: 20px 0;
+  margin: 25px 0;
   font-weight: 400;
   letter-spacing: 0.4px;
+}
+
+.winContent p:last-child {
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.winContent p:last-child::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+
+  width: 800px;
+  height: 1px;
+
+  background: rgba(0, 0, 0, 0.144);
 }
 
 .winTitle,
 .loseTitle,
 .drawTitle {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
 }
+
+
 
 .winContent p:nth-child(1),
 .winContent p:nth-child(2) {
@@ -837,4 +857,3 @@ height: 700px;
 .winContent p:nth-child(4) {
   margin-top: 20px;
 }
-

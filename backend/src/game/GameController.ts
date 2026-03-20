@@ -31,8 +31,7 @@ export default class GameController {
             return { ok: false, message: `Insufficient ${currency}` };
         }
 
-        const rawId = await RedisService.Redis.incr("socket:game:id");
-        const gameId = typeof rawId === "number" ? rawId : parseInt(rawId as string);
+        const gameId = await RedisService.Redis.incr("socket:game:id");
 
         const deck = this.server.Blackjack.createDeck();
         const playerHand: Card[] = [deck[0], deck[2]];
@@ -88,9 +87,12 @@ export default class GameController {
             if (reward > 0) {
                 await UserModel.increaseBalance(userId, currency, reward);
             }
+
             const historyResult = isBlackjack && !isDealerBlackjack ? "blackjack" : result === "draw" ? "draw" : result === "win" ? "win" : "lose";
-            const playerPayout = result === "lose" ? -bet : reward;
-            const dealerPayout = result === "lose" ? bet : result === "draw" ? 0 : -reward;
+
+            const playerPayout = reward - bet;
+            const dealerPayout = -playerPayout;
+
             await GameHistoryModel.createGameHistory(userId, 1, gameType, bet, playerValue, dealerValue, historyResult, playerPayout, dealerPayout);
             return {
                 ok: true,
@@ -105,7 +107,7 @@ export default class GameController {
                 balance,
                 blackjack: isBlackjack,
                 dealerBlackjack: isDealerBlackjack,
-                result: result as "win" | "lose" | "draw",
+                result,
                 reward,
             };
         }
@@ -175,9 +177,12 @@ export default class GameController {
 
         if (playerValue === 21) {
             const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
+
             const historyResult = resolved.result;
-            const playerPayout = resolved.result === "lose" ? -gameState.playerBet : resolved.reward;
-            const dealerPayout = resolved.result === "lose" ? gameState.playerBet : resolved.result === "draw" ? 0 : -resolved.reward;
+
+            const playerPayout = resolved.reward - gameState.playerBet;
+            const dealerPayout = -playerPayout;
+
             await GameHistoryModel.createGameHistory(
                 gameState.userId,
                 1,
@@ -206,9 +211,12 @@ export default class GameController {
         }
 
         const resolved = await this.server.Blackjack.resolveDealer(gameState, GameState.saveGameState.bind(GameState));
+
         const historyResult = resolved.result;
-        const playerPayout = resolved.result === "lose" ? -gameState.playerBet : resolved.reward;
-        const dealerPayout = resolved.result === "lose" ? gameState.playerBet : resolved.result === "draw" ? 0 : -resolved.reward;
+
+        const playerPayout = resolved.reward - gameState.playerBet;
+        const dealerPayout = -playerPayout;
+
         await GameHistoryModel.createGameHistory(gameState.userId, 1, gameState.gameType, gameState.playerBet, resolved.playerValue, resolved.dealerValue, historyResult, playerPayout, dealerPayout);
         return { ok: true, gameId, ...resolved };
     }

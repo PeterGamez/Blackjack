@@ -509,7 +509,7 @@ export default function Dealer() {
               </div>
             )}
 
-            {result && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
+        
           </div>
           {result && !popupType && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
 
@@ -583,7 +583,7 @@ export default function Dealer() {
                       setIsDealerDrawing(false);
                       standResolveRef.current = false;
                     }}>
-                    TRY AGAIN
+                    PLAY AGAIN
                   </button>
                 </div>
               </div>
@@ -690,24 +690,7 @@ export default function Dealer() {
             </>
           )}
 
-          {gameStatus === "game-over" && (
-            <button
-              onClick={() => {
-                setGameStatus("betting");
-                setPlayerHand([]);
-                setDealerHand([]);
-                setResult("");
-                setMessage("");
-                setPendingBet(0);
-                setDealerRevealIndex(null);
-                setIsDealerDrawing(false);
-                standResolveRef.current = false;
-              }}
-              disabled={playerChips <= 0}
-              className={`${styles.controlButton} ${styles.playAgainButton}`.trim()}>
-              {playerChips <= 0 ? "Out of chips!" : "Play Again"}
-            </button>
-          )}
+         
 
           {message && gameStatus !== "betting" && <p className={styles.bottomMessage}>{message}</p>}
         </div>

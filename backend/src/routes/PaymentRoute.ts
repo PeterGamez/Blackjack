@@ -139,6 +139,10 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
+                if (data.transTimestamp.getTime() < Date.now() - 15 * 60 * 1000) {
+                    return c.json({ error: "Bank slip is older than 15 minutes" }, 400);
+                }
+
                 const isDuplicate = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
                 if (isDuplicate) {
                     return c.json({ error: "This bank slip has already been used" }, 400);

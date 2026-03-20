@@ -139,6 +139,11 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
+                const isDuplicate = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
+                if (isDuplicate) {
+                    return c.json({ error: "This bank slip has already been used" }, 400);
+                }
+
                 await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 

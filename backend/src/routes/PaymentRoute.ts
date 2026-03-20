@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { BlankEnv, BlankSchema } from "hono/types";
+import { anyId } from "promptparse/generate";
 
 import type Server from "../Server";
 import type { RouteInterface } from "../interfaces/Route";
@@ -86,38 +87,13 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Package not found" }, 404);
                 }
 
-                const imageUrl = `https://promptpay.io/${this.server.config.bank.promptpay}/${pack.price}.png`;
+                const payload = anyId({ type: "EWALLETID", target: this.server.config.bank.ewalletid, amount: pack.price });
 
-                return c.json({ url: imageUrl });
+                return c.json({ payload });
             } catch (error) {
                 this.server.error("PaymentRoute", `Error processing QR code request:`);
                 console.error(error);
                 return c.json({ error: "Error processing QR code request" }, 500);
-            }
-        });
-
-        this.app.get("package/:id", async (c) => {
-            try {
-                const packageId = parseInt(c.req.param("id"));
-                if (isNaN(packageId)) {
-                    return c.json({ error: "Invalid package ID" }, 400);
-                }
-
-                const pack = await PackageModel.selectPackage(packageId);
-                if (!pack) {
-                    return c.json({ error: "Package not found" }, 404);
-                }
-
-                return c.json({
-                    id: pack.id,
-                    image: pack.image,
-                    price: pack.price,
-                    tokens: pack.tokens,
-                });
-            } catch (error) {
-                this.server.error("PaymentRoute", `Error fetching package:`);
-                console.error(error);
-                return c.json({ error: "Error fetching package" }, 500);
             }
         });
 

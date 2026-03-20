@@ -41,7 +41,7 @@ export default class PaymentRoute implements RouteInterface {
             }
         });
 
-        this.app.get("package/:id", async (c) => {
+        this.app.get("/package/:id", async (c) => {
             try {
                 const packageId = parseInt(c.req.param("id"));
                 if (isNaN(packageId)) {

@@ -24,7 +24,7 @@ export default class CodeModel {
     }
 
     public static async selectAllCodes(): Promise<CodeInterface[]> {
-        const sql = `SELECT * FROM ${this.table} ORDER BY createdAt DESC`;
+        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -35,7 +35,7 @@ export default class CodeModel {
     }
 
     public static async selectCode(id: number): Promise<CodeInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [id]);
@@ -46,7 +46,7 @@ export default class CodeModel {
     }
 
     public static async selectCodeByCode(code: string): Promise<CodeInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE code = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE code = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [code]);
@@ -57,7 +57,7 @@ export default class CodeModel {
     }
 
     public static async updateCode<T extends keyof CodeType>(id: number, type: T, value: CodeType[T]): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);

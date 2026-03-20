@@ -35,7 +35,7 @@ export default class GameHistoryModel {
     }
 
     public static async selectAllGameHistoryByUserId(userId: number): Promise<GameHistoryInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE playerId = ? OR dealerId = ? ORDER BY createdAt DESC`;
+        const sql = `SELECT * FROM ${this.table} WHERE (playerId = ? OR dealerId = ?) AND deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [userId, userId]);

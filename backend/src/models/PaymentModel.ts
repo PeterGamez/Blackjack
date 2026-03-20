@@ -23,7 +23,7 @@ export default class PaymentModel {
     }
 
     public static async selectAllPaymentsByUserId(userId: number): Promise<PaymentInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE userId = ? ORDER BY createdAt DESC`;
+        const sql = `SELECT * FROM ${this.table} WHERE userId = ? AND deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [userId]);
@@ -34,7 +34,7 @@ export default class PaymentModel {
     }
 
     public static async selectAllPayments(): Promise<PaymentInterface[]> {
-        const sql = `SELECT * FROM ${this.table} ORDER BY createdAt DESC`;
+        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);

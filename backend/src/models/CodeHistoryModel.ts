@@ -21,7 +21,7 @@ export default class CodeHistoryModel {
     }
 
     public static async selectCodeHistoryCountByCodeId(codeId: number): Promise<number> {
-        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ?`;
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [codeId]);
@@ -32,7 +32,7 @@ export default class CodeHistoryModel {
     }
 
     public static async isRedeemCodeHistoryByCodeIdAndUserId(codeId: number, userId: number): Promise<boolean> {
-        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND userId = ?`;
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE codeId = ? AND userId = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [codeId, userId]);

@@ -24,7 +24,7 @@ export default class PackageModel {
     }
 
     public static async selectAllPackages(): Promise<PackageInterface[]> {
-        const sql = `SELECT * FROM ${this.table} ORDER BY price ASC`;
+        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL ORDER BY price ASC`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -35,7 +35,7 @@ export default class PackageModel {
     }
 
     public static async selectAllActivePackages(): Promise<PackageInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE isActive = 1`;
+        const sql = `SELECT * FROM ${this.table} WHERE isActive = 1 AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -46,7 +46,7 @@ export default class PackageModel {
     }
 
     public static async selectPackage(id: number): Promise<PackageInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND isActive = 1`;
+        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND isActive = 1 AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [id]);
@@ -57,7 +57,7 @@ export default class PackageModel {
     }
 
     public static async selectPackageById(id: number): Promise<PackageInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [id]);
@@ -68,7 +68,7 @@ export default class PackageModel {
     }
 
     public static async updatePackage<T extends keyof PackageType>(id: number, type: T, value: PackageType[T]): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);

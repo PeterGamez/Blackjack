@@ -36,7 +36,7 @@ export default class ProductModel {
     }
 
     public static async selectAllProducts(): Promise<ProductInterface[]> {
-        const sql = `SELECT * FROM ${this.table}`;
+        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -47,7 +47,7 @@ export default class ProductModel {
     }
 
     public static async selectAllActiveProducts(): Promise<ProductInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE isActive = true`;
+        const sql = `SELECT * FROM ${this.table} WHERE isActive = true AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -58,7 +58,7 @@ export default class ProductModel {
     }
 
     public static async selectProduct(id: number): Promise<ProductInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [id]);
@@ -69,7 +69,7 @@ export default class ProductModel {
     }
 
     public static async updateProduct<T extends keyof ProductType>(id: number, type: T, value: ProductType[T]): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);

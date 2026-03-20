@@ -30,7 +30,7 @@ export default class UserInventoryModel {
         SELECT ${this.table}.*, ${productTable}.type
         FROM ${this.table}
         INNER JOIN ${productTable} ON ${this.table}.productId = ${productTable}.id
-        WHERE ${this.table}.userId = ?`;
+        WHERE ${this.table}.userId = ? AND ${this.table}.deletedAt IS NULL AND ${productTable}.deletedAt IS NULL`;
 
         const connection = await this.DB.getConnection();
         try {

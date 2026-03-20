@@ -25,7 +25,7 @@ export default class UserModel {
     }
 
     public static async selectUser(id: number): Promise<UserInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [id]);
@@ -36,7 +36,7 @@ export default class UserModel {
     }
 
     public static async selectAllUser(): Promise<UserInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE id > 10`;
+        const sql = `SELECT * FROM ${this.table} WHERE id > 10 AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql);
@@ -47,7 +47,7 @@ export default class UserModel {
     }
 
     public static async selectUserByUsernameOrEmail(user: string): Promise<UserInterface> {
-        const sql = `SELECT * FROM ${this.table} WHERE username = ? OR email = ?`;
+        const sql = `SELECT * FROM ${this.table} WHERE (username = ? OR email = ?) AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [user, user]);
@@ -58,7 +58,7 @@ export default class UserModel {
     }
 
     public static async selectUserExistsByUsernameOrEmail(username: string, email: string): Promise<boolean> {
-        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE username = ? OR email = ?`;
+        const sql = `SELECT COUNT(*) as count FROM ${this.table} WHERE (username = ? OR email = ?) AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             const [rows] = await connection.execute(sql, [username, email]);
@@ -69,7 +69,7 @@ export default class UserModel {
     }
 
     public static async updateUser<T extends keyof UserType>(id: number, type: T, value: UserType[T]): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ? WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [value, id]);
@@ -80,7 +80,7 @@ export default class UserModel {
     }
 
     public static async increaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} + ? WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [amount, id]);
@@ -91,7 +91,7 @@ export default class UserModel {
     }
 
     public static async decreaseBalance(id: number, type: CurrencyType, amount: number): Promise<void> {
-        const sql = `UPDATE ${this.table} SET ${type} = ${type} - ? WHERE id = ? AND ${type} >= ?`;
+        const sql = `UPDATE ${this.table} SET ${type} = ${type} - ? WHERE id = ? AND ${type} >= ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [amount, id, amount]);
@@ -102,11 +102,21 @@ export default class UserModel {
     }
 
     public static async deleteUser(id: number): Promise<void> {
-        const sql = `DELETE FROM ${this.table} WHERE id = ?`;
+        const sql = `UPDATE ${this.table} SET deletedAt = NOW() WHERE id = ? AND deletedAt IS NULL`;
         const connection = await this.DB.getConnection();
         try {
             await connection.execute(sql, [id]);
             await UserService.delUser(id);
+        } finally {
+            connection.release();
+        }
+    }
+
+    public static async restoreUser(id: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET deletedAt = NULL WHERE id = ? AND deletedAt IS NOT NULL`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [id]);
         } finally {
             connection.release();
         }

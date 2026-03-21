@@ -22,6 +22,17 @@ export default class PaymentModel {
         }
     }
 
+    public static async selectAllPayments(): Promise<PaymentInterface[]> {
+        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL ORDER BY createdAt DESC`;
+        const connection = await this.DB.getConnection();
+        try {
+            const [rows] = await connection.execute(sql);
+            return rows as PaymentInterface[];
+        } finally {
+            connection.release();
+        }
+    }
+
     public static async selectAllPaymentsByUserId(userId: number): Promise<PaymentInterface[]> {
         const sql = `SELECT * FROM ${this.table} WHERE userId = ? AND deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
@@ -33,11 +44,11 @@ export default class PaymentModel {
         }
     }
 
-    public static async selectAllPayments(): Promise<PaymentInterface[]> {
-        const sql = `SELECT * FROM ${this.table} WHERE deletedAt IS NULL ORDER BY createdAt DESC`;
+    public static async selectAllPaymentsByReceiptRef(receiptRef: string): Promise<PaymentInterface[]> {
+        const sql = `SELECT * FROM ${this.table} WHERE receiptRef = ? AND deletedAt IS NULL ORDER BY createdAt DESC`;
         const connection = await this.DB.getConnection();
         try {
-            const [rows] = await connection.execute(sql);
+            const [rows] = await connection.execute(sql, [receiptRef]);
             return rows as PaymentInterface[];
         } finally {
             connection.release();

@@ -32,7 +32,7 @@ export default {
     },
 
     bank: {
-        promptpay: process.env.BANK_PROMPTPAY || "",
+        ewalletid: process.env.EWALLETID || "",
         slipok: {
             branch: process.env.SLIPOK_BRANCH || "",
             authorization: process.env.SLIPOK_AUTHORIZATION || "",

@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import nodemailer from "nodemailer";
 
@@ -107,16 +107,9 @@ export class Email {
     }
 
     private async generate(): Promise<string> {
-        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const length = 64;
+        const bytes = Math.floor((length * 3) / 4);
 
-        const buffer = new Uint8Array(32);
-
-        crypto.getRandomValues(buffer);
-
-        const token = Array.from(buffer)
-            .map((b) => chars[b % chars.length])
-            .join("");
-
-        return token;
+        return randomBytes(bytes).toString("base64url");
     }
 }

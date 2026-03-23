@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import nodemailer from "nodemailer";
+import { Transporter, createTransport } from "nodemailer";
 
 import type Server from "../Server";
 import type { EmailVerificationData } from "../interfaces/Cache";
@@ -12,7 +12,7 @@ export class Email {
 
     private server: Server;
 
-    private transporter: nodemailer.Transporter;
+    private transporter: Transporter;
 
     private htmlVerifyEmail(verificationUrl: string): string {
         return `
@@ -37,7 +37,7 @@ export class Email {
     public constructor(server: Server) {
         this.server = server;
 
-        this.transporter = nodemailer.createTransport({
+        this.transporter = createTransport({
             host: server.config.email.host,
             port: server.config.email.port,
             secure: server.config.email.secure,

@@ -49,12 +49,12 @@ export class Email {
     }
 
     public async sendVerificationEmail(userId: number, email: string): Promise<void> {
-        const verificationToken = await this.generate();
+        const verificationToken = this.generate();
 
         await RedisService.hmset<EmailVerificationData>(`${this.PREFIX_VERIFY}${verificationToken}`, { userId: userId.toString(), email });
         await RedisService.expire(`${this.PREFIX_VERIFY}${verificationToken}`, this.server.config.email.verifyExpiresIn * 60);
 
-        const verificationUrl = `${this.server.config.site.url}/auth/verify?token=${verificationToken}`;
+        const verificationUrl = `${this.server.config.site.url}/auth/verify?token=${encodeURIComponent(verificationToken)}`;
 
         await this.transporter.sendMail({
             from: `${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
@@ -72,18 +72,22 @@ export class Email {
             return null;
         }
 
-        await RedisService.del(key);
-
         return { userId: parseInt(value.userId), email: value.email };
     }
 
+    public async deleteVerificationToken(token: string): Promise<void> {
+        const key = `${this.PREFIX_VERIFY}${token}`;
+
+        await RedisService.del(key);
+    }
+
     public async sendPasswordResetEmail(userId: number, email: string): Promise<void> {
-        const resetToken = await this.generate();
+        const resetToken = this.generate();
 
         await RedisService.hmset<EmailVerificationData>(`${this.PREFIX_RESET}${resetToken}`, { userId: userId.toString(), email });
         await RedisService.expire(`${this.PREFIX_RESET}${resetToken}`, this.server.config.email.resetPasswordExpiresIn * 60);
 
-        const resetUrl = `${this.server.config.site.url}/auth/reset-password?token=${resetToken}`;
+        const resetUrl = `${this.server.config.site.url}/auth/reset-password?token=${encodeURIComponent(resetToken)}`;
 
         await this.transporter.sendMail({
             from: `${this.server.config.site.name} <${this.server.config.email.auth.user}>`,
@@ -101,12 +105,16 @@ export class Email {
             return null;
         }
 
-        await RedisService.del(key);
-
         return { userId: parseInt(value.userId), email: value.email };
     }
 
-    private async generate(): Promise<string> {
+    public async deletePasswordResetToken(token: string): Promise<void> {
+        const key = `${this.PREFIX_RESET}${token}`;
+
+        await RedisService.del(key);
+    }
+
+    private generate(): string {
         const length = 64;
         const bytes = Math.floor((length * 3) / 4);
 

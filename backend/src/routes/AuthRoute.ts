@@ -99,6 +99,8 @@ export default class AuthRoute implements RouteInterface {
                     return c.json({ error: "Invalid token" }, 400);
                 }
 
+                await this.server.Email.deleteVerificationToken(token);
+
                 const user = await UserModel.selectUserByUsernameOrEmail(email);
                 if (!user) {
                     return c.json({ error: "User not found" }, 404);
@@ -272,6 +274,8 @@ export default class AuthRoute implements RouteInterface {
                 if (!email) {
                     return c.json({ error: "Invalid token" }, 400);
                 }
+
+                await this.server.Email.deletePasswordResetToken(token);
 
                 const hashedPassword = await this.server.Password.hash(password);
 

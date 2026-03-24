@@ -1,6 +1,4 @@
-import type { Server as HttpServer } from "node:http";
-import { createServer } from "node:http";
-
+import { ServerType } from "@hono/node-server";
 import type { Socket } from "socket.io";
 import { Server as IOServer } from "socket.io";
 
@@ -9,14 +7,12 @@ import GameSocket from "../sockets/GameSocket";
 
 export default class SocketService {
     public static io: IOServer;
-    private static httpServer: HttpServer;
     private static server: Server;
 
-    public static init(server: Server) {
+    public static init(server: Server, httpServer: ServerType) {
         this.server = server;
-        this.httpServer = createServer();
 
-        this.io = new IOServer(this.httpServer, {
+        this.io = new IOServer(httpServer, {
             cors: {
                 origin: "*",
                 methods: ["GET", "POST"],
@@ -27,9 +23,7 @@ export default class SocketService {
 
         this.registerEvents();
 
-        this.httpServer.listen(server.config.socket.port, () => {
-            server.log("Socket.IO", `Socket server running at http://localhost:${server.config.socket.port}`);
-        });
+        server.log("Socket.IO", `Socket server running at ws://localhost:${server.config.port}`);
     }
 
     private static registerEvents(): void {
@@ -45,6 +39,5 @@ export default class SocketService {
 
     public static close(): void {
         this.io?.close();
-        this.httpServer?.close();
     }
 }

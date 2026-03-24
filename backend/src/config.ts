@@ -1,14 +1,10 @@
 export default {
+    path: process.env.API_PATH || "/",
+    port: parseInt(process.env.PORT || "3001"),
+
     site: {
         name: process.env.SITE_NAME || "Blackjack",
         url: process.env.SITE_URL || "http://localhost:3000",
-    },
-    api: {
-        path: process.env.API_PATH || "/",
-        port: parseInt(process.env.API_PORT || "3001"),
-    },
-    socket: {
-        port: parseInt(process.env.SOCKET_PORT || "3002"),
     },
 
     auth: {

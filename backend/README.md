@@ -47,6 +47,6 @@ bun run dev
 ```
 
 - REST API → `http://localhost:3001`
-- Socket.IO → `ws://localhost:3002`
+- Socket.IO → `ws://localhost:3001`
 
 ---

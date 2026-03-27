@@ -8,7 +8,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
 
-import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
+import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
 

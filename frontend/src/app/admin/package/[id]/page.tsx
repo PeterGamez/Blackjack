@@ -77,6 +77,11 @@ export default function AdminPackageEditPage() {
     const price = Number(draft.price);
     const tokens = Number(draft.tokens);
 
+    if (!draft.image.trim()) {
+      setError("Image is required");
+      return;
+    }
+
     if (!Number.isInteger(price) || price <= 0) {
       setError("Price must be integer > 0");
       return;

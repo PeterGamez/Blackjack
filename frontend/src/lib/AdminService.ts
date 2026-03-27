@@ -313,6 +313,16 @@ export default class AdminService {
     }
   }
 
+  public static async deletePackage(packageId: number): Promise<void> {
+    const response = await this.authenticatedFetch(`/admin/package/${packageId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+  }
+
   // ==========================================
   // Products
   // ==========================================

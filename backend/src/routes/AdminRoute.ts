@@ -343,7 +343,7 @@ export default class AdminRoute implements RouteInterface {
 
         this.app.post("/package", async (c) => {
             try {
-                let body: { image: string; price: number; tokens: number; isActive: boolean };
+                let body: { image?: unknown; price?: unknown; tokens?: unknown; isActive?: unknown };
                 try {
                     body = await c.req.json();
                 } catch {
@@ -352,8 +352,12 @@ export default class AdminRoute implements RouteInterface {
 
                 const { image, price, tokens, isActive } = body;
 
-                if (!image || price === undefined || tokens === undefined || isActive === undefined) {
+                if (price === undefined || tokens === undefined || isActive === undefined) {
                     return c.json({ error: "Missing required fields" }, 400);
+                }
+
+                if (image !== undefined && image !== null && typeof image !== "string") {
+                    return c.json({ error: "image must be a string" }, 400);
                 }
 
                 if (typeof price !== "number" || price <= 0) {
@@ -368,7 +372,9 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "isActive must be a boolean" }, 400);
                 }
 
-                const newPackageId = await PackageModel.createPackage(image, price, tokens, isActive);
+                const normalizedImage = typeof image === "string" ? image.trim() : "";
+
+                const newPackageId = await PackageModel.createPackage(normalizedImage, price, tokens, isActive);
 
                 return c.json({ message: "Package created successfully", packageId: newPackageId });
             } catch (error) {
@@ -424,8 +430,12 @@ export default class AdminRoute implements RouteInterface {
 
                 const { image, price, tokens, isActive } = body;
 
-                if (!image && price === undefined && tokens === undefined && isActive === undefined) {
+                if (image === undefined && price === undefined && tokens === undefined && isActive === undefined) {
                     return c.json({ error: "No update fields provided" }, 400);
+                }
+
+                if (image !== undefined && image !== null && typeof image !== "string") {
+                    return c.json({ error: "image must be a string" }, 400);
                 }
 
                 if (price !== undefined && (typeof price !== "number" || price <= 0)) {
@@ -445,8 +455,9 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Package not found" }, 404);
                 }
 
-                if (image) {
-                    await PackageModel.updatePackage(packageId, "image", image);
+                if (image !== undefined) {
+                    const normalizedImage = typeof image === "string" ? image.trim() : "";
+                    await PackageModel.updatePackage(packageId, "image", normalizedImage);
                 }
                 if (price !== undefined) {
                     await PackageModel.updatePackage(packageId, "price", price);
@@ -461,6 +472,28 @@ export default class AdminRoute implements RouteInterface {
                 return c.json({ message: "Package updated successfully" });
             } catch (error) {
                 this.server.error("AdminRoute", `Error updating package:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
+        });
+
+        this.app.delete("/package/:id", async (c) => {
+            try {
+                const packageId = parseInt(c.req.param("id"));
+                if (isNaN(packageId)) {
+                    return c.json({ error: "Invalid package ID" }, 400);
+                }
+
+                const pkg = await PackageModel.selectPackageById(packageId);
+                if (!pkg) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
+                await PackageModel.deletePackage(packageId);
+
+                return c.json({ message: "Package deleted successfully" });
+            } catch (error) {
+                this.server.error("AdminRoute", `Error deleting package:`);
                 console.error(error);
                 return c.json({ error: "Internal server error" }, 500);
             }

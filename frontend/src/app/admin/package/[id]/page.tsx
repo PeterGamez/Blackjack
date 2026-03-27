@@ -32,6 +32,7 @@ export default function AdminPackageEditPage() {
   const [pkg, setPkg] = useState<PackageInterface>(null);
   const [draft, setDraft] = useState<AdminPackageDraft>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -76,11 +77,6 @@ export default function AdminPackageEditPage() {
     const price = Number(draft.price);
     const tokens = Number(draft.tokens);
 
-    if (!draft.image.trim()) {
-      setError("Image is required");
-      return;
-    }
-
     if (!Number.isInteger(price) || price <= 0) {
       setError("Price must be integer > 0");
       return;
@@ -112,6 +108,24 @@ export default function AdminPackageEditPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!pkg || isDeleting) return;
+
+    const isConfirmed = window.confirm(`Delete package #${pkg.id}? This action cannot be undone.`);
+    if (!isConfirmed) return;
+
+    setIsDeleting(true);
+    setError("");
+
+    try {
+      await AdminService.deletePackage(packageId);
+      router.push("/admin/package");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete package");
+      setIsDeleting(false);
+    }
+  };
+
   if (status === "loading") {
     return (
       <div className={styles.page}>
@@ -138,7 +152,7 @@ export default function AdminPackageEditPage() {
             <>
               <div className={styles.grid} style={{ marginTop: 18 }}>
                 <label className={styles.label}>
-                  Image URL
+                  Image URL (optional)
                   <input className={styles.input} value={draft.image ?? ""} onChange={(e) => handleDraftChange("image", e.target.value)} />
                 </label>
 
@@ -162,6 +176,9 @@ export default function AdminPackageEditPage() {
               </div>
 
               <div className={styles.actionRow} style={{ marginTop: 14 }}>
+                <button type="button" className={styles.deleteButton} onClick={handleDelete} disabled={isSaving || isDeleting}>
+                  {isDeleting ? "Deleting..." : "Delete Package"}
+                </button>
                 <button type="button" className={styles.saveButton} onClick={handleSave} disabled={isSaving}>
                   {isSaving ? "Saving..." : "Save Package"}
                 </button>

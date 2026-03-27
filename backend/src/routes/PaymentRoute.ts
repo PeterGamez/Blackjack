@@ -25,6 +25,9 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.get("/packages", async (c) => {
             try {
+                c.header("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+                c.header("Pragma", "no-cache");
+                c.header("Expires", "0");
                 const packages = await PackageModel.selectAllActivePackages();
 
                 const response = packages.map((pack) => ({
@@ -44,6 +47,9 @@ export default class PaymentRoute implements RouteInterface {
 
         this.app.get("/package/:id", async (c) => {
             try {
+                c.header("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+                c.header("Pragma", "no-cache");
+                c.header("Expires", "0");
                 const packageId = parseInt(c.req.param("id"));
                 if (isNaN(packageId)) {
                     return c.json({ error: "Invalid package ID" }, 400);

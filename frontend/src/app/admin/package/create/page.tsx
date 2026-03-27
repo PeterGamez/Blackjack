@@ -53,11 +53,6 @@ export default function AdminPackageCreatePage() {
     const price = Number(draft.price);
     const tokens = Number(draft.tokens);
 
-    if (!draft.image.trim()) {
-      setError("Image is required");
-      return;
-    }
-
     if (!Number.isInteger(price) || price <= 0) {
       setError("Price must be integer > 0");
       return;
@@ -110,7 +105,7 @@ export default function AdminPackageCreatePage() {
 
           <div className={styles.grid} style={{ marginTop: 18 }}>
             <label className={styles.label}>
-              Image URL
+              Image URL (optional)
               <input className={styles.input} value={draft.image} onChange={(e) => setDraft((prev) => ({ ...prev, image: e.target.value }))} />
             </label>
 

@@ -25,29 +25,6 @@ export default function TopupPage() {
     }
   };
 
-  const resolvePackageImage = (image: string, tokens: number): string => {
-    const imagePath = image.trim();
-    const tokenBasedImage = `/topup-packages/${tokens}.png`;
-
-    if (!imagePath) {
-      return tokenBasedImage;
-    }
-
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:") || imagePath.startsWith("blob:")) {
-      return imagePath;
-    }
-
-    if (imagePath.startsWith("public/")) {
-      return `/${imagePath.replace(/^public\/+/, "")}`;
-    }
-
-    if (imagePath.startsWith("/")) {
-      return imagePath;
-    }
-
-    return `/${imagePath}`;
-  };
-
   useEffect(() => {
     const initPage = async () => {
       const user = await UserService.getUser();
@@ -97,13 +74,13 @@ export default function TopupPage() {
             <div key={`${pkg.id}-${pkg.image}`} className={styles.packageCard} onClick={() => router.push(`/topup/payment?packageId=${pkg.id}&tokens=${pkg.tokens}&price=${pkg.price}`)}>
               <div className={styles.packageImageWrap}>
                 <Image
-                  src={resolvePackageImage(pkg.image, pkg.tokens)}
+                  src={pkg.image}
                   alt={`${pkg.tokens.toLocaleString()} token package`}
                   className={styles.packageImage}
                   loading="lazy"
                   width={600}
                   height={600}
-                  unoptimized={resolvePackageImage(pkg.image, pkg.tokens).startsWith("http")}
+                  unoptimized
                 />
               </div>
               <div className={styles.packageInfo}>

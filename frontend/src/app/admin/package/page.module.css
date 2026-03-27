@@ -165,7 +165,8 @@
 }
 
 .createButton,
-.saveButton {
+.saveButton,
+.deleteButton {
   border: none;
   border-radius: 10px;
   padding: 10px 14px;
@@ -183,8 +184,14 @@
   color: #1a1a1a;
 }
 
+.deleteButton {
+  background: #b33434;
+  color: #fff;
+}
+
 .createButton:disabled,
-.saveButton:disabled {
+.saveButton:disabled,
+.deleteButton:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
@@ -217,6 +224,7 @@
 .actionRow {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 @media (max-width: 760px) {

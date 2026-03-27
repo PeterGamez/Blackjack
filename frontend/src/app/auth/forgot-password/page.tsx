@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import AuthService from "@/lib/AuthService";
+import AuthService from "@lib/AuthService";
 
 import styles from "./forgot.module.css";
 

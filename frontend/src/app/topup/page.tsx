@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
 
-import config from "@/config";
-import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
+import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
 
@@ -17,22 +16,13 @@ export default function TopupPage() {
   const router = useRouter();
   const [packages, setPackages] = useState<PaymentPackageInterface[]>([]);
 
-  const resolvePackageImage = (image: string): string => {
-    const imagePath = image.trim();
-
-    if (!imagePath) {
-      return "/icons/token.png";
+  const loadPackages = async () => {
+    try {
+      const paymentPackages = await PaymentService.getPackages();
+      setPackages(paymentPackages);
+    } catch (error) {
+      console.error("Failed to load payment packages:", error);
     }
-
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:") || imagePath.startsWith("blob:")) {
-      return imagePath;
-    }
-
-    if (imagePath.startsWith("/")) {
-      return `${config.apiUrl}${imagePath}`;
-    }
-
-    return imagePath;
   };
 
   useEffect(() => {
@@ -43,15 +33,28 @@ export default function TopupPage() {
         return;
       }
 
-      try {
-        const paymentPackages = await PaymentService.getPackages();
-        setPackages(paymentPackages);
-      } catch (error) {
-        console.error("Failed to load payment packages:", error);
+      await loadPackages();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void loadPackages();
       }
     };
 
+    const handleFocus = () => {
+      void loadPackages();
+    };
+
     initPage();
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [router]);
 
   return (
@@ -68,16 +71,16 @@ export default function TopupPage() {
       <div className={styles.gridShell}>
         <div className={styles.grid}>
           {packages.map((pkg) => (
-            <div key={pkg.id} className={styles.packageCard} onClick={() => router.push(`/topup/payment?packageId=${pkg.id}&tokens=${pkg.tokens}&price=${pkg.price}`)}>
+            <div key={`${pkg.id}-${pkg.image}`} className={styles.packageCard} onClick={() => router.push(`/topup/payment?packageId=${pkg.id}&tokens=${pkg.tokens}&price=${pkg.price}`)}>
               <div className={styles.packageImageWrap}>
                 <Image
-                  src={resolvePackageImage(pkg.image)}
+                  src={pkg.image}
                   alt={`${pkg.tokens.toLocaleString()} token package`}
                   className={styles.packageImage}
                   loading="lazy"
-                  width={120}
-                  height={120}
-                  unoptimized={resolvePackageImage(pkg.image).startsWith("http")}
+                  width={600}
+                  height={600}
+                  unoptimized
                 />
               </div>
               <div className={styles.packageInfo}>

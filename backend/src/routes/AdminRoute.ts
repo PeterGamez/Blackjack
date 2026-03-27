@@ -446,21 +446,43 @@ export default class AdminRoute implements RouteInterface {
                 }
 
                 if (image) {
-                    await PackageModel.updatePackage(packageId, "image", image);
+                    await PackageModel.updatePackage(pkg.id, "image", image);
                 }
                 if (price !== undefined) {
-                    await PackageModel.updatePackage(packageId, "price", price);
+                    await PackageModel.updatePackage(pkg.id, "price", price);
                 }
                 if (tokens !== undefined) {
-                    await PackageModel.updatePackage(packageId, "tokens", tokens);
+                    await PackageModel.updatePackage(pkg.id, "tokens", tokens);
                 }
                 if (isActive !== undefined) {
-                    await PackageModel.updatePackage(packageId, "isActive", isActive);
+                    await PackageModel.updatePackage(pkg.id, "isActive", isActive);
                 }
 
                 return c.json({ message: "Package updated successfully" });
             } catch (error) {
                 this.server.error("AdminRoute", `Error updating package:`);
+                console.error(error);
+                return c.json({ error: "Internal server error" }, 500);
+            }
+        });
+
+        this.app.delete("/package/:id", async (c) => {
+            try {
+                const packageId = parseInt(c.req.param("id"));
+                if (isNaN(packageId)) {
+                    return c.json({ error: "Invalid package ID" }, 400);
+                }
+
+                const pkg = await PackageModel.selectPackageById(packageId);
+                if (!pkg) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
+                await PackageModel.deletePackage(packageId);
+
+                return c.json({ message: "Package deleted successfully" });
+            } catch (error) {
+                this.server.error("AdminRoute", `Error deleting package:`);
                 console.error(error);
                 return c.json({ error: "Internal server error" }, 500);
             }

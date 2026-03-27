@@ -26,6 +26,7 @@ function PaymentContent() {
   const [selectedPackage, setSelectedPackage] = useState<PaymentPackageInterface | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [qrPayload, setQrPayload] = useState("");
 
   useEffect(() => {
     const initPaymentPage = async () => {
@@ -55,6 +56,8 @@ function PaymentContent() {
 
     initPaymentPage();
   }, [packageId, router]);
+
+
 
   useEffect(() => {
     if (!successMessage) {
@@ -117,6 +120,14 @@ function PaymentContent() {
     }
   };
 
+  useEffect(() => {
+    if (!selectedPackage) return;
+
+    PaymentService.getQrPayload(selectedPackage.id)
+      .then(setQrPayload)
+      .catch(() => setQrPayload(""));
+  }, [selectedPackage]);
+
   const displayTokens = selectedPackage?.tokens ?? 0;
   const displayPrice = selectedPackage?.price ?? 0;
 
@@ -177,7 +188,18 @@ function PaymentContent() {
 
             <div className={`${styles.qrBody} ${method === "qr" ? styles.qrBodyOpen : ""}`}>
               <div className={styles.qrInner}>
-                <div className={styles.qrPreview}>QR Code</div>
+              <div className={styles.qrPreview}>
+  <div className={styles.qrPreview}>
+  {qrPayload ? (
+    <img
+      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`}
+      alt="PromptPay QR"
+    />
+  ) : (
+    <div>Loading QR...</div>
+  )}
+</div>
+</div>
                 <label className={styles.uploadButton}>
                   ⬆ UPLOAD SLIP
                   <input type="file" accept="image/*" onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)} className={styles.hiddenFileInput} />

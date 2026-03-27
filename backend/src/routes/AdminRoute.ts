@@ -343,7 +343,7 @@ export default class AdminRoute implements RouteInterface {
 
         this.app.post("/package", async (c) => {
             try {
-                let body: { image?: unknown; price?: unknown; tokens?: unknown; isActive?: unknown };
+                let body: { image: string; price: number; tokens: number; isActive: boolean };
                 try {
                     body = await c.req.json();
                 } catch {
@@ -352,29 +352,11 @@ export default class AdminRoute implements RouteInterface {
 
                 const { image, price, tokens, isActive } = body;
 
-                if (price === undefined || tokens === undefined || isActive === undefined) {
+                if (!image || price === undefined || tokens === undefined || isActive === undefined) {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
-                if (image !== undefined && image !== null && typeof image !== "string") {
-                    return c.json({ error: "image must be a string" }, 400);
-                }
-
-                if (typeof price !== "number" || price <= 0) {
-                    return c.json({ error: "price must be a positive number" }, 400);
-                }
-
-                if (typeof tokens !== "number" || tokens <= 0) {
-                    return c.json({ error: "tokens must be a positive number" }, 400);
-                }
-
-                if (typeof isActive !== "boolean") {
-                    return c.json({ error: "isActive must be a boolean" }, 400);
-                }
-
-                const normalizedImage = typeof image === "string" ? image.trim() : "";
-
-                const newPackageId = await PackageModel.createPackage(normalizedImage, price, tokens, isActive);
+                const newPackageId = await PackageModel.createPackage(image, price, tokens, isActive);
 
                 return c.json({ message: "Package created successfully", packageId: newPackageId });
             } catch (error) {
@@ -430,34 +412,8 @@ export default class AdminRoute implements RouteInterface {
 
                 const { image, price, tokens, isActive } = body;
 
-                if (image === undefined && price === undefined && tokens === undefined && isActive === undefined) {
-                    return c.json({ error: "No update fields provided" }, 400);
-                }
-
-                if (image !== undefined && image !== null && typeof image !== "string") {
-                    return c.json({ error: "image must be a string" }, 400);
-                }
-
-                if (price !== undefined && (typeof price !== "number" || price <= 0)) {
-                    return c.json({ error: "price must be a positive number" }, 400);
-                }
-
-                if (tokens !== undefined && (typeof tokens !== "number" || tokens <= 0)) {
-                    return c.json({ error: "tokens must be a positive number" }, 400);
-                }
-
-                if (isActive !== undefined && typeof isActive !== "boolean") {
-                    return c.json({ error: "isActive must be a boolean" }, 400);
-                }
-
-                const pkg = await PackageModel.selectPackageById(packageId);
-                if (!pkg) {
-                    return c.json({ error: "Package not found" }, 404);
-                }
-
-                if (image !== undefined) {
-                    const normalizedImage = typeof image === "string" ? image.trim() : "";
-                    await PackageModel.updatePackage(packageId, "image", normalizedImage);
+                if (image) {
+                    await PackageModel.updatePackage(packageId, "image", image);
                 }
                 if (price !== undefined) {
                     await PackageModel.updatePackage(packageId, "price", price);

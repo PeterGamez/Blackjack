@@ -356,6 +356,18 @@ export default class AdminRoute implements RouteInterface {
                     return c.json({ error: "Missing required fields" }, 400);
                 }
 
+                if (typeof price !== "number" || price <= 0) {
+                    return c.json({ error: "price must be a positive number" }, 400);
+                }
+
+                if (typeof tokens !== "number" || tokens <= 0) {
+                    return c.json({ error: "tokens must be a positive number" }, 400);
+                }
+
+                if (typeof isActive !== "boolean") {
+                    return c.json({ error: "isActive must be a boolean" }, 400);
+                }
+
                 const newPackageId = await PackageModel.createPackage(image, price, tokens, isActive);
 
                 return c.json({ message: "Package created successfully", packageId: newPackageId });
@@ -412,17 +424,38 @@ export default class AdminRoute implements RouteInterface {
 
                 const { image, price, tokens, isActive } = body;
 
+                if (!image && price === undefined && tokens === undefined && isActive === undefined) {
+                    return c.json({ error: "No update fields provided" }, 400);
+                }
+
+                if (price !== undefined && (typeof price !== "number" || price <= 0)) {
+                    return c.json({ error: "price must be a positive number" }, 400);
+                }
+
+                if (tokens !== undefined && (typeof tokens !== "number" || tokens <= 0)) {
+                    return c.json({ error: "tokens must be a positive number" }, 400);
+                }
+
+                if (isActive !== undefined && typeof isActive !== "boolean") {
+                    return c.json({ error: "isActive must be a boolean" }, 400);
+                }
+
+                const pkg = await PackageModel.selectPackageById(packageId);
+                if (!pkg) {
+                    return c.json({ error: "Package not found" }, 404);
+                }
+
                 if (image) {
-                    await PackageModel.updatePackage(packageId, "image", image);
+                    await PackageModel.updatePackage(pkg.id, "image", image);
                 }
                 if (price !== undefined) {
-                    await PackageModel.updatePackage(packageId, "price", price);
+                    await PackageModel.updatePackage(pkg.id, "price", price);
                 }
                 if (tokens !== undefined) {
-                    await PackageModel.updatePackage(packageId, "tokens", tokens);
+                    await PackageModel.updatePackage(pkg.id, "tokens", tokens);
                 }
                 if (isActive !== undefined) {
-                    await PackageModel.updatePackage(packageId, "isActive", isActive);
+                    await PackageModel.updatePackage(pkg.id, "isActive", isActive);
                 }
 
                 return c.json({ message: "Package updated successfully" });

@@ -152,7 +152,7 @@ export default function AdminPackageEditPage() {
             <>
               <div className={styles.grid} style={{ marginTop: 18 }}>
                 <label className={styles.label}>
-                  Image URL (optional)
+                  Image URL
                   <input className={styles.input} value={draft.image ?? ""} onChange={(e) => handleDraftChange("image", e.target.value)} />
                 </label>
 

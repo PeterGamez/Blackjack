@@ -105,7 +105,7 @@ export default function AdminPackageCreatePage() {
 
           <div className={styles.grid} style={{ marginTop: 18 }}>
             <label className={styles.label}>
-              Image URL (optional)
+              Image URL
               <input className={styles.input} value={draft.image} onChange={(e) => setDraft((prev) => ({ ...prev, image: e.target.value }))} />
             </label>
 

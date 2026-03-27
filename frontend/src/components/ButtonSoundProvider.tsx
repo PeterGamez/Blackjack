@@ -3,13 +3,39 @@
 import { useEffect, useRef } from "react";
 
 const BUTTON_SOUND_SRC = "/sounds/button-click.mp3";
-const BUTTON_SELECTOR = [
+const INTERACTIVE_SELECTOR = [
   "button",
+  "a[href]",
+  "summary",
   "[role='button']",
   "input[type='button']",
   "input[type='submit']",
   "input[type='reset']",
+  "input[type='checkbox']",
+  "input[type='radio']",
+  "input[type='range']",
+  "label[for]",
 ].join(",");
+
+const FALLBACK_VOLUME = 0.5;
+
+function getEffectVolume(): number {
+  if (typeof window === "undefined") {
+    return FALLBACK_VOLUME;
+  }
+
+  const raw = window.localStorage.getItem("effectVolume");
+  if (!raw) {
+    return FALLBACK_VOLUME;
+  }
+
+  const value = Number.parseInt(raw, 10);
+  if (Number.isNaN(value)) {
+    return FALLBACK_VOLUME;
+  }
+
+  return Math.min(100, Math.max(0, value)) / 100;
+}
 
 function isDisabledElement(element: Element): boolean {
   if (!(element instanceof HTMLElement)) {
@@ -27,6 +53,27 @@ function isDisabledElement(element: Element): boolean {
   return false;
 }
 
+function findClickableElement(target: Element): HTMLElement | null {
+  let current: Element | null = target;
+
+  while (current) {
+    if (current.matches(INTERACTIVE_SELECTOR) && !isDisabledElement(current)) {
+      return current as HTMLElement;
+    }
+
+    if (current instanceof HTMLElement) {
+      const cursor = window.getComputedStyle(current).cursor;
+      if (cursor === "pointer" && current.getAttribute("aria-disabled") !== "true") {
+        return current;
+      }
+    }
+
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
 export default function ButtonSoundProvider() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -41,18 +88,18 @@ export default function ButtonSoundProvider() {
         return;
       }
 
-      const button = target.closest(BUTTON_SELECTOR);
-      if (!button || isDisabledElement(button)) {
+      const clickable = findClickableElement(target);
+      if (!clickable) {
         return;
       }
 
       if (!audioRef.current) {
         audioRef.current = new Audio(BUTTON_SOUND_SRC);
         audioRef.current.preload = "auto";
-        audioRef.current.volume = 0.5;
       }
 
       const audio = audioRef.current;
+      audio.volume = getEffectVolume();
       audio.pause();
       audio.currentTime = 0;
       void audio.play().catch(() => {

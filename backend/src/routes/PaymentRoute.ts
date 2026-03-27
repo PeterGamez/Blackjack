@@ -143,8 +143,8 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Bank slip is older than 15 minutes" }, 400);
                 }
 
-                const isDuplicate = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
-                if (isDuplicate) {
+                const duplicatePayments = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
+                if (duplicatePayments.length > 0) {
                     return c.json({ error: "This bank slip has already been used" }, 400);
                 }
 

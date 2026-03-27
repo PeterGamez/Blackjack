@@ -269,6 +269,29 @@
 }
 
 .linkBodyOpen {
+  max-height: 100px;
+  opacity: 1;
+}
+
+.linkInput {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2c3344;
+  background: #e5e7ec;
+  color: #333;
+  font-size: 14px;
+}
+
+.linkBody {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+.linkBodyOpen {
   max-height: 120px;
   opacity: 1;
 }

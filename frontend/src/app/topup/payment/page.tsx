@@ -100,15 +100,16 @@ function PaymentContent() {
         }
 
         await PaymentService.payByBankSlip(packageId, slipFile);
-      }
-
-      if (method === "truemoney") {
+      } else if (method === "truemoney") {
         if (!truemoneyUrl.trim()) {
           setErrorMessage("Please paste your TrueMoney envelope URL.");
           return;
         }
 
         await PaymentService.payByTrueMoney(packageId, truemoneyUrl.trim());
+      } else {
+        setErrorMessage("Invalid payment method selected.");
+        return;
       }
 
       await UserService.getUser();

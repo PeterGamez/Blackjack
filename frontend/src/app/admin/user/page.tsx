@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
 
-import { UserInterface } from "@/interfaces/Admin/UserInterface";
+import { UserInterface } from "@interfaces/Admin/UserInterface";
 
 import styles from "./page.module.css";
 

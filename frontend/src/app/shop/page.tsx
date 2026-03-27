@@ -11,7 +11,7 @@ import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 import { getCardBackImage, getCardImage, getChipImage, getTableImage } from "@utils/skinUtils";
 
-import ShopService from "@/lib/ShopService";
+import ShopService from "@lib/ShopService";
 
 import styles from "./shop.module.css";
 

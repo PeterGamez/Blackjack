@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
 
-import { ProductInterface } from "@/interfaces/Admin/ProductInterface";
-import { CurrencyType } from "@/interfaces/CurrencyType";
+import { ProductInterface } from "@interfaces/Admin/ProductInterface";
+import { CurrencyType } from "@interfaces/CurrencyType";
 
 import styles from "../page.module.css";
 

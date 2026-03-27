@@ -97,7 +97,7 @@ export default function TableSettingPage() {
 
       {/* Create Button */}
       <div className={styles.createButtonWrapper}>
-        <button className={styles.createButton} onClick={createTable}>
+        <button className={styles.createButton} onClick={() => router.push("/comingsoon")}>
           CREATE TABLE
         </button>
       </div>

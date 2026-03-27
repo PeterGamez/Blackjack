@@ -1,6 +1,6 @@
-import config from "@/config";
-import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
+import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
 
+import config from "../config";
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
 

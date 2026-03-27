@@ -17,7 +17,7 @@ const INTERACTIVE_SELECTOR = [
   "label[for]",
 ].join(",");
 
-const FALLBACK_VOLUME = 0.5;
+const FALLBACK_VOLUME = 0.75;
 
 function getEffectVolume(): number {
   if (typeof window === "undefined") {

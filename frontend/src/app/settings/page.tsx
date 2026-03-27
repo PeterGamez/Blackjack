@@ -27,6 +27,8 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
+const DEFAULT_VOLUME = 75;
+
 const parseVolume = (value: string, fallback: number): number => {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
@@ -44,8 +46,8 @@ const normalizeError = (error: unknown, fallback: string): string => {
 export default function SettingsPage() {
   const router = useRouter();
 
-  const [musicVolume, setMusicVolume] = useState(70);
-  const [effectVolume, setEffectVolume] = useState(75);
+  const [musicVolume, setMusicVolume] = useState(() => parseVolume(LocalStorage.getItem("musicVolume"), DEFAULT_VOLUME));
+  const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume"), DEFAULT_VOLUME));
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
   const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
@@ -63,8 +65,13 @@ export default function SettingsPage() {
   }, [router]);
 
   useEffect(() => {
-    setMusicVolume(parseVolume(LocalStorage.getItem("musicVolume"), 70));
-    setEffectVolume(parseVolume(LocalStorage.getItem("effectVolume"), 75));
+    if (LocalStorage.getItem("musicVolume") === null) {
+      LocalStorage.setItem("musicVolume", DEFAULT_VOLUME.toString());
+    }
+
+    if (LocalStorage.getItem("effectVolume") === null) {
+      LocalStorage.setItem("effectVolume", DEFAULT_VOLUME.toString());
+    }
   }, []);
 
   useEffect(() => {

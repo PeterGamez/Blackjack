@@ -156,7 +156,7 @@ export default function SettingsPage() {
       <Navbar />
 
       <main className={styles.container}>
-        <button type="button" className={styles.backButton} onClick={() => router.push("/")}>
+        <button type="button" className={styles.backButton} onClick={() => router.back()}>
           ← Back
         </button>
 

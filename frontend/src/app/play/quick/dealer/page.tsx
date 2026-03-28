@@ -551,12 +551,14 @@ export default function Dealer() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
+      <Navbar disabled />
       <div className={styles.main}>
         <div className={styles.tableWrap}>
-          <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
-            ← Back
-          </button>
+          {gameStatus === "betting" && (
+            <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
+              ← Back
+            </button>
+          )}
           <div className={styles.table}>
             <Image src={getTableImage(tableSkin)} alt="game table" fill style={{ objectFit: "fill", zIndex: 0 }} unoptimized />
             <div className={styles.innerShadow} />

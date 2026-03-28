@@ -11,11 +11,11 @@ export default class PaymentModel {
         this.DB = DB;
     }
 
-    public static async createPayment(userId: number, receiptRef: string, type: PaymentInterface["type"], amount: number): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (userId, receiptRef, type, amount) VALUES (?, ?, ?, ?)`;
+    public static async createPayment(userId: number, receiptRef: string, type: PaymentInterface["type"], amount: number, tokens: number): Promise<number> {
+        const sql = `INSERT INTO ${this.table} (userId, receiptRef, type, amount, tokens) VALUES (?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
-            const [result] = await connection.execute<ResultSetHeader>(sql, [userId, receiptRef, type, amount]);
+            const [result] = await connection.execute<ResultSetHeader>(sql, [userId, receiptRef, type, amount, tokens]);
             return result.insertId;
         } finally {
             connection.release();

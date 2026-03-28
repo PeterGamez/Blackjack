@@ -26,9 +26,15 @@ async function run() {
             origin: "*",
             allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             allowHeaders: ["Content-Type", "Authorization"],
-            credentials: true,
         })
     );
+    app.use("*", async (c, next) => {
+        c.header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        c.header("Pragma", "no-cache");
+        c.header("Expires", "0");
+
+        await next();
+    });
 
     initRoutes(server, app);
     initModels(server);

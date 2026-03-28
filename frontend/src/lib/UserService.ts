@@ -1,9 +1,9 @@
-import { UserInterface } from "@interfaces/API/UserInterface";
+import config from "@config";
 
-import config from "@/config";
-import { GameHistoryInterface } from "@/interfaces/API/GameHistoryInterface";
-import { PaymentHistoryInterface } from "@/interfaces/API/PaymentHistoryInterface";
-import { CurrencyType } from "@/interfaces/CurrencyType";
+import { GameHistoryInterface } from "@interfaces/API/GameHistoryInterface";
+import { PaymentHistoryInterface } from "@interfaces/API/PaymentHistoryInterface";
+import { UserInterface } from "@interfaces/API/UserInterface";
+import { CurrencyType } from "@interfaces/CurrencyType";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
@@ -147,14 +147,15 @@ export default class UserService {
 
   public static async redeemCode(code: string): Promise<{ message: string; amount: number; type: CurrencyType }> {
     try {
-      const response = await this.authenticatedFetch("/user/redeem-code", {
+      const response = await this.authenticatedFetch("/code/redeem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
       });
 
       if (!response?.ok) {
-        throw new Error("Redeem code failed");
+        const data: { error?: string; message?: string } = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || "Redeem code failed");
       }
 
       return await response.json();

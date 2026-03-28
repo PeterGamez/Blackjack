@@ -126,8 +126,8 @@
   background: rgba(92, 107, 138, 0.6);
   border-radius: 20px;
   border: 1px solid rgba(92, 107, 138, 0.8);
-  min-width: 220px;
-  width: 220px;
+  min-width: 260px;
+  width: 260px;
   transition: all 0.3s ease;
   justify-content: flex-start;
 }

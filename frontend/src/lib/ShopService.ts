@@ -1,5 +1,6 @@
-import config from "@/config";
-import { ProductInterface } from "@/interfaces/API/ProductInterface";
+import config from "@config";
+
+import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "./LocalStorage";
 

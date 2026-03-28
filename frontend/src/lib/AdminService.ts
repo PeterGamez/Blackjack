@@ -1,8 +1,9 @@
-import config from "@/config";
-import { CodeInterface } from "@/interfaces/Admin/CodeInterface";
-import { PackageInterface } from "@/interfaces/Admin/PackageInterface";
-import { ProductInterface } from "@/interfaces/Admin/ProductInterface";
-import { UserInterface } from "@/interfaces/Admin/UserInterface";
+import config from "@config";
+
+import { CodeInterface } from "@interfaces/Admin/CodeInterface";
+import { PackageInterface } from "@interfaces/Admin/PackageInterface";
+import { ProductInterface } from "@interfaces/Admin/ProductInterface";
+import { UserInterface } from "@interfaces/Admin/UserInterface";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
@@ -306,6 +307,16 @@ export default class AdminService {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      await this.parseError(response);
+    }
+  }
+
+  public static async deletePackage(packageId: number): Promise<void> {
+    const response = await this.authenticatedFetch(`/admin/package/${packageId}`, {
+      method: "DELETE",
     });
 
     if (!response.ok) {

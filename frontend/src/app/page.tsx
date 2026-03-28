@@ -1,11 +1,12 @@
 "use client";
 
-import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import LocalStorage from "@/lib/LocalStorage";
-import UserService from "@/lib/UserService";
+import Navbar from "@components/Navbar";
+
+import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
 
 import styles from "./page.module.css";
 

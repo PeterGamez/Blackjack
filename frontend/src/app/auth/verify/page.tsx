@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-import AuthService from "@/lib/AuthService";
+import AuthService from "@lib/AuthService";
 
 import styles from "./page.module.css";
 

@@ -1,6 +1,6 @@
 import { ProductInterface } from "@interfaces/API/ProductInterface";
 
-import config from "../config";
+import config from "@config";
 import LocalStorage from "./LocalStorage";
 
 export default class ShopService {

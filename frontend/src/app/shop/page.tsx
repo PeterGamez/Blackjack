@@ -301,9 +301,9 @@ function StorePageContent() {
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                           {isTokenPayment ? (
-                            <img src="/icons/token.png" alt="ticket" style={{ width: 35 }} />
+                            <Image src="/icons/token.png" alt="ticket" width={35} height={35} />
                             ) : (
-                              <img src="/icons/coin.png" alt="coin" style={{ width: 35 }} />
+                              <Image src="/icons/coin.png" alt="coin" width={35} height={35} />
                             )} {priceText}
                         </span>
                         <button

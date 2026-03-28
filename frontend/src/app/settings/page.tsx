@@ -6,6 +6,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
+import { UserInterface } from "@interfaces/API/UserInterface";
 
 import styles from "./settings.module.css";
 
@@ -41,7 +42,7 @@ export default function SettingsPage() {
   const router = useRouter();
 
   // 🔥 เพิ่ม user state
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserInterface | null>(null);
   const isLoggedIn = !!user;
 
   const [musicVolume, setMusicVolume] = useState(() =>
@@ -59,7 +60,7 @@ export default function SettingsPage() {
   } | null>(null);
 
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [historyError, setHistoryError] = useState<string>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
   // 🔥 โหลด user
@@ -276,8 +277,13 @@ export default function SettingsPage() {
                 <p>Loading...</p>
               )}
 
+              {isLoggedIn && !historyLoading && historyError && (
+                <p className={styles.feedbackError}>{historyError}</p>
+              )}
+
               {isLoggedIn &&
                 !historyLoading &&
+                !historyError &&
                 transactions.map((t) => (
                   <div key={t.id} className={styles.historyItem}>
                     <span>{t.date}</span>

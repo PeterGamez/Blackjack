@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 
-import config from "@/config";
+import config from "@config";
 import ButtonSoundProvider from "@components/ButtonSoundProvider";
 import BackgroundMusicProvider from "@components/BackgroundMusicProvider";
 

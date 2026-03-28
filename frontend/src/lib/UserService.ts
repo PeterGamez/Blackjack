@@ -3,7 +3,7 @@ import { PaymentHistoryInterface } from "@interfaces/API/PaymentHistoryInterface
 import { UserInterface } from "@interfaces/API/UserInterface";
 import { CurrencyType } from "@interfaces/CurrencyType";
 
-import config from "../config";
+import config from "@config";
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
 import ShopService from "./ShopService";

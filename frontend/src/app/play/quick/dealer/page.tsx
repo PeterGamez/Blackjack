@@ -3,14 +3,14 @@
 import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
 import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 
-import config from "@/config";
+import config from "@config";
 
 import styles from "./page.module.css";
 import { getEffectVolume } from "@components/ButtonSoundProvider";
@@ -65,7 +65,6 @@ const FORCED_CARD_SUITS = ["♠", "♥", "♦", "♣"];
 const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 const CARD_DRAW_SOUND_SRC = "/sounds/draw.mp3";
 const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
-const FALLBACK_EFFECT_VOLUME = 0.75;
 const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0.8;
 const CARD_DRAW_SOUND_GAIN = 1;
@@ -111,7 +110,7 @@ export default function Dealer() {
     return Math.min(1, Math.max(0, getEffectVolume() * gain));
   };
 
-  const playCardDrawSound = () => {
+  const playCardDrawSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -133,9 +132,9 @@ export default function Dealer() {
     void audio.play().catch(() => {
       // Ignore browser/media playback errors.
     });
-  };
+  }, []);
 
-  const playBlackjackLoseSound = () => {
+  const playBlackjackLoseSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -153,7 +152,7 @@ export default function Dealer() {
     void audio.play().catch(() => {
       // Ignore browser/media playback errors.
     });
-  };
+  }, []);
 
   useEffect(() => {
     const pool = Array.from({ length: 4 }, () => {
@@ -207,14 +206,14 @@ export default function Dealer() {
 
     prevPlayerCardCountRef.current = playerHand.length;
     prevDealerCardCountRef.current = dealerHand.length;
-  }, [dealerHand.length, gameStatus, playerHand.length]);
+  }, [dealerHand.length, gameStatus, playCardDrawSound, playerHand.length]);
 
   useEffect(() => {
     const lower = result.toLowerCase();
     if (lower.includes("blackjack") && lower.includes("dealer")) {
       playBlackjackLoseSound();
     }
-  }, [result]);
+  }, [playBlackjackLoseSound, result]);
 
   useEffect(() => {
     const syncSkins = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import LocalStorage from "@lib/LocalStorage";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const BG_MUSIC_SRC = "/sounds/bg-music.mp3";
 
@@ -15,7 +15,6 @@ function getBgMusicVolume(): number {
 
 export default function BackgroundMusicProvider() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (getBgMusicVolume() == 0) {
@@ -29,12 +28,11 @@ export default function BackgroundMusicProvider() {
     audioRef.current = audio;
 
     const playAudio = () => {
-      if (audioRef.current && !isPlaying) {
+      if (audioRef.current && audioRef.current.paused) {
         audioRef.current.play().catch(() => {
           // Browser autoplay policy might block this
           // Music will play on first user interaction
         });
-        setIsPlaying(true);
       }
     };
 

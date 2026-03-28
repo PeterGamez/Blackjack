@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@components/Navbar";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -25,7 +26,6 @@ function PaymentContent() {
   const [isLoadingPackage, setIsLoadingPackage] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<PaymentPackageInterface | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [qrPayload, setQrPayload] = useState("");
   const [slipPreviewUrl, setSlipPreviewUrl] = useState("");
   const [isSlipModalOpen, setIsSlipModalOpen] = useState(false);
@@ -66,8 +66,6 @@ function PaymentContent() {
 
   const handleConfirmPayment = async () => {
     setErrorMessage("");
-    setSuccessMessage("");
-
     if (!packageId || Number.isNaN(packageId)) {
       setErrorMessage("Invalid package. Please return and select a package again.");
       return;
@@ -106,7 +104,6 @@ function PaymentContent() {
       }
 
       await UserService.getUser();
-      setSuccessMessage("Payment successful. Your tokens have been updated.");
       setShowSuccessModal(true);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Payment failed");
@@ -197,7 +194,13 @@ function PaymentContent() {
                 <div className={styles.qrPreviewRow}>
                   <div className={styles.qrPreview}>
                     {qrPayload ? (
-                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`} alt="PromptPay QR" />
+                      <Image
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`}
+                        alt="PromptPay QR"
+                        width={220}
+                        height={220}
+                        unoptimized
+                      />
                     ) : (
                       <div>Loading QR...</div>
                     )}
@@ -212,7 +215,7 @@ function PaymentContent() {
                         setIsSlipModalOpen(true);
                       }}
                     >
-                      <img src={slipPreviewUrl} alt="Uploaded slip preview" />
+                      <Image src={slipPreviewUrl} alt="Uploaded slip preview" width={120} height={120} unoptimized />
                     </button>
                   )}
                 </div>
@@ -259,7 +262,7 @@ function PaymentContent() {
             <button type="button" className={styles.slipModalClose} onClick={() => setIsSlipModalOpen(false)}>
               Close
             </button>
-            <img src={slipPreviewUrl} alt="Uploaded slip full preview" className={styles.slipModalImage} />
+            <Image src={slipPreviewUrl} alt="Uploaded slip full preview" className={styles.slipModalImage} width={1200} height={1600} unoptimized />
           </div>
         </div>
       )}

@@ -19,17 +19,6 @@ export default function TableSettingPage() {
   const [startingMoneyType, setStartingMoneyType] = useState("Coin");
   const [minimumBetType, setMinimumBetType] = useState("Coin");
 
-  const createTable = () => {
-    console.log({
-      roomId,
-      roomPassword,
-      startingMoney,
-      startingMoneyType,
-      minimumBet,
-      minimumBetType,
-    });
-  };
-
   return (
     <div className={styles.container}>
       <Navbar />

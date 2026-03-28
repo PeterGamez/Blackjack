@@ -3,7 +3,7 @@ import { PackageInterface } from "@interfaces/Admin/PackageInterface";
 import { ProductInterface } from "@interfaces/Admin/ProductInterface";
 import { UserInterface } from "@interfaces/Admin/UserInterface";
 
-import config from "../config";
+import config from "@config";
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
 

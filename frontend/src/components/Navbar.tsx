@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
-import UserService from "@lib/UserService";
 
 import styles from "./Navbar.module.css";
 import ProfileAvatar from "./ProfileAvatar";
 import TokenConverterModal from "./TokenConverterModal";
-import config from "@/config";
+import config from "@config";
 
 export default function Navbar({ disabled = false }: { disabled?: boolean }) {
   const router = useRouter();

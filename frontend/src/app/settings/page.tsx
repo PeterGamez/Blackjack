@@ -26,12 +26,8 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
-const DEFAULT_VOLUME = 75;
-
-const parseVolume = (value: string, fallback: number): number => {
-  if (!value) return fallback;
+const parseVolume = (value: string): number => {
   const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed)) return fallback;
   return Math.min(100, Math.max(0, parsed));
 };
 
@@ -45,8 +41,8 @@ const normalizeError = (error: unknown, fallback: string): string => {
 export default function SettingsPage() {
   const router = useRouter();
 
-  const [musicVolume, setMusicVolume] = useState(() => parseVolume(LocalStorage.getItem("musicVolume"), DEFAULT_VOLUME));
-  const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume"), DEFAULT_VOLUME));
+  const [musicVolume, setMusicVolume] = useState(() => parseVolume(LocalStorage.getItem("musicVolume")));
+  const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume")));
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
   const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
@@ -64,16 +60,6 @@ export default function SettingsPage() {
   }, [router]);
 
   useEffect(() => {
-    if (LocalStorage.getItem("musicVolume") === null) {
-      LocalStorage.setItem("musicVolume", DEFAULT_VOLUME.toString());
-    }
-
-    if (LocalStorage.getItem("effectVolume") === null) {
-      LocalStorage.setItem("effectVolume", DEFAULT_VOLUME.toString());
-    }
-  }, []);
-
-  useEffect(() => {
     LocalStorage.setItem("musicVolume", musicVolume.toString());
   }, [musicVolume]);
 
@@ -89,7 +75,7 @@ export default function SettingsPage() {
       const paymentHistory = await UserService.getPaymentHistorys();
 
       const paymentTransactions: TransactionItem[] = paymentHistory.map((payment) => ({
-        id: `payment-${payment.receiptRef}-${payment.createdAt}`,
+        id: `payment-${payment.receiptRef}`,
         date: dateFormatter.format(new Date(payment.createdAt)),
         format: payment.type === "bank" ? "Top up (Bank Transfer)" : "Top up (TrueMoney)",
         amount: `${payment.tokens} (${payment.amount} THB)`,

@@ -10,6 +10,7 @@ import UserService from "@lib/UserService";
 import styles from "./Navbar.module.css";
 import ProfileAvatar from "./ProfileAvatar";
 import TokenConverterModal from "./TokenConverterModal";
+import config from "@/config";
 
 export default function Navbar({ disabled = false }: { disabled?: boolean }) {
   const router = useRouter();
@@ -57,6 +58,16 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
       window.removeEventListener("storage", onStorageChange);
       window.removeEventListener("local-storage-change", onStorageChange);
     };
+  }, []);
+
+  useEffect(() => {
+    if (LocalStorage.getItem("musicVolume") === null) {
+      LocalStorage.setItem("musicVolume", config.sound.music.toString());
+    }
+
+    if (LocalStorage.getItem("effectVolume") === null) {
+      LocalStorage.setItem("effectVolume", config.sound.effect.toString());
+    }
   }, []);
 
   return (

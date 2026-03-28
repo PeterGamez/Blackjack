@@ -130,7 +130,13 @@ export default class PaymentRoute implements RouteInterface {
 
                 if (!response.success) {
                     this.server.warn("PaymentRoute", `Failed to verify slip: ${response.message}`);
-                    return c.json({ error: "Failed to verify slip", message: response.message }, 400);
+                    if (response.code == 1011) {
+                        return c.json({ error: "Invalid or expired bank slip" }, 400);
+                    } else if (response.code == 1012) {
+                        return c.json({ error: "This bank slip has already been used" }, 400);
+                    } else {
+                        return c.json({ error: "Failed to verify slip", message: response.message }, 400);
+                    }
                 }
 
                 const data = response.data;
@@ -139,7 +145,12 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
-                if (data.transTimestamp.getTime() < Date.now() - 15 * 60 * 1000) {
+                const transTimestampMs = new Date(data.transTimestamp).getTime();
+                if (Number.isNaN(transTimestampMs)) {
+                    return c.json({ error: "Invalid bank slip timestamp" }, 400);
+                }
+
+                if (transTimestampMs < Date.now() - 15 * 60 * 1000) {
                     return c.json({ error: "Bank slip is older than 15 minutes" }, 400);
                 }
 

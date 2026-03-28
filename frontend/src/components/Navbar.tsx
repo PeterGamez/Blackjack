@@ -108,7 +108,7 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
           </div>
 
           <button className={styles.settingsButton} aria-label="Open settings" disabled={disabled} onClick={() => router.push("/settings")}>
-            <Image src="/icons/setting.png" alt="token" width={25} height={25}/>
+            <Image src="/icons/setting.png" alt="token" width={25} height={25} />
           </button>
         </div>
       </div>

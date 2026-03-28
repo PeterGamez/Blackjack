@@ -1,7 +1,8 @@
 "use client";
 
-import LocalStorage from "@lib/LocalStorage";
 import { useEffect, useRef } from "react";
+
+import LocalStorage from "@lib/LocalStorage";
 
 const BG_MUSIC_SRC = "/sounds/bg-music.mp3";
 

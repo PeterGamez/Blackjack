@@ -1,7 +1,8 @@
 "use client";
 
-import LocalStorage from "@lib/LocalStorage";
 import { useEffect, useRef } from "react";
+
+import LocalStorage from "@lib/LocalStorage";
 
 const BUTTON_SOUND_SRC = "/sounds/button-click.mp3";
 const INTERACTIVE_SELECTOR = [

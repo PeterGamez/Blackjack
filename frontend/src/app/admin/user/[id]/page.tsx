@@ -4,11 +4,11 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { UserInterface } from "@interfaces/Admin/UserInterface";
+
 import AdminService from "@lib/AdminService";
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-
-import { UserInterface } from "@interfaces/Admin/UserInterface";
 
 import styles from "../page.module.css";
 

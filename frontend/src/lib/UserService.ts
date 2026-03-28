@@ -1,9 +1,10 @@
+import config from "@config";
+
 import { GameHistoryInterface } from "@interfaces/API/GameHistoryInterface";
 import { PaymentHistoryInterface } from "@interfaces/API/PaymentHistoryInterface";
 import { UserInterface } from "@interfaces/API/UserInterface";
 import { CurrencyType } from "@interfaces/CurrencyType";
 
-import config from "@config";
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
 import ShopService from "./ShopService";

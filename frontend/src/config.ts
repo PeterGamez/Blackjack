@@ -6,7 +6,7 @@ const config = {
   sound: {
     music: 20,
     effect: 50,
-  }
+  },
 };
 
 export default config;

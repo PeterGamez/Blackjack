@@ -54,10 +54,10 @@ export default function TokenConverterModal({ isOpen, onClose, availableTokens }
       setIsConverting(true);
       await PaymentService.convertTokensToCoins(parsedTokens);
       await UserService.getUser();
-      
+
       setConvertedAmount({ tokens: parsedTokens, coins: coinsToReceive });
       setShowSuccess(true);
-      
+
       setTimeout(() => {
         setShowSuccess(false);
         setTokenAmount("");
@@ -116,61 +116,59 @@ export default function TokenConverterModal({ isOpen, onClose, availableTokens }
           <>
             <h2 className={styles.title}>แปลง Token เป็น Coin</h2>
 
-        <div className={styles.conversionInfo}>
-          <div className={styles.rateBox}>
-            <span className={styles.rateLabel}>อัตราแลกเปลี่ยน:</span>
-            <span className={styles.rateValue}>1 Token = {conversionRate} Coins</span>
-          </div>
-        </div>
-
-        <div className={styles.balanceInfo}>
-          <span className={styles.balanceLabel}>Token ที่มีอยู่:</span>
-          <span className={styles.balanceValue}>{availableTokens.toLocaleString()}</span>
-        </div>
-
-        <div className={styles.inputGroup}>
-          <label htmlFor="tokenAmount" className={styles.label}>
-            จำนวน Token ที่ต้องการแปลง
-          </label>
-          <input
-            ref={inputRef}
-            id="tokenAmount"
-            type="text"
-            className={styles.input}
-            value={tokenAmount}
-            onChange={(e) => {
-              const value = e.target.value.replaceAll(",", "");
-              if (value === "" || /^\d+$/.test(value)) {
-                setTokenAmount(value);
-              }
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="0"
-            disabled={isConverting}
-          />
-        </div>
-
-        {parsedTokens > 0 && (
-          <div className={styles.previewBox}>
-            <div className={styles.previewRow}>
-              <span>คุณจะได้รับ:</span>
-              <span className={styles.previewCoins}>{coinsToReceive.toLocaleString()} Coins</span>
+            <div className={styles.conversionInfo}>
+              <div className={styles.rateBox}>
+                <span className={styles.rateLabel}>อัตราแลกเปลี่ยน:</span>
+                <span className={styles.rateValue}>1 Token = {conversionRate} Coins</span>
+              </div>
             </div>
-          </div>
-        )}
 
-        {parsedTokens > availableTokens && (
-          <div className={styles.errorMessage}>Token ไม่เพียงพอ</div>
-        )}
+            <div className={styles.balanceInfo}>
+              <span className={styles.balanceLabel}>Token ที่มีอยู่:</span>
+              <span className={styles.balanceValue}>{availableTokens.toLocaleString()}</span>
+            </div>
 
-        <div className={styles.actions}>
-          <button type="button" className={styles.cancelButton} onClick={onClose} disabled={isConverting}>
-            ยกเลิก
-          </button>
-          <button type="button" className={styles.convertButton} onClick={handleConvert} disabled={isConverting || parsedTokens <= 0 || parsedTokens > availableTokens}>
-            {isConverting ? "กำลังแปลง..." : "แปลง"}
-          </button>
-        </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="tokenAmount" className={styles.label}>
+                จำนวน Token ที่ต้องการแปลง
+              </label>
+              <input
+                ref={inputRef}
+                id="tokenAmount"
+                type="text"
+                className={styles.input}
+                value={tokenAmount}
+                onChange={(e) => {
+                  const value = e.target.value.replaceAll(",", "");
+                  if (value === "" || /^\d+$/.test(value)) {
+                    setTokenAmount(value);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="0"
+                disabled={isConverting}
+              />
+            </div>
+
+            {parsedTokens > 0 && (
+              <div className={styles.previewBox}>
+                <div className={styles.previewRow}>
+                  <span>คุณจะได้รับ:</span>
+                  <span className={styles.previewCoins}>{coinsToReceive.toLocaleString()} Coins</span>
+                </div>
+              </div>
+            )}
+
+            {parsedTokens > availableTokens && <div className={styles.errorMessage}>Token ไม่เพียงพอ</div>}
+
+            <div className={styles.actions}>
+              <button type="button" className={styles.cancelButton} onClick={onClose} disabled={isConverting}>
+                ยกเลิก
+              </button>
+              <button type="button" className={styles.convertButton} onClick={handleConvert} disabled={isConverting || parsedTokens <= 0 || parsedTokens > availableTokens}>
+                {isConverting ? "กำลังแปลง..." : "แปลง"}
+              </button>
+            </div>
           </>
         )}
       </div>

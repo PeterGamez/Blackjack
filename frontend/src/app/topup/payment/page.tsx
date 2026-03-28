@@ -6,10 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
+import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
+
 import PaymentService from "@lib/PaymentService";
 import UserService from "@lib/UserService";
-
-import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
 
 import styles from "./page.module.css";
 
@@ -59,10 +59,6 @@ function PaymentContent() {
 
     initPaymentPage();
   }, [packageId, router]);
-
-
-
-
 
   const handleConfirmPayment = async () => {
     setErrorMessage("");
@@ -194,13 +190,7 @@ function PaymentContent() {
                 <div className={styles.qrPreviewRow}>
                   <div className={styles.qrPreview}>
                     {qrPayload ? (
-                      <Image
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`}
-                        alt="PromptPay QR"
-                        width={220}
-                        height={220}
-                        unoptimized
-                      />
+                      <Image src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`} alt="PromptPay QR" width={220} height={220} unoptimized />
                     ) : (
                       <div>Loading QR...</div>
                     )}
@@ -213,8 +203,7 @@ function PaymentContent() {
                       onClick={(event) => {
                         event.stopPropagation();
                         setIsSlipModalOpen(true);
-                      }}
-                    >
+                      }}>
                       <Image src={slipPreviewUrl} alt="Uploaded slip preview" width={120} height={120} unoptimized />
                     </button>
                   )}
@@ -257,8 +246,7 @@ function PaymentContent() {
             className={styles.slipModalBody}
             onClick={(event) => {
               event.stopPropagation();
-            }}
-          >
+            }}>
             <button type="button" className={styles.slipModalClose} onClick={() => setIsSlipModalOpen(false)}>
               Close
             </button>

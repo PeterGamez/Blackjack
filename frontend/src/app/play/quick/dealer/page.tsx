@@ -1,19 +1,19 @@
 "use client";
 
+import { getEffectVolume } from "@components/ButtonSoundProvider";
 import Navbar from "@components/Navbar";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-import LocalStorage from "@lib/LocalStorage";
-import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
-
 import config from "@config";
 
+import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
+
 import styles from "./page.module.css";
-import { getEffectVolume } from "@components/ButtonSoundProvider";
 
 interface Card {
   suit: string;
@@ -68,7 +68,7 @@ const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
 const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0.8;
 const CARD_DRAW_SOUND_GAIN = 1;
-const BLACKJACK_LOSE_SOUND_GAIN =5;
+const BLACKJACK_LOSE_SOUND_GAIN = 5;
 
 export default function Dealer() {
   const router = useRouter();
@@ -633,8 +633,6 @@ export default function Dealer() {
                 {message && <p className={styles.inlineError}>{message}</p>}
               </div>
             )}
-
-        
           </div>
           {result && !popupType && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
 
@@ -814,8 +812,6 @@ export default function Dealer() {
               </div>
             </>
           )}
-
-         
 
           {message && gameStatus !== "betting" && <p className={styles.bottomMessage}>{message}</p>}
         </div>

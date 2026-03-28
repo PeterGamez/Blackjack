@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@components/Navbar";
+import { getCardBackImage, getCardImage, getChipImage, getTableImage } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -8,10 +9,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { ProductInterface } from "@interfaces/API/ProductInterface";
 
 import LocalStorage from "@lib/LocalStorage";
-import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getChipImage, getTableImage } from "@utils/skinUtils";
-
 import ShopService from "@lib/ShopService";
+import UserService from "@lib/UserService";
 
 import styles from "./shop.module.css";
 
@@ -300,11 +299,7 @@ function StorePageContent() {
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                          {isTokenPayment ? (
-                            <Image src="/icons/token.png" alt="ticket" width={35} height={35} />
-                            ) : (
-                              <Image src="/icons/coin.png" alt="coin" width={35} height={35} />
-                            )} {priceText}
+                          {isTokenPayment ? <Image src="/icons/token.png" alt="ticket" width={35} height={35} /> : <Image src="/icons/coin.png" alt="coin" width={35} height={35} />} {priceText}
                         </span>
                         <button
                           onClick={() => void buy(p)}

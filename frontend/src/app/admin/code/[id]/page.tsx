@@ -4,10 +4,10 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { CodeInterface } from "@interfaces/Admin/CodeInterface";
+
 import AdminService from "@lib/AdminService";
 import UserService from "@lib/UserService";
-
-import { CodeInterface } from "@interfaces/Admin/CodeInterface";
 
 import styles from "../page.module.css";
 

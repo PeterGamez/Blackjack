@@ -13,7 +13,7 @@ import styles from "./page.module.css";
 const menuItems = [
   { key: "shop", label: "Shop", path: "/shop", className: styles.menuButtonShop },
   { key: "inventory", label: "Inventory", path: "/inventory", className: styles.menuButtonInventory },
-  { key: "gambling", label: "Gambling", path: "/gambling", className: styles.menuButtonGambling },
+  { key: "gambling", label: "Gambling", path: "/comingsoon", className: styles.menuButtonGambling },
   { key: "create", label: "Create Table", path: "/createtable", className: styles.menuButtonCreate },
   { key: "play", label: "Play", path: "/play", className: styles.menuButtonPlay },
 ] as const;

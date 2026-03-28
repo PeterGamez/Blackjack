@@ -68,17 +68,21 @@ const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J
 const CARD_DRAW_SOUND_SRC = "/sounds/draw.mp3";
 const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
 const BLACKJACK_WIN_SOUND_SRC = "/sounds/win.mp3";
+const BLACKJACK_DRAW_SOUND_SRC = "/sounds/gamedraw.mp3";
 const DEALER_BLACKJACK_SOUND_SRC = "/sounds/blackjack.mp3";
 const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_WIN_SOUND_START_AT_SECONDS = 0.5;
+const BLACKJACK_DRAW_SOUND_START_AT_SECONDS = 0;
 const DEALER_BLACKJACK_SOUND_START_AT_SECONDS = 0.8;
 const BLACKJACK_WIN_SOUND_DELAY_MS = 0;
+const BLACKJACK_DRAW_SOUND_DELAY_MS = 0;
 const DEALER_BLACKJACK_SOUND_DELAY_MS = 0;
 const CARD_DRAW_SOUND_GAIN = 1;
-const BLACKJACK_LOSE_SOUND_GAIN = 5;
-const BLACKJACK_WIN_SOUND_GAIN = 5;
-const DEALER_BLACKJACK_SOUND_GAIN = 5;
+const BLACKJACK_LOSE_SOUND_GAIN = 0.5;
+const BLACKJACK_WIN_SOUND_GAIN = 0.5;
+const BLACKJACK_DRAW_SOUND_GAIN = 0.5;
+const DEALER_BLACKJACK_SOUND_GAIN = 0.5;
 
 export default function Dealer() {
   const router = useRouter();
@@ -86,6 +90,7 @@ export default function Dealer() {
   const cardDrawAudioPoolRef = useRef<HTMLAudioElement[]>([]);
   const blackjackLoseAudioRef = useRef<HTMLAudioElement>(null);
   const blackjackWinAudioRef = useRef<HTMLAudioElement>(null);
+  const blackjackDrawAudioRef = useRef<HTMLAudioElement>(null);
   const dealerBlackjackAudioRef = useRef<HTMLAudioElement>(null);
   const prevPlayerCardCountRef = useRef(0);
   const prevDealerCardCountRef = useRef(0);
@@ -195,6 +200,37 @@ export default function Dealer() {
         }
       }, 3000);
     }, BLACKJACK_WIN_SOUND_DELAY_MS);
+  }, []);
+
+  const playBlackjackDrawSound = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!blackjackDrawAudioRef.current) {
+      blackjackDrawAudioRef.current = new Audio(BLACKJACK_DRAW_SOUND_SRC);
+      blackjackDrawAudioRef.current.preload = "auto";
+      blackjackDrawAudioRef.current.load();
+    }
+
+    const audio = blackjackDrawAudioRef.current;
+
+    // รอ delay ก่อนแล้วค่อยเล่นเสียง
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = BLACKJACK_DRAW_SOUND_START_AT_SECONDS;
+      audio.volume = getScaledVolume(BLACKJACK_DRAW_SOUND_GAIN);
+      void audio.play().catch(() => {
+        // Ignore browser/media playback errors.
+      });
+
+      // หยุดเสียงหลัง 3 วินาที
+      setTimeout(() => {
+        if (blackjackDrawAudioRef.current) {
+          blackjackDrawAudioRef.current.pause();
+        }
+      }, 3000);
+    }, BLACKJACK_DRAW_SOUND_DELAY_MS);
   }, []);
 
   const playDealerBlackjackSound = useCallback(() => {
@@ -511,8 +547,10 @@ export default function Dealer() {
       } else {
         playBlackjackLoseSound();
       }
+    } else if (popupType === "draw") {
+      playBlackjackDrawSound();
     }
-  }, [popupType, playBlackjackLoseSound, playBlackjackWinSound, playDealerBlackjackSound, result]);
+  }, [popupType, playBlackjackLoseSound, playBlackjackWinSound, playBlackjackDrawSound, playDealerBlackjackSound, result]);
 
   const startGame = (betAmount: number) => {
     if (betAmount <= 0 || betAmount > playerChips) {
@@ -711,7 +749,6 @@ export default function Dealer() {
             {gameStatus !== "betting" && (
               <div className={`${styles.scoreWrap} ${styles.dealerScoreWrap}`}>
                 <div className={styles.scoreBadge}>{gameStatus === "playing" ? dealerHand.reduce((acc, c) => acc + c.value, 0) : dealerValue}</div>
-                {gameStatus === "playing" && <span className={styles.scoreTimer}>{timer} s</span>}
               </div>
             )}
 

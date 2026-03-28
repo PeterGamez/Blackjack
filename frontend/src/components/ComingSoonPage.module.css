@@ -13,7 +13,7 @@
 }
 
 .title {
-  font-size: 32px;
+  font-size: 34px;
   color: #E6EAF2;
 }
 
@@ -22,10 +22,10 @@
 }
 
 .backButton {
-  padding: 10px 20px;
-  background: #4da6ff;
-  color: white;
+  padding: 15px 40px;
+  color: #1F2A44;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
+  background: linear-gradient(48.01deg, #f2c879 11.6%, #ecc06b 30.8%, #c99a3f 50%, #e6b85c 69.2%, #f2c879 88.4%);
   cursor: pointer;
 }

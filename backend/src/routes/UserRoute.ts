@@ -176,6 +176,7 @@ export default class UserRoute implements RouteInterface {
                     receiptRef: payment.receiptRef,
                     type: payment.type,
                     amount: payment.amount,
+                    tokens: payment.tokens,
                     createdAt: payment.createdAt,
                 }));
 

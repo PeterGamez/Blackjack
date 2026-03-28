@@ -130,7 +130,7 @@ export default class PaymentRoute implements RouteInterface {
 
                 if (!response.success) {
                     this.server.warn("PaymentRoute", `Failed to verify slip: ${response.message}`);
-                    return c.json({ error: "Failed to verify slip" }, 400);
+                    return c.json({ error: "Failed to verify slip", message: response.message }, 400);
                 }
 
                 const data = response.data;

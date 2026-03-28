@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import config from "@config";
+
 import LocalStorage from "@lib/LocalStorage";
 
 const BG_MUSIC_SRC = "/sounds/bg-music.mp3";
@@ -9,7 +11,11 @@ const BG_MUSIC_SRC = "/sounds/bg-music.mp3";
 function getBgMusicVolume(): number {
   const raw = LocalStorage.getItem("musicVolume");
 
-  const value = Number.parseInt(raw, 10);
+  let value = Number.parseInt(raw, 10);
+
+  if (isNaN(value)) {
+    value = config.sound.music;
+  }
 
   return Math.min(100, Math.max(0, value)) / 100;
 }

@@ -13,7 +13,7 @@ export default class CodeModel {
     }
 
     public static async createCode(code: string, amount: number, type: CodeInterface["type"], maxUses: number, isActive: boolean, expiredDate: Date): Promise<number> {
-        const sql = `INSERT INTO ${this.table} (code, amount, type, maxUses, expiredDate) VALUES (?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO ${this.table} (code, amount, type, maxUses, isActive, expiredDate) VALUES (?, ?, ?, ?, ?, ?)`;
         const connection = await this.DB.getConnection();
         try {
             const [result] = await connection.execute<ResultSetHeader>(sql, [code, amount, type, maxUses, isActive, expiredDate]);

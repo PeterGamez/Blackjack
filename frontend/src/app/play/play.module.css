@@ -173,21 +173,21 @@
   left: 80px;
   background: transparent;
   border: none;
-  color: #e6eaf2;
-  font-size: 1.2rem;
+  color: #E6EAF2;
+  font-size: 0.95rem;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 400;
-  letter-spacing: 1px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
   transition: all 0.3s ease;
   z-index: 50;
   text-transform: uppercase;
 }
 
 .backButton:hover {
-  background: rgba(92, 107, 138, 0.6);
-  transform: translateX(-5px);
+  background: #5C6B8A;
+  transform: translateX(-3px);
 }
 
 /* ===== MODE TITLE ===== */

@@ -107,24 +107,103 @@
 
 .backButton {
   position: absolute;
-  left: -100px;
-  transform: translateY(-50%);
+  top: 0px;
+  left: -120px;
   background: transparent;
   border: none;
-  color: #93a3bb;
-  font-size: 14px;
-  font-weight: 500;
+  color: #E6EAF2;
+  font-size: 0.95rem;
   cursor: pointer;
-  padding: 6px 0;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  transition: all 0.3s ease;
+  z-index: 50;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  white-space: nowrap;
-  transition: color 0.2s, transform 0.2s;
 }
 
 .backButton:hover {
-  color: #e6eaf2;
-  transform: translateY(-50%) translateX(-4px);
+  background: #5C6B8A;
+  transform: translateX(-3px);
+}
+
+.tutorialButton {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  top: 3%;
+  right: -7%;
+  padding: 1% 2%;
+  border: none;
+  border-radius: 50%;
+  background: #E6B85C;
+  color: #1F2A44;
+  font-weight: 1000;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(249, 115, 22, 0.22);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.tutorialOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 24px;
+}
+
+.tutorialModal {
+  width: min(560px, 100%);
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.4);
+}
+
+.tutorialModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tutorialModalTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #E6EAF2;
+}
+
+.tutorialModalClose {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #E6EAF2;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.tutorialModalBody {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #E6EAF2;
+  line-height: 1.7;
+}
+
+.tutorialModalBody p {
+  margin: 0;
 }
 
 .table {

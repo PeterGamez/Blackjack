@@ -14,7 +14,6 @@ type TransactionItem = {
   date: string;
   format: string;
   amount: number;
-  status: string;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("th-TH", {
@@ -93,8 +92,7 @@ export default function SettingsPage() {
         id: `payment-${payment.receiptRef}-${payment.createdAt}`,
         date: payment.createdAt,
         format: payment.type === "bank" ? "Top up (Bank Transfer)" : "Top up (TrueMoney)",
-        amount: payment.amount,
-        status: "completed",
+        amount: payment.tokens,
       }));
 
       const topupTransactions = paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -226,7 +224,7 @@ export default function SettingsPage() {
                     <span>{transaction.displayDate}</span>
                     <span>{transaction.format}</span>
                     <span className={transaction.amount >= 0 ? styles.amountPositive : styles.amountNegative}>{transaction.displayAmount}</span>
-                    <span className={styles[`status${transaction.status[0].toUpperCase()}${transaction.status.slice(1)}`]}>{transaction.status}</span>
+                    <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}
             </div>

@@ -16,6 +16,7 @@
   box-sizing: border-box;
 }
 
+/*
 .logoHomeButton {
   position: absolute;
   left: 50%;
@@ -33,6 +34,7 @@
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
+
 
 .logoHomeButton:hover {
   transform: translate(-50%, calc(-50% - 2px));
@@ -61,7 +63,7 @@
   height: 100%;
   object-fit: contain;
 }
-
+*/
 /* Profile Section */
 .profileSection {
   display: flex;
@@ -212,9 +214,11 @@
     min-height: 90px;
   }
 
+  /*
   .logoHomeButton {
     padding: 0.26rem;
   }
+  */
 
   .logoIconWrap {
     width: 48px;

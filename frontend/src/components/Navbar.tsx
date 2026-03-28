@@ -51,11 +51,14 @@ export default function Navbar() {
         <span className={styles.username}>{username || "Sign in"}</span>
       </div>
 
+      {/* 
       <button type="button" className={styles.logoHomeButton} aria-label="Back to main menu" onClick={() => router.push("/")}>
         <span className={styles.logoIconWrap}>
           <Image src="/logo.png" alt="21 Blackjack" width={54} height={54} className={styles.logoImage} priority />
         </span>
       </button>
+      */}
+      
 
       {/* Resources Section */}
       <div className={styles.resourcesSection}>

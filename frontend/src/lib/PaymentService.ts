@@ -126,4 +126,26 @@ export default class PaymentService {
 
     return data.payload || "";
   }
+
+  public static async convertTokensToCoins(tokens: number): Promise<void> {
+    const normalizedTokens = Math.floor(tokens);
+
+    if (!Number.isFinite(normalizedTokens) || normalizedTokens <= 0) {
+      throw new Error("Tokens must be greater than 0");
+    }
+
+    const response = await this.authenticatedFetch("/payment/tokenconvert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tokens: normalizedTokens, type: "coin" }),
+    });
+
+    const data: { error?: string; message?: string } = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || "Failed to convert tokens");
+    }
+  }
 }

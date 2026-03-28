@@ -13,7 +13,7 @@ type TransactionItem = {
   id: string;
   date: string;
   format: string;
-  amount: number;
+  amount: string;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("th-TH", {
@@ -90,9 +90,9 @@ export default function SettingsPage() {
 
       const paymentTransactions: TransactionItem[] = paymentHistory.map((payment) => ({
         id: `payment-${payment.receiptRef}-${payment.createdAt}`,
-        date: payment.createdAt,
+        date: dateFormatter.format(new Date(payment.createdAt)),
         format: payment.type === "bank" ? "Top up (Bank Transfer)" : "Top up (TrueMoney)",
-        amount: payment.tokens,
+        amount: `${payment.tokens} (${payment.amount} THB)`,
       }));
 
       const topupTransactions = paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -138,16 +138,6 @@ export default function SettingsPage() {
       setRedeemLoading(false);
     }
   };
-
-  const formattedTransactions = useMemo(
-    () =>
-      transactions.map((item) => ({
-        ...item,
-        displayDate: dateFormatter.format(new Date(item.date)),
-        displayAmount: `${item.amount >= 0 ? "+" : "-"}${amountFormatter.format(Math.abs(item.amount))}`,
-      })),
-    [transactions]
-  );
 
   return (
     <div className={styles.page}>
@@ -215,15 +205,15 @@ export default function SettingsPage() {
 
               {!historyLoading && historyError && <p className={styles.feedbackError}>{historyError}</p>}
 
-              {!historyLoading && !historyError && formattedTransactions.length === 0 && <p className={styles.emptyMessage}>No transactions found.</p>}
+              {!historyLoading && !historyError && transactions.length === 0 && <p className={styles.emptyMessage}>No transactions found.</p>}
 
               {!historyLoading &&
                 !historyError &&
-                formattedTransactions.map((transaction) => (
+                transactions.map((transaction) => (
                   <div key={transaction.id} className={styles.historyItem}>
-                    <span>{transaction.displayDate}</span>
+                    <span>{transaction.date}</span>
                     <span>{transaction.format}</span>
-                    <span className={styles.amountPositive}>{transaction.displayAmount}</span>
+                    <span className={styles.amountPositive}>{transaction.amount}</span>
                     <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}

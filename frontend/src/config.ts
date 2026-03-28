@@ -5,7 +5,7 @@ const config = {
 
   sound: {
     music: 20,
-    effect: 70,
+    effect: 50,
   }
 };
 

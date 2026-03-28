@@ -3,6 +3,7 @@ import { Inter, Sora } from "next/font/google";
 
 import config from "@/config";
 import ButtonSoundProvider from "@components/ButtonSoundProvider";
+import BackgroundMusicProvider from "@components/BackgroundMusicProvider";
 
 import "./globals.css";
 
@@ -62,6 +63,7 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning className={`${sora.variable} ${inter.variable} antialiased`}>
         <ButtonSoundProvider />
+        <BackgroundMusicProvider />
         {children}
       </body>
     </html>

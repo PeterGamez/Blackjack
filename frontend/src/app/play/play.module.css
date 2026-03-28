@@ -174,12 +174,12 @@
   background: transparent;
   border: none;
   color: #E6EAF2;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   cursor: pointer;
   padding: 0.8rem 1.2rem;
   border-radius: 10px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   transition: all 0.3s ease;
   z-index: 50;
   text-transform: uppercase;

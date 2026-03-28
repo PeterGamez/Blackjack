@@ -1,39 +1,16 @@
 "use client";
 
+import LocalStorage from "@lib/LocalStorage";
 import { useEffect, useRef, useState } from "react";
 
 const BG_MUSIC_SRC = "/sounds/bg-music.mp3";
-const FALLBACK_VOLUME = 0.3;
 
 function getBgMusicVolume(): number {
-  if (typeof window === "undefined") {
-    return FALLBACK_VOLUME;
-  }
-
-  const raw = window.localStorage.getItem("musicVolume");
-  if (!raw) {
-    return FALLBACK_VOLUME;
-  }
+  const raw = LocalStorage.getItem("musicVolume");
 
   const value = Number.parseInt(raw, 10);
-  if (Number.isNaN(value)) {
-    return FALLBACK_VOLUME;
-  }
 
   return Math.min(100, Math.max(0, value)) / 100;
-}
-
-function isBgMusicEnabled(): boolean {
-  if (typeof window === "undefined") {
-    return true;
-  }
-
-  const raw = window.localStorage.getItem("musicEnabled");
-  if (!raw) {
-    return true;
-  }
-
-  return raw === "true";
 }
 
 export default function BackgroundMusicProvider() {
@@ -41,7 +18,7 @@ export default function BackgroundMusicProvider() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (!isBgMusicEnabled()) {
+    if (getBgMusicVolume() == 0) {
       return;
     }
 
@@ -90,7 +67,7 @@ export default function BackgroundMusicProvider() {
         audioRef.current.volume = getBgMusicVolume();
       }
       if (e.key === "musicEnabled" && audioRef.current) {
-        if (isBgMusicEnabled()) {
+        if (getBgMusicVolume() > 0) {
           audioRef.current.play().catch(() => {});
         } else {
           audioRef.current.pause();

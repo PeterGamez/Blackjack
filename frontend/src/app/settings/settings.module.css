@@ -8,25 +8,28 @@
 .container {
 	max-width: 1100px;
 	margin: 0 auto;
-	padding: 212px 24px 72px;
+	padding: 140px 24px 72px;
 }
 
 .backButton {
-	border: none;
-	background: transparent;
-	color: #93a3bb;
-	font-size: 14px;
-	font-weight: 600;
-	letter-spacing: 0.8px;
-	text-transform: uppercase;
-	cursor: pointer;
-	margin-bottom: 18px;
-	transition: color 0.2s, transform 0.2s;
+  justify-self: start;
+  background: transparent;
+  border: none;
+  color: #e6eaf2;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  z-index: 50;
+  text-transform: uppercase;
 }
 
 .backButton:hover {
-	color: #f2c879;
-	transform: translateX(-4px);
+  background: rgba(92, 107, 138, 0.6);
+  transform: translateX(-5px);
 }
 
 .settingsCard {

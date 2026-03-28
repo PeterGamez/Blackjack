@@ -1,8 +1,9 @@
 "use client";
 
-import ProfileAvatar from "@components/ProfileAvatar";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+
+import ProfileAvatar from "@components/ProfileAvatar";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";

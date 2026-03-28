@@ -1,8 +1,9 @@
 "use client";
 
-import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+
+import Navbar from "@components/Navbar";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";

@@ -1,9 +1,10 @@
-import BackgroundMusicProvider from "@components/BackgroundMusicProvider";
-import ButtonSoundProvider from "@components/ButtonSoundProvider";
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 
 import config from "@config";
+
+import BackgroundMusicProvider from "@components/BackgroundMusicProvider";
+import ButtonSoundProvider from "@components/ButtonSoundProvider";
 
 import "./globals.css";
 

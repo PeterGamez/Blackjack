@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 
 import styles from "./ComingSoonPage.module.css";
-import Navbar from "./Navbar";
 
 type ComingSoonPageProps = {
   message: string;
@@ -17,7 +16,6 @@ export default function ComingSoonPage({ message, backPath, backLabel, variant =
 
   return (
     <div className={`${styles.container} ${variant === "cool" ? styles.cool : ""}`.trim()}>
-      <Navbar />
       <h1 className={styles.title}>Coming soon</h1>
       <p className={styles.message}>{message}</p>
       <button onClick={() => router.push(backPath)} className={styles.backButton}>

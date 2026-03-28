@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #d9d3c7;
+  background: #1E2430;
   flex-direction: column;
   gap: 20px;
 }
@@ -14,7 +14,7 @@
 
 .title {
   font-size: 32px;
-  color: #333;
+  color: #E6EAF2;
 }
 
 .message {

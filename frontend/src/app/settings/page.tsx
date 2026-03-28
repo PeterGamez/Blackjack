@@ -212,12 +212,12 @@ export default function SettingsPage() {
               {isLoggedIn &&
                 !historyLoading &&
                 !historyError &&
-                transactions.map((t) => (
-                  <div key={t.id} className={styles.historyItem}>
-                    <span>{t.date}</span>
-                    <span>{t.format}</span>
-                    <span>{t.amount}</span>
-                    <span>Completed</span>
+                transactions.map((transaction) => (
+                  <div key={transaction.id} className={styles.historyItem}>
+                    <span>{transaction.date}</span>
+                    <span>{transaction.format}</span>
+                    <span className={styles.amountPositive}>{transaction.amount}</span>
+                    <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}
             </div>

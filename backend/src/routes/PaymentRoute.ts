@@ -229,6 +229,52 @@ export default class PaymentRoute implements RouteInterface {
                 return c.json({ error: "Error processing TrueMoney" }, 500);
             }
         });
+
+        this.app.post("/tokenconvert", async (c) => {
+            try {
+                let body: { tokens: number; type: "coin" };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
+
+                const { tokens, type } = body;
+
+                if (!tokens || !type) {
+                    return c.json({ error: "Missing tokens or type" }, 400);
+                }
+
+                if (type !== "coin") {
+                    return c.json({ error: "Invalid conversion type" }, 400);
+                }
+
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                if (tokens <= 0) {
+                    return c.json({ error: "Tokens must be greater than 0" }, 400);
+                }
+
+                if (user.tokens < tokens) {
+                    return c.json({ error: "Insufficient tokens" }, 400);
+                }
+
+                if (type === "coin") {
+                    const coinsToAdd = tokens * 5;
+                    await UserModel.decreaseBalance(user.id, "tokens", tokens);
+                    await UserModel.increaseBalance(user.id, "coins", coinsToAdd);
+                }
+
+                return c.json({ message: "Token conversion successful" });
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error processing token conversion:`);
+                console.error(error);
+                return c.json({ error: "Error processing token conversion" }, 500);
+            }
+        });
     }
 
     public getApp(app: Hono) {

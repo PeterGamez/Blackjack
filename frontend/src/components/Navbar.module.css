@@ -16,54 +16,6 @@
   box-sizing: border-box;
 }
 
-/*
-.logoHomeButton {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  padding: 0.3rem;
-  border: 1px solid rgba(92, 107, 138, 0.8);
-  border-radius: 50%;
-  background: rgba(92, 107, 138, 0.6);
-  color: #f9e8be;
-  cursor: pointer;
-  z-index: 3;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-}
-
-
-.logoHomeButton:hover {
-  transform: translate(-50%, calc(-50% - 2px));
-  border-color: rgba(92, 107, 138, 1);
-  background: rgba(92, 107, 138, 0.8);
-  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
-}
-
-.logoHomeButton:focus-visible {
-  outline: 2px solid rgba(242, 200, 121, 0.95);
-  outline-offset: 3px;
-}
-
-.logoIconWrap {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
-}
-
-.logoImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-*/
 /* Profile Section */
 .profileSection {
   display: flex;
@@ -213,12 +165,6 @@
     height: auto;
     min-height: 90px;
   }
-
-  /*
-  .logoHomeButton {
-    padding: 0.26rem;
-  }
-  */
 
   .logoIconWrap {
     width: 48px;

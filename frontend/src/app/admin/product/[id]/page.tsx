@@ -4,11 +4,11 @@ import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import AdminService from "@lib/AdminService";
-import UserService from "@lib/UserService";
-
 import { ProductInterface } from "@interfaces/Admin/ProductInterface";
 import { CurrencyType } from "@interfaces/CurrencyType";
+
+import AdminService from "@lib/AdminService";
+import UserService from "@lib/UserService";
 
 import styles from "../page.module.css";
 

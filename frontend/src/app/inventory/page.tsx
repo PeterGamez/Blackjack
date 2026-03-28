@@ -1,18 +1,17 @@
 "use client";
 
 import Navbar from "@components/Navbar";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProductInterface } from "@interfaces/API/ProductInterface";
 
-import LocalStorage from "@lib/LocalStorage";
-import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
-
 import AuthService from "@lib/AuthService";
+import LocalStorage from "@lib/LocalStorage";
 import ShopService from "@lib/ShopService";
+import UserService from "@lib/UserService";
 
 import styles from "./page.module.css";
 

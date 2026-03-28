@@ -1,4 +1,5 @@
-import config from "../config";
+import config from "@config";
+
 import LocalStorage from "./LocalStorage";
 
 export default class AuthService {

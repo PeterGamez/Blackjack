@@ -1,16 +1,18 @@
 "use client";
 
+import { getEffectVolume } from "@components/ButtonSoundProvider";
 import Navbar from "@components/Navbar";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
+
+import config from "@config";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
-
-import config from "@/config";
 
 import styles from "./page.module.css";
 
@@ -95,6 +97,7 @@ function getEffectVolume(): number {
 
   return Math.min(100, Math.max(0, value)) / 100;
 }
+const BLACKJACK_LOSE_SOUND_GAIN = 5;
 
 export default function Dealer() {
   const router = useRouter();
@@ -138,7 +141,7 @@ export default function Dealer() {
     return Math.min(1, Math.max(0, getEffectVolume() * gain));
   };
 
-  const playCardDrawSound = () => {
+  const playCardDrawSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -160,9 +163,9 @@ export default function Dealer() {
     void audio.play().catch(() => {
       // Ignore browser/media playback errors.
     });
-  };
+  }, []);
 
-  const playBlackjackLoseSound = () => {
+  const playBlackjackLoseSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -180,7 +183,7 @@ export default function Dealer() {
     void audio.play().catch(() => {
       // Ignore browser/media playback errors.
     });
-  };
+  }, []);
 
   const playBlackjackWinSound = () => {
     if (typeof window === "undefined") {
@@ -320,7 +323,14 @@ export default function Dealer() {
 
     prevPlayerCardCountRef.current = playerHand.length;
     prevDealerCardCountRef.current = dealerHand.length;
-  }, [dealerHand.length, gameStatus, playerHand.length]);
+  }, [dealerHand.length, gameStatus, playCardDrawSound, playerHand.length]);
+
+  useEffect(() => {
+    const lower = result.toLowerCase();
+    if (lower.includes("blackjack") && lower.includes("dealer")) {
+      playBlackjackLoseSound();
+    }
+  }, [playBlackjackLoseSound, result]);
 
   useEffect(() => {
     const syncSkins = () => {
@@ -757,8 +767,6 @@ export default function Dealer() {
                 {message && <p className={styles.inlineError}>{message}</p>}
               </div>
             )}
-
-        
           </div>
           {result && !popupType && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
 
@@ -938,8 +946,6 @@ export default function Dealer() {
               </div>
             </>
           )}
-
-         
 
           {message && gameStatus !== "betting" && <p className={styles.bottomMessage}>{message}</p>}
         </div>

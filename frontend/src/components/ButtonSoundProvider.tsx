@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import LocalStorage from "@lib/LocalStorage";
+
 const BUTTON_SOUND_SRC = "/sounds/button-click.mp3";
 const INTERACTIVE_SELECTOR = [
   "button",
@@ -17,22 +19,10 @@ const INTERACTIVE_SELECTOR = [
   "label[for]",
 ].join(",");
 
-const FALLBACK_VOLUME = 0.75;
-
-function getEffectVolume(): number {
-  if (typeof window === "undefined") {
-    return FALLBACK_VOLUME;
-  }
-
-  const raw = window.localStorage.getItem("effectVolume");
-  if (!raw) {
-    return FALLBACK_VOLUME;
-  }
+export function getEffectVolume(): number {
+  const raw = LocalStorage.getItem("effectVolume");
 
   const value = Number.parseInt(raw, 10);
-  if (Number.isNaN(value)) {
-    return FALLBACK_VOLUME;
-  }
 
   return Math.min(100, Math.max(0, value)) / 100;
 }

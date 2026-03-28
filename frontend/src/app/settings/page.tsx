@@ -43,7 +43,6 @@ const normalizeError = (error: unknown, fallback: string): string => {
 export default function SettingsPage() {
   const router = useRouter();
 
-  // 🔥 เพิ่ม user state
   const [user, setUser] = useState<UserInterface | null>(null);
   const isLoggedIn = !!user;
 
@@ -61,7 +60,6 @@ export default function SettingsPage() {
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
-  // 🔥 โหลด user
   useEffect(() => {
     (async () => {
       const u = await UserService.getUser();
@@ -96,7 +94,11 @@ export default function SettingsPage() {
         amount: `${payment.tokens} (${payment.amount} THB)`,
       }));
 
-      setTransactions(paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      if (paymentTransactions.length === 0) {
+        setHistoryError("No transactions found");
+      } else {
+        setTransactions(paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      }
     } catch (error) {
       setHistoryError(normalizeError(error, "Failed to load transaction history"));
     } finally {
@@ -111,7 +113,6 @@ export default function SettingsPage() {
   const onRedeemSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // 🔥 กันกรณีไม่ login
     if (!isLoggedIn) {
       setRedeemFeedback({
         type: "error",
@@ -166,7 +167,6 @@ export default function SettingsPage() {
         <section className={styles.settingsCard}>
           <h1 className={styles.title}>Settings</h1>
 
-          {/* 🔹 Volume ปรับได้ปกติ */}
           <div className={styles.soundRow}>
             <div className={styles.sliderBox}>
               <label className={styles.sliderLabel}>Music Volume</label>
@@ -181,7 +181,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* 🔥 Redeem (disable ถ้าไม่ login) */}
           <form className={styles.redeemRow} onSubmit={onRedeemSubmit}>
             <label className={styles.redeemLabel}>Redeem Code</label>
 
@@ -198,7 +197,6 @@ export default function SettingsPage() {
             {redeemFeedback && <p className={redeemFeedback.type === "success" ? styles.feedbackSuccess : styles.feedbackError}>{redeemFeedback.text}</p>}
           </form>
 
-          {/* 🔥 History */}
           <div className={styles.historyRow}>
             <h2 className={styles.historyTitle}>Transaction History</h2>
 
@@ -212,12 +210,12 @@ export default function SettingsPage() {
               {isLoggedIn &&
                 !historyLoading &&
                 !historyError &&
-                transactions.map((t) => (
-                  <div key={t.id} className={styles.historyItem}>
-                    <span>{t.date}</span>
-                    <span>{t.format}</span>
-                    <span>{t.amount}</span>
-                    <span>Completed</span>
+                transactions.map((transaction) => (
+                  <div key={transaction.id} className={styles.historyItem}>
+                    <span>{transaction.date}</span>
+                    <span>{transaction.format}</span>
+                    <span className={styles.amountPositive}>{transaction.amount}</span>
+                    <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}
             </div>

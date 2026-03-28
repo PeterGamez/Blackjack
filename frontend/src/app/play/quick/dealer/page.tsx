@@ -45,6 +45,7 @@ interface GameStartAck {
   coins?: number;
   result?: "win" | "lose" | "draw";
   blackjack?: boolean;
+  reward?: number;
 }
 
 interface GameActionAck {
@@ -56,6 +57,7 @@ interface GameActionAck {
   balance?: number;
   coins?: number;
   result?: "win" | "lose" | "draw";
+  reward?: number;
 }
 
 type GameStatus = "betting" | "playing" | "game-over";
@@ -98,11 +100,14 @@ export default function Dealer() {
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [bet, setBet] = useState<number>(0);
+  const betRef = useRef<number>(0);
   const [pendingBet, setPendingBet] = useState<number>(0);
   const [playerChips, setPlayerChips] = useState<number>(0);
   const playerChipsRef = useRef<number>(0);
   const [message, setMessage] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [isBlackjackResult, setIsBlackjackResult] = useState(false);
+  const [roundPayout, setRoundPayout] = useState<number>(0);
   const [gameId, setGameId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
@@ -318,6 +323,10 @@ export default function Dealer() {
   }, []);
 
   useEffect(() => {
+    betRef.current = bet;
+  }, [bet]);
+
+  useEffect(() => {
     playerChipsRef.current = playerChips;
   }, [playerChips]);
 
@@ -449,6 +458,8 @@ export default function Dealer() {
         standResolveRef.current = false;
         stopTimer();
         setPlayerHand(data.playerHand);
+        setIsBlackjackResult(false);
+        setRoundPayout(-betRef.current);
         setResult("BUST! Dealer wins");
         setGameStatus("game-over");
         setDealerRevealIndex(null);
@@ -489,6 +500,8 @@ export default function Dealer() {
             }
 
             await wait(240);
+            setIsBlackjackResult(false);
+            setRoundPayout(data.reward - betRef.current);
             setResult(msg);
             setPlayerChips(nextChips);
             LocalStorage.setItem("coins", nextChips.toString());
@@ -500,6 +513,8 @@ export default function Dealer() {
           setDealerRevealIndex(null);
           setIsDealerDrawing(false);
           setDealerHand(data.dealerHand);
+          setIsBlackjackResult(false);
+          setRoundPayout(data.reward - betRef.current);
           setResult(msg);
           setPlayerChips(nextChips);
           LocalStorage.setItem("coins", nextChips.toString());
@@ -577,6 +592,7 @@ export default function Dealer() {
       setPlayerHand(ack.playerHand);
       setDealerHand(ack.dealerHand);
       setBet(ack.bet);
+      betRef.current = ack.bet;
       const nextChips = typeof ack?.balance === "number" ? ack.balance : typeof ack?.coins === "number" ? ack.coins : playerChips;
       setPlayerChips(nextChips);
       LocalStorage.setItem("coins", nextChips.toString());
@@ -585,12 +601,17 @@ export default function Dealer() {
       // Blackjack on initial deal — game is already over
       if (ack.result !== undefined) {
         const msg = ack.result === "win" ? (ack.blackjack ? "Blackjack! 🎉 You win!" : "You win! 🎉") : ack.result === "draw" ? "Draw! Both Blackjack" : "Dealer Blackjack — Dealer wins";
+        const reward = typeof ack.reward === "number" ? ack.reward : 0;
+        setIsBlackjackResult(true);
+        setRoundPayout(reward - ack.bet);
         setResult(msg);
         setGameStatus("game-over");
         setDealerRevealIndex(null);
         setIsDealerDrawing(false);
         stopTimer();
       } else {
+        setIsBlackjackResult(false);
+        setRoundPayout(0);
         setResult("");
         setGameStatus("playing");
         setDealerRevealIndex(null);
@@ -621,6 +642,8 @@ export default function Dealer() {
       setPlayerHand(ack.playerHand);
       if (ack.bust) {
         stopTimer();
+        setIsBlackjackResult(false);
+        setRoundPayout(-bet);
         setResult("BUST! Dealer wins");
         setGameStatus("game-over");
         setDealerRevealIndex(null);
@@ -630,6 +653,9 @@ export default function Dealer() {
         stopTimer();
         if (ack.dealerHand) setDealerHand(ack.dealerHand);
         const msg = ack.result === "win" ? "You win! 🎉" : ack.result === "draw" ? "Draw!" : "Dealer wins";
+        const reward = typeof ack.reward === "number" ? ack.reward : ack.result === "draw" ? bet : ack.result === "win" ? bet * 2 : 0;
+        setIsBlackjackResult(false);
+        setRoundPayout(reward - bet);
         setResult(msg);
         const nextChips = typeof ack.balance === "number" ? ack.balance : typeof ack.coins === "number" ? ack.coins : playerChips;
         setPlayerChips(nextChips);
@@ -668,6 +694,7 @@ export default function Dealer() {
   const playerValue = calculateHandValue(playerHand);
   const dealerValue = calculateHandValue(dealerHand);
   const chipStacks = getChipStacks(bet);
+  const payoutPrefix = roundPayout > 0 ? "+" : "";
   const resultClassName = result.includes("win") ? styles.resultWin : result.includes("Draw") ? styles.resultDraw : styles.resultLose;
 
   const getDealerDealStyle = (cardIndex: number): CSSProperties => ({
@@ -791,13 +818,13 @@ export default function Dealer() {
           {popupType === "win" && (
             <div className={styles.winOverlay}>
               <div className={styles.winContentFull}>
-                <h1 className={styles.winTitle}>You Win!</h1>
+                <h1 className={styles.winTitle}>{isBlackjackResult ? "Blackjack!" : "You Win!"}</h1>
 
                 <div className={styles.winContent}>
                   <p>Your Score: {playerValue}</p>
                   <p>Opponent Score: {dealerValue}</p>
-                  <p>Bet: {bet} chips</p>
-                  <p>Result: +{bet} chips</p>
+                  <p>Bet: {bet} coins</p>
+                  <p>Result: {payoutPrefix}{roundPayout} coins</p>
 
                   <div className={styles.divider}></div>
 
@@ -813,6 +840,8 @@ export default function Dealer() {
                       setGameStatus("betting");
                       setPlayerHand([]);
                       setDealerHand([]);
+                      setIsBlackjackResult(false);
+                      setRoundPayout(0);
                       setResult("");
                       setMessage("");
                       setPendingBet(0);
@@ -830,13 +859,13 @@ export default function Dealer() {
           {popupType === "lose" && (
             <div className={styles.winOverlay}>
               <div className={styles.winContentFull}>
-                <h1 className={styles.loseTitle}>You Lose</h1>
+                <h1 className={styles.loseTitle}>{isBlackjackResult ? "Dealer Blackjack" : "You Lose"}</h1>
 
                 <div className={styles.winContent}>
                   <p>Your Score: {playerValue}</p>
                   <p>Opponent Score: {dealerValue}</p>
-                  <p>Bet: {bet} chips</p>
-                  <p>Result: -{bet} chips</p>
+                  <p>Bet: {bet} coins</p>
+                  <p>Result: {payoutPrefix}{roundPayout} coins</p>
 
                   <div className={styles.divider}></div>
 
@@ -851,6 +880,8 @@ export default function Dealer() {
                       setGameStatus("betting");
                       setPlayerHand([]);
                       setDealerHand([]);
+                      setIsBlackjackResult(false);
+                      setRoundPayout(0);
                       setResult("");
                       setMessage("");
                       setPendingBet(0);
@@ -868,13 +899,13 @@ export default function Dealer() {
           {popupType === "draw" && (
             <div className={styles.winOverlay}>
               <div className={styles.winContentFull}>
-                <h1 className={styles.drawTitle}>Draw</h1>
+                <h1 className={styles.drawTitle}>{isBlackjackResult ? "Both Blackjack" : "Draw"}</h1>
 
                 <div className={styles.winContent}>
                   <p>Your Score: {playerValue}</p>
                   <p>Opponent Score: {dealerValue}</p>
-                  <p>Bet: {bet} chips</p>
-                  <p>Result: 0 chips</p>
+                  <p>Bet: {bet} coins</p>
+                  <p>Result: {payoutPrefix}{roundPayout} coins</p>
 
                   <div className={styles.divider}></div>
 
@@ -889,6 +920,8 @@ export default function Dealer() {
                       setGameStatus("betting");
                       setPlayerHand([]);
                       setDealerHand([]);
+                      setIsBlackjackResult(false);
+                      setRoundPayout(0);
                       setResult("");
                       setMessage("");
                       setPendingBet(0);

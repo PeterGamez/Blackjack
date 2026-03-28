@@ -87,23 +87,8 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
           <span className={styles.logoIconWrap}>
             <Image src="/logo.png" alt="21 Blackjack" width={54} height={54} className={styles.logoImage} priority />
           </span>
-        </button>
+        </button>      
 
-      {/* 
-      <button type="button" className={styles.logoHomeButton} aria-label="Back to main menu" onClick={() => router.push("/")}>
-        <span className={styles.logoIconWrap}>
-          <Image src="/logo.png" alt="21 Blackjack" width={54} height={54} className={styles.logoImage} priority />
-        </span>
-      </button>
-      */}
-      
-
-      {/* Resources Section */}
-      <div className={styles.resourcesSection}>
-        {/* Coins */}
-        <div className={styles.resourceBox}>
-          <div className={styles.coinIcon}>
-            <Image src="/icons/coin.png" alt="coin" width={45} height={45} />
         {/* Resources Section */}
         <div className={styles.resourcesSection}>
           {/* Coins */}
@@ -141,24 +126,6 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
             </svg>
           </button>
         </div>
-
-        <button className={styles.settingsButton} aria-label="Open settings" onClick={() => router.push("/settings")}>
-          <Image src="/icons/setting.png" alt="token" width={25} height={25}/>
-
-          {/*
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 8.75A3.25 3.25 0 1 1 8.75 12 3.25 3.25 0 0 1 12 8.75Z" stroke="currentColor" strokeWidth="1.9" />
-            <path
-              d="M20.17 10.96a1 1 0 0 0-.24-1.1l-1.06-1.06a1 1 0 0 1-.24-1.1l.39-.99a1 1 0 0 0-.54-1.29l-1.43-.6a1 1 0 0 0-1.27.45l-.52.91a1 1 0 0 1-.95.51h-1.5a1 1 0 0 1-.95-.51l-.52-.91a1 1 0 0 0-1.27-.45l-1.43.6a1 1 0 0 0-.54 1.29l.39.99a1 1 0 0 1-.24 1.1L4.07 9.86a1 1 0 0 0-.24 1.1l.41 1.03a1 1 0 0 1 0 .74l-.41 1.03a1 1 0 0 0 .24 1.1l1.06 1.06a1 1 0 0 1 .24 1.1l-.39.99a1 1 0 0 0 .54 1.29l1.43.6a1 1 0 0 0 1.27-.45l.52-.91a1 1 0 0 1 .95-.51h1.5a1 1 0 0 1 .95.51l.52.91a1 1 0 0 0 1.27.45l1.43-.6a1 1 0 0 0 .54-1.29l-.39-.99a1 1 0 0 1 .24-1.1l1.06-1.06a1 1 0 0 0 .24-1.1l-.41-1.03a1 1 0 0 1 0-.74Z"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          */}
-          
-        </button>
       </div>
     </>
   );

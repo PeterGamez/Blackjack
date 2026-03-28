@@ -130,13 +130,15 @@
 
 .tutorialButton {
   position: absolute;
+  width: 52px;
+  height: 52px;
   top: 3%;
   right: -7%;
   padding: 1% 2%;
-  border: white solid 2px;
-  border-radius: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  color: #000000;
+  border: none;
+  border-radius: 50%;
+  background: #E6B85C;
+  color: #1F2A44;
   font-weight: 1000;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -175,7 +177,7 @@
   margin: 0;
   font-size: 24px;
   font-weight: 800;
-  color: #f3f4f6;
+  color: #E6EAF2;
 }
 
 .tutorialModalClose {
@@ -186,7 +188,7 @@
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: #E6EAF2;
   font-size: 24px;
   cursor: pointer;
 }
@@ -196,7 +198,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  color: #e5e7eb;
+  color: #E6EAF2;
   line-height: 1.7;
 }
 

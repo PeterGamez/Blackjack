@@ -950,10 +950,6 @@ export default function Dealer() {
                   </button>
                 </div>
                 <div className={styles.tutorialModalBody}>
-                  <p><strong>กฏ</strong></p>
-                  <p>ใช้ไพ่ 1–8 สำรับ (52 ใบต่อสำรับ)</p>
-                  <p>ผู้เล่นแต่ละคนจะได้ไพ่ 2 ใบ</p>
-                  <p>ดีลเลอร์ก็ได้ไพ่ 2 ใบ (มักจะเปิด 1 ใบ คว่ำ 1 ใบ)</p>
 
                   <p><strong>วิธีการนับเลขไพ่</strong></p>
                   <p>ไพ่ 2–10 = ตามตัวเลข</p>

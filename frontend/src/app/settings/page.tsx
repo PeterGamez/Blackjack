@@ -94,7 +94,11 @@ export default function SettingsPage() {
         amount: `${payment.tokens} (${payment.amount} THB)`,
       }));
 
-      setTransactions(paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      if (paymentTransactions.length === 0) {
+        setHistoryError("No transactions found");
+      } else {
+        setTransactions(paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      }
     } catch (error) {
       setHistoryError(normalizeError(error, "Failed to load transaction history"));
     } finally {

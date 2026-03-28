@@ -107,8 +107,8 @@
 
 .backButton {
   position: absolute;
-  top: 190px;
-  left: 80px;
+  top: 0px;
+  left: -120px;
   background: transparent;
   border: none;
   color: #E6EAF2;

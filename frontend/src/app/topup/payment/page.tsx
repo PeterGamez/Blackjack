@@ -27,6 +27,8 @@ function PaymentContent() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [qrPayload, setQrPayload] = useState("");
+  const [slipPreviewUrl, setSlipPreviewUrl] = useState("");
+  const [isSlipModalOpen, setIsSlipModalOpen] = useState(false);
 
   useEffect(() => {
     const initPaymentPage = async () => {
@@ -129,6 +131,20 @@ function PaymentContent() {
       .catch(() => setQrPayload(""));
   }, [selectedPackage]);
 
+  useEffect(() => {
+    if (!slipFile) {
+      setSlipPreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(slipFile);
+    setSlipPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [slipFile]);
+
   const displayTokens = selectedPackage?.tokens ?? 0;
   const displayPrice = selectedPackage?.price ?? 0;
 
@@ -189,18 +205,28 @@ function PaymentContent() {
 
             <div className={`${styles.qrBody} ${method === "qr" ? styles.qrBodyOpen : ""}`}>
               <div className={styles.qrInner}>
-              <div className={styles.qrPreview}>
-  <div className={styles.qrPreview}>
-  {qrPayload ? (
-    <img
-      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`}
-      alt="PromptPay QR"
-    />
-  ) : (
-    <div>Loading QR...</div>
-  )}
-</div>
-</div>
+                <div className={styles.qrPreviewRow}>
+                  <div className={styles.qrPreview}>
+                    {qrPayload ? (
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`} alt="PromptPay QR" />
+                    ) : (
+                      <div>Loading QR...</div>
+                    )}
+                  </div>
+
+                  {slipPreviewUrl && (
+                    <button
+                      type="button"
+                      className={styles.slipPreview}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setIsSlipModalOpen(true);
+                      }}
+                    >
+                      <img src={slipPreviewUrl} alt="Uploaded slip preview" />
+                    </button>
+                  )}
+                </div>
                 <label className={styles.uploadButton}>
                   ⬆ UPLOAD SLIP
                   <input type="file" accept="image/*" onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)} className={styles.hiddenFileInput} />
@@ -232,6 +258,22 @@ function PaymentContent() {
           </div>
         </div>
       </div>
+
+      {isSlipModalOpen && slipPreviewUrl && (
+        <div className={styles.slipModalOverlay} onClick={() => setIsSlipModalOpen(false)}>
+          <div
+            className={styles.slipModalBody}
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <button type="button" className={styles.slipModalClose} onClick={() => setIsSlipModalOpen(false)}>
+              Close
+            </button>
+            <img src={slipPreviewUrl} alt="Uploaded slip full preview" className={styles.slipModalImage} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import LocalStorage from "@lib/LocalStorage";
+import UserService from "@lib/UserService";
 
 import styles from "./Navbar.module.css";
 import ProfileAvatar from "./ProfileAvatar";
+import TokenConverterModal from "./TokenConverterModal";
+import config from "@/config";
 
 export default function Navbar({ disabled = false }: { disabled?: boolean }) {
   const router = useRouter();
@@ -15,6 +18,20 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
   const [username, setUsername] = useState<string>(null);
   const [coins, setCoins] = useState(0);
   const [tokens, setTokens] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCoinPlusClick = () => {
+    if (disabled) {
+      return;
+    }
+
+    if (!username) {
+      router.push("/auth");
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     const readCache = () => {
@@ -43,8 +60,20 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (LocalStorage.getItem("musicVolume") === null) {
+      LocalStorage.setItem("musicVolume", config.sound.music.toString());
+    }
+
+    if (LocalStorage.getItem("effectVolume") === null) {
+      LocalStorage.setItem("effectVolume", config.sound.effect.toString());
+    }
+  }, []);
+
   return (
-    <div className={styles.navbar}>
+    <>
+      <TokenConverterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} availableTokens={tokens} />
+      <div className={styles.navbar}>
       {/* Profile Section */}
       <div className={styles.profileSection} onClick={() => (username ? router.push("/profile") : router.push("/auth"))} style={{ cursor: disabled ? "not-allowed" : "pointer", pointerEvents: disabled ? "none" : "auto" }}>
         <ProfileAvatar username={username} className={styles.profileAvatar} />
@@ -65,6 +94,9 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
             <Image src="/icons/coin.png" alt="coin" width={45} height={45} />
           </div>
           <span className={styles.resourceValue}>{coins.toLocaleString()}</span>
+          <button className={styles.plusButton} disabled={disabled} onClick={handleCoinPlusClick}>
+            +
+          </button>
         </div>
 
         {/* Tokens */}
@@ -91,6 +123,7 @@ export default function Navbar({ disabled = false }: { disabled?: boolean }) {
           </svg>
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

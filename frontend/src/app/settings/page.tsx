@@ -13,8 +13,7 @@ type TransactionItem = {
   id: string;
   date: string;
   format: string;
-  amount: number;
-  status: string;
+  amount: string;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("th-TH", {
@@ -27,12 +26,12 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
   maximumFractionDigits: 2,
 });
 
-const DEFAULT_VOLUME = 75;
+const parseVolume = (value: string): number => {
+  const parsed = Number.parseInt(value ?? "", 10);
+  if (Number.isNaN(parsed)) {
+    return 50;
+  }
 
-const parseVolume = (value: string, fallback: number): number => {
-  if (!value) return fallback;
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed)) return fallback;
   return Math.min(100, Math.max(0, parsed));
 };
 
@@ -46,32 +45,18 @@ const normalizeError = (error: unknown, fallback: string): string => {
 export default function SettingsPage() {
   const router = useRouter();
 
-  const [musicVolume, setMusicVolume] = useState(() => parseVolume(LocalStorage.getItem("musicVolume"), DEFAULT_VOLUME));
-  const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume"), DEFAULT_VOLUME));
+  const [musicVolume, setMusicVolume] = useState(() => parseVolume(LocalStorage.getItem("musicVolume")));
+  const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume")));
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
-  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
+  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyError, setHistoryError] = useState<string>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
   useEffect(() => {
-    UserService.getUser().then((data) => {
-      if (!data) {
-        router.replace("/auth");
-      }
-    });
-  }, [router]);
-
-  useEffect(() => {
-    if (LocalStorage.getItem("musicVolume") === null) {
-      LocalStorage.setItem("musicVolume", DEFAULT_VOLUME.toString());
-    }
-
-    if (LocalStorage.getItem("effectVolume") === null) {
-      LocalStorage.setItem("effectVolume", DEFAULT_VOLUME.toString());
-    }
+    void UserService.getUser();
   }, []);
 
   useEffect(() => {
@@ -90,11 +75,10 @@ export default function SettingsPage() {
       const paymentHistory = await UserService.getPaymentHistorys();
 
       const paymentTransactions: TransactionItem[] = paymentHistory.map((payment) => ({
-        id: `payment-${payment.receiptRef}-${payment.createdAt}`,
-        date: payment.createdAt,
+        id: `payment-${payment.receiptRef}`,
+        date: dateFormatter.format(new Date(payment.createdAt)),
         format: payment.type === "bank" ? "Top up (Bank Transfer)" : "Top up (TrueMoney)",
-        amount: payment.amount,
-        status: "completed",
+        amount: `${payment.tokens} (${payment.amount} THB)`,
       }));
 
       const topupTransactions = paymentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -140,16 +124,6 @@ export default function SettingsPage() {
       setRedeemLoading(false);
     }
   };
-
-  const formattedTransactions = useMemo(
-    () =>
-      transactions.map((item) => ({
-        ...item,
-        displayDate: dateFormatter.format(new Date(item.date)),
-        displayAmount: `${item.amount >= 0 ? "+" : "-"}${amountFormatter.format(Math.abs(item.amount))}`,
-      })),
-    [transactions]
-  );
 
   return (
     <div className={styles.page}>
@@ -217,16 +191,16 @@ export default function SettingsPage() {
 
               {!historyLoading && historyError && <p className={styles.feedbackError}>{historyError}</p>}
 
-              {!historyLoading && !historyError && formattedTransactions.length === 0 && <p className={styles.emptyMessage}>No transactions found.</p>}
+              {!historyLoading && !historyError && transactions.length === 0 && <p className={styles.emptyMessage}>No transactions found.</p>}
 
               {!historyLoading &&
                 !historyError &&
-                formattedTransactions.map((transaction) => (
+                transactions.map((transaction) => (
                   <div key={transaction.id} className={styles.historyItem}>
-                    <span>{transaction.displayDate}</span>
+                    <span>{transaction.date}</span>
                     <span>{transaction.format}</span>
-                    <span className={transaction.amount >= 0 ? styles.amountPositive : styles.amountNegative}>{transaction.displayAmount}</span>
-                    <span className={styles[`status${transaction.status[0].toUpperCase()}${transaction.status.slice(1)}`]}>{transaction.status}</span>
+                    <span className={styles.amountPositive}>{transaction.amount}</span>
+                    <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}
             </div>

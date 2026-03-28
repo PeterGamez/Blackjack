@@ -27,6 +27,9 @@ function PaymentContent() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [qrPayload, setQrPayload] = useState("");
+  const [slipPreviewUrl, setSlipPreviewUrl] = useState("");
+  const [isSlipModalOpen, setIsSlipModalOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const initPaymentPage = async () => {
@@ -59,17 +62,7 @@ function PaymentContent() {
 
 
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
 
-    const timeout = window.setTimeout(() => {
-      router.push("/topup");
-    }, 2500);
-
-    return () => window.clearTimeout(timeout);
-  }, [successMessage, router]);
 
   const handleConfirmPayment = async () => {
     setErrorMessage("");
@@ -113,7 +106,8 @@ function PaymentContent() {
       }
 
       await UserService.getUser();
-      setSuccessMessage("Payment successful. Your tokens have been updated. Redirecting...");
+      setSuccessMessage("Payment successful. Your tokens have been updated.");
+      setShowSuccessModal(true);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Payment failed");
     } finally {
@@ -128,6 +122,20 @@ function PaymentContent() {
       .then(setQrPayload)
       .catch(() => setQrPayload(""));
   }, [selectedPackage]);
+
+  useEffect(() => {
+    if (!slipFile) {
+      setSlipPreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(slipFile);
+    setSlipPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [slipFile]);
 
   const displayTokens = selectedPackage?.tokens ?? 0;
   const displayPrice = selectedPackage?.price ?? 0;
@@ -171,9 +179,6 @@ function PaymentContent() {
           <button className={styles.confirmButton} onClick={handleConfirmPayment} disabled={isSubmitting || isLoadingPackage || !selectedPackage}>
             {isSubmitting ? "PROCESSING..." : "CONFIRM PAYMENT"}
           </button>
-
-          {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
-          {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
         </div>
 
         <div className={styles.methods}>
@@ -189,18 +194,28 @@ function PaymentContent() {
 
             <div className={`${styles.qrBody} ${method === "qr" ? styles.qrBodyOpen : ""}`}>
               <div className={styles.qrInner}>
-              <div className={styles.qrPreview}>
-  <div className={styles.qrPreview}>
-  {qrPayload ? (
-    <img
-      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`}
-      alt="PromptPay QR"
-    />
-  ) : (
-    <div>Loading QR...</div>
-  )}
-</div>
-</div>
+                <div className={styles.qrPreviewRow}>
+                  <div className={styles.qrPreview}>
+                    {qrPayload ? (
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`} alt="PromptPay QR" />
+                    ) : (
+                      <div>Loading QR...</div>
+                    )}
+                  </div>
+
+                  {slipPreviewUrl && (
+                    <button
+                      type="button"
+                      className={styles.slipPreview}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setIsSlipModalOpen(true);
+                      }}
+                    >
+                      <img src={slipPreviewUrl} alt="Uploaded slip preview" />
+                    </button>
+                  )}
+                </div>
                 <label className={styles.uploadButton}>
                   ⬆ UPLOAD SLIP
                   <input type="file" accept="image/*" onChange={(event) => setSlipFile(event.target.files?.[0] ?? null)} className={styles.hiddenFileInput} />
@@ -232,6 +247,73 @@ function PaymentContent() {
           </div>
         </div>
       </div>
+
+      {isSlipModalOpen && slipPreviewUrl && (
+        <div className={styles.slipModalOverlay} onClick={() => setIsSlipModalOpen(false)}>
+          <div
+            className={styles.slipModalBody}
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <button type="button" className={styles.slipModalClose} onClick={() => setIsSlipModalOpen(false)}>
+              Close
+            </button>
+            <img src={slipPreviewUrl} alt="Uploaded slip full preview" className={styles.slipModalImage} />
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className={styles.successOverlay}>
+          <div className={styles.successModal}>
+            <div className={styles.successIcon}>
+              <svg viewBox="0 0 52 52" className={styles.checkmarkSvg}>
+                <circle className={styles.checkmarkCircle} cx="26" cy="26" r="25" fill="none" />
+                <path className={styles.checkmarkCheck} fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+              </svg>
+            </div>
+            <h2 className={styles.successTitle}>ชำระเงินสำเร็จ!</h2>
+            <div className={styles.successDetails}>
+              <div className={styles.successRow}>
+                <span className={styles.successLabel}>Package:</span>
+                <span className={styles.successValue}>{displayTokens.toLocaleString()} Tokens</span>
+              </div>
+              <div className={styles.successDivider}>↑</div>
+              <div className={styles.successRow}>
+                <span className={styles.successLabel}>ราคา:</span>
+                <span className={`${styles.successValue} ${styles.successValueGreen}`}>{displayPrice.toLocaleString()} THB</span>
+              </div>
+            </div>
+            <button className={styles.successReturnButton} onClick={() => router.push("/topup")}>
+              กลับไปหน้าเติมเงิน
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {errorMessage && (
+        <div className={styles.errorOverlay} onClick={() => setErrorMessage("")}>
+          <div className={styles.errorModal} onClick={(e) => e.stopPropagation()}>
+            <button type="button" className={styles.errorCloseButton} onClick={() => setErrorMessage("")}>
+              ✕
+            </button>
+            <div className={styles.errorIcon}>
+              <svg viewBox="0 0 52 52" className={styles.errorSvg}>
+                <circle className={styles.errorCircle} cx="26" cy="26" r="25" fill="none" />
+                <path className={styles.errorX} fill="none" d="M16 16 36 36 M36 16 16 36" />
+              </svg>
+            </div>
+            <h2 className={styles.errorTitle}>เกิดข้อผิดพลาด</h2>
+            <p className={styles.errorText}>{errorMessage}</p>
+            <button className={styles.errorOkButton} onClick={() => setErrorMessage("")}>
+              ตกลง
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

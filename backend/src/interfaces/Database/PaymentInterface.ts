@@ -5,4 +5,5 @@ export interface PaymentInterface extends InterfaceBase {
     receiptRef: string;
     type: "bank" | "truemoney";
     amount: number;
+    tokens: number;
 }

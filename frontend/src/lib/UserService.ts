@@ -146,14 +146,15 @@ export default class UserService {
 
   public static async redeemCode(code: string): Promise<{ message: string; amount: number; type: CurrencyType }> {
     try {
-      const response = await this.authenticatedFetch("/user/redeem-code", {
+      const response = await this.authenticatedFetch("/code/redeem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
       });
 
       if (!response?.ok) {
-        throw new Error("Redeem code failed");
+        const data: { error?: string; message?: string } = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || "Redeem code failed");
       }
 
       return await response.json();

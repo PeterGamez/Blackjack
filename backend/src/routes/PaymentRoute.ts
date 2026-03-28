@@ -159,7 +159,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "This bank slip has already been used" }, 400);
                 }
 
-                await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount);
+                await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount, pack.tokens);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Bank slip verified successfully" });
@@ -219,7 +219,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 
-                await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount);
+                await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount, pack.tokens);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Voucher redeemed successfully" });

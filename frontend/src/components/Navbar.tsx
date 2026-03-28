@@ -82,6 +82,9 @@ export default function Navbar() {
         </div>
 
         <button className={styles.settingsButton} aria-label="Open settings" onClick={() => router.push("/settings")}>
+          <Image src="/icons/setting.png" alt="token" width={25} height={25}/>
+
+          {/*
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M12 8.75A3.25 3.25 0 1 1 8.75 12 3.25 3.25 0 0 1 12 8.75Z" stroke="currentColor" strokeWidth="1.9" />
             <path
@@ -92,6 +95,8 @@ export default function Navbar() {
               strokeLinejoin="round"
             />
           </svg>
+          */}
+          
         </button>
       </div>
     </div>

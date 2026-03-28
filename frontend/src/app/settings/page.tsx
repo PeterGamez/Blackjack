@@ -27,7 +27,11 @@ const amountFormatter = new Intl.NumberFormat("th-TH", {
 });
 
 const parseVolume = (value: string): number => {
-  const parsed = Number.parseInt(value, 10);
+  const parsed = Number.parseInt(value ?? "", 10);
+  if (Number.isNaN(parsed)) {
+    return 50;
+  }
+
   return Math.min(100, Math.max(0, parsed));
 };
 
@@ -45,19 +49,15 @@ export default function SettingsPage() {
   const [effectVolume, setEffectVolume] = useState(() => parseVolume(LocalStorage.getItem("effectVolume")));
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemLoading, setRedeemLoading] = useState(false);
-  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string }>(null);
+  const [redeemFeedback, setRedeemFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyError, setHistoryError] = useState<string>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
   useEffect(() => {
-    UserService.getUser().then((data) => {
-      if (!data) {
-        router.replace("/auth");
-      }
-    });
-  }, [router]);
+    void UserService.getUser();
+  }, []);
 
   useEffect(() => {
     LocalStorage.setItem("musicVolume", musicVolume.toString());

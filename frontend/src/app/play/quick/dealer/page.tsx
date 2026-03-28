@@ -109,6 +109,7 @@ export default function Dealer() {
   const [timer, setTimer] = useState<number>(10);
   const [dealerRevealIndex, setDealerRevealIndex] = useState<number | null>(null);
   const [isDealerDrawing, setIsDealerDrawing] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [cardSkin, setCardSkin] = useState<string>("default");
   const [chipSkin, setChipSkin] = useState<string>("default");
   const [tableSkin, setTableSkin] = useState<string>("default");
@@ -694,6 +695,9 @@ export default function Dealer() {
               ← Back
             </button>
           )}
+          <button type="button" className={styles.tutorialButton} onClick={() => setIsTutorialOpen(true)}>
+            ?
+          </button>
           <div className={styles.table}>
             <Image src={getTableImage(tableSkin)} alt="game table" fill style={{ objectFit: "fill", zIndex: 0 }} unoptimized />
             <div className={styles.innerShadow} />
@@ -898,6 +902,42 @@ export default function Dealer() {
                     }}>
                     PLAY AGAIN
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isTutorialOpen && (
+            <div className={styles.tutorialOverlay} onClick={() => setIsTutorialOpen(false)}>
+              <div className={styles.tutorialModal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.tutorialModalHeader}>
+                  <h2 className={styles.tutorialModalTitle}>วิธีการเล่น</h2>
+                  <button type="button" className={styles.tutorialModalClose} onClick={() => setIsTutorialOpen(false)}>
+                    ×
+                  </button>
+                </div>
+                <div className={styles.tutorialModalBody}>
+                  <p><strong>กฏ</strong></p>
+                  <p>ใช้ไพ่ 1–8 สำรับ (52 ใบต่อสำรับ)</p>
+                  <p>ผู้เล่นแต่ละคนจะได้ไพ่ 2 ใบ</p>
+                  <p>ดีลเลอร์ก็ได้ไพ่ 2 ใบ (มักจะเปิด 1 ใบ คว่ำ 1 ใบ)</p>
+                  
+                  <p><strong>วิธีการนับเลขไพ่</strong></p>
+                  <p>ไพ่ 2–10 = ตามตัวเลข</p>
+                  <p>ไพ่ J, Q, K = 10 แต้ม</p>
+                  <p>ไพ่ A = 1 หรือ 11 แต้ม (เลือกให้ได้เปรียบที่สุด)</p>
+
+                  <p><strong>วิธีการเล่น</strong></p>
+                  <p>1. ผู้เล่นวางเดิมพัน</p>
+                  <p>2. แจกไพ่คนละ 2 ใบ</p>
+                  <p>3. ผู้เล่นเลือกการกระทำ:</p>
+                  <p>&nbsp;&nbsp;• Hit = ขอไพ่เพิ่ม</p>
+                  <p>&nbsp;&nbsp;• Stand = หยุด ไม่รับเพิ่ม</p>
+                  <p>&nbsp;&nbsp;• Double Down = เพิ่มเดิมพัน 2 เท่า แล้วจั่วได้อีก 1 ใบเท่านั้น</p>
+                  <p>&nbsp;&nbsp;• Split = ถ้าได้ไพ่ 2 ใบเหมือนกัน แยกเป็น 2 มือ</p>
+                  <p>4. เมื่อผู้เล่นครบแล้ว ดีลเลอร์จะเปิดไพ่และเล่นตามกติกา</p>
+                  <p>5. ต้องจั่วจนแต้มอย่างน้อย 17</p>
+                  <p>6. เปรียบเทียบแต้ม ใครใกล้ 21 มากกว่าชนะ</p>
                 </div>
               </div>
             </div>

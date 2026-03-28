@@ -1,10 +1,11 @@
 "use client";
 
-import Navbar from "@components/Navbar";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+
+import Navbar from "@components/Navbar";
 
 import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
 

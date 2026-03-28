@@ -1,18 +1,19 @@
 "use client";
 
-import { getEffectVolume } from "@components/ButtonSoundProvider";
-import Navbar from "@components/Navbar";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import config from "@config";
 
+import { getEffectVolume } from "@components/ButtonSoundProvider";
+import Navbar from "@components/Navbar";
+
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
+
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 
 import styles from "./page.module.css";
 
@@ -68,7 +69,6 @@ const CARD_DRAW_SOUND_SRC = "/sounds/draw.mp3";
 const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
 const BLACKJACK_WIN_SOUND_SRC = "/sounds/win.mp3";
 const DEALER_BLACKJACK_SOUND_SRC = "/sounds/blackjack.mp3";
-const FALLBACK_EFFECT_VOLUME = 0.75;
 const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_WIN_SOUND_START_AT_SECONDS = 0.5;
@@ -76,28 +76,9 @@ const DEALER_BLACKJACK_SOUND_START_AT_SECONDS = 0.8;
 const BLACKJACK_WIN_SOUND_DELAY_MS = 0;
 const DEALER_BLACKJACK_SOUND_DELAY_MS = 0;
 const CARD_DRAW_SOUND_GAIN = 1;
-const BLACKJACK_LOSE_SOUND_GAIN =5;
+const BLACKJACK_LOSE_SOUND_GAIN = 5;
 const BLACKJACK_WIN_SOUND_GAIN = 5;
 const DEALER_BLACKJACK_SOUND_GAIN = 5;
-
-function getEffectVolume(): number {
-  if (typeof window === "undefined") {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  const raw = window.localStorage.getItem("effectVolume");
-  if (!raw) {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  const value = Number.parseInt(raw, 10);
-  if (Number.isNaN(value)) {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  return Math.min(100, Math.max(0, value)) / 100;
-}
-const BLACKJACK_LOSE_SOUND_GAIN = 5;
 
 export default function Dealer() {
   const router = useRouter();
@@ -121,7 +102,7 @@ export default function Dealer() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<number>(0);
   const [timer, setTimer] = useState<number>(10);
-  const [dealerRevealIndex, setDealerRevealIndex] = useState<number>(null);
+  const [dealerRevealIndex, setDealerRevealIndex] = useState<number | null>(null);
   const [isDealerDrawing, setIsDealerDrawing] = useState(false);
   const [cardSkin, setCardSkin] = useState<string>("default");
   const [chipSkin, setChipSkin] = useState<string>("default");
@@ -185,7 +166,7 @@ export default function Dealer() {
     });
   }, []);
 
-  const playBlackjackWinSound = () => {
+  const playBlackjackWinSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -197,7 +178,7 @@ export default function Dealer() {
     }
 
     const audio = blackjackWinAudioRef.current;
-    
+
     // รอ delay ก่อนแล้วค่อยเล่นเสียง
     setTimeout(() => {
       audio.pause();
@@ -214,9 +195,9 @@ export default function Dealer() {
         }
       }, 3000);
     }, BLACKJACK_WIN_SOUND_DELAY_MS);
-  };
+  }, []);
 
-  const playDealerBlackjackSound = () => {
+  const playDealerBlackjackSound = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
@@ -228,7 +209,7 @@ export default function Dealer() {
     }
 
     const audio = dealerBlackjackAudioRef.current;
-    
+
     // รอ delay ก่อนแล้วค่อยเล่นเสียง
     setTimeout(() => {
       audio.pause();
@@ -245,7 +226,7 @@ export default function Dealer() {
         }
       }, 3000);
     }, DEALER_BLACKJACK_SOUND_DELAY_MS);
-  };
+  }, []);
 
   useEffect(() => {
     const pool = Array.from({ length: 4 }, () => {
@@ -512,7 +493,7 @@ export default function Dealer() {
     };
   }, [router]);
 
-  const popupType: PopupType = useMemo(() => {
+  const popupType: PopupType | null = useMemo(() => {
     if (!result) return null;
     const lower = result.toLowerCase();
     if (lower.includes("you win")) return "win";
@@ -531,7 +512,7 @@ export default function Dealer() {
         playBlackjackLoseSound();
       }
     }
-  }, [popupType]);
+  }, [popupType, playBlackjackLoseSound, playBlackjackWinSound, playDealerBlackjackSound, result]);
 
   const startGame = (betAmount: number) => {
     if (betAmount <= 0 || betAmount > playerChips) {

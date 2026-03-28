@@ -1,8 +1,9 @@
 "use client";
 
-import Navbar from "@components/Navbar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import Navbar from "@components/Navbar";
 
 import { CodeInterface } from "@interfaces/Admin/CodeInterface";
 

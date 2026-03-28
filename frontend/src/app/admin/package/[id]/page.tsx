@@ -1,8 +1,9 @@
 "use client";
 
-import Navbar from "@components/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import Navbar from "@components/Navbar";
 
 import { PackageInterface } from "@interfaces/Admin/PackageInterface";
 

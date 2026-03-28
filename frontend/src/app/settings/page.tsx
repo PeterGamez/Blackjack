@@ -223,7 +223,7 @@ export default function SettingsPage() {
                   <div key={transaction.id} className={styles.historyItem}>
                     <span>{transaction.displayDate}</span>
                     <span>{transaction.format}</span>
-                    <span className={transaction.amount >= 0 ? styles.amountPositive : styles.amountNegative}>{transaction.displayAmount}</span>
+                    <span className={styles.amountPositive}>{transaction.displayAmount}</span>
                     <span className={styles.statusCompleted}>Completed</span>
                   </div>
                 ))}

@@ -13,6 +13,7 @@ import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin,
 import config from "@/config";
 
 import styles from "./page.module.css";
+import { getEffectVolume } from "@components/ButtonSoundProvider";
 
 interface Card {
   suit: string;
@@ -69,24 +70,6 @@ const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0.8;
 const CARD_DRAW_SOUND_GAIN = 1;
 const BLACKJACK_LOSE_SOUND_GAIN =5;
-
-function getEffectVolume(): number {
-  if (typeof window === "undefined") {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  const raw = window.localStorage.getItem("effectVolume");
-  if (!raw) {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  const value = Number.parseInt(raw, 10);
-  if (Number.isNaN(value)) {
-    return FALLBACK_EFFECT_VOLUME;
-  }
-
-  return Math.min(100, Math.max(0, value)) / 100;
-}
 
 export default function Dealer() {
   const router = useRouter();

@@ -13,25 +13,12 @@ function getBgMusicVolume(): number {
   return Math.min(100, Math.max(0, value)) / 100;
 }
 
-function isBgMusicEnabled(): boolean {
-  if (typeof window === "undefined") {
-    return true;
-  }
-
-  const raw = window.localStorage.getItem("musicEnabled");
-  if (!raw) {
-    return true;
-  }
-
-  return raw === "true";
-}
-
 export default function BackgroundMusicProvider() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (!isBgMusicEnabled()) {
+    if (getBgMusicVolume() == 0) {
       return;
     }
 
@@ -80,7 +67,7 @@ export default function BackgroundMusicProvider() {
         audioRef.current.volume = getBgMusicVolume();
       }
       if (e.key === "musicEnabled" && audioRef.current) {
-        if (isBgMusicEnabled()) {
+        if (getBgMusicVolume() > 0) {
           audioRef.current.play().catch(() => {});
         } else {
           audioRef.current.pause();

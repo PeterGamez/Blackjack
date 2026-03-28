@@ -18,7 +18,7 @@ const INTERACTIVE_SELECTOR = [
   "label[for]",
 ].join(",");
 
-function getEffectVolume(): number {
+export function getEffectVolume(): number {
   const raw = LocalStorage.getItem("effectVolume");
 
   const value = Number.parseInt(raw, 10);

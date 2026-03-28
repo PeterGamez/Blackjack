@@ -1,5 +1,6 @@
-import config from "@/config";
-import { PaymentPackageInterface } from "@/interfaces/API/PaymentPackageInterface";
+import config from "@config";
+
+import { PaymentPackageInterface } from "@interfaces/API/PaymentPackageInterface";
 
 import AuthService from "./AuthService";
 import LocalStorage from "./LocalStorage";
@@ -106,6 +107,46 @@ export default class PaymentService {
 
     if (!response.ok) {
       throw new Error(data.error || data.message || "Failed to redeem TrueMoney voucher");
+    }
+  }
+
+  public static async getQrPayload(packageId: number): Promise<string> {
+    const response = await this.authenticatedFetch("/payment/qr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ packageId }),
+    });
+
+    const data: { payload?: string; error?: string } = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to get QR payload");
+    }
+
+    return data.payload || "";
+  }
+
+  public static async convertTokensToCoins(tokens: number): Promise<void> {
+    const normalizedTokens = Math.floor(tokens);
+
+    if (!Number.isFinite(normalizedTokens) || normalizedTokens <= 0) {
+      throw new Error("Tokens must be greater than 0");
+    }
+
+    const response = await this.authenticatedFetch("/payment/tokenconvert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tokens: normalizedTokens, type: "coin" }),
+    });
+
+    const data: { error?: string; message?: string } = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || "Failed to convert tokens");
     }
   }
 }

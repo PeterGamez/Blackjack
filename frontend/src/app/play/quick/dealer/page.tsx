@@ -1,16 +1,17 @@
 "use client";
 
+import { getEffectVolume } from "@components/ButtonSoundProvider";
 import Navbar from "@components/Navbar";
+import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@utils/skinUtils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
+
+import config from "@config";
 
 import LocalStorage from "@lib/LocalStorage";
 import UserService from "@lib/UserService";
-import { getCardBackImage, getCardImage, getCardSkin, getChipImage, getChipSkin, getTableImage, getTableSkin } from "@lib/skinUtils";
-
-import config from "@/config";
 
 import styles from "./page.module.css";
 
@@ -62,10 +63,20 @@ type PopupType = "win" | "lose" | "draw";
 const CHIP_VALUES = [1, 5, 10, 25, 100, 500, 1000];
 const FORCED_CARD_SUITS = ["♠", "♥", "♦", "♣"];
 const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const CARD_DRAW_SOUND_SRC = "/sounds/draw.mp3";
+const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
+const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
+const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0.8;
+const CARD_DRAW_SOUND_GAIN = 1;
+const BLACKJACK_LOSE_SOUND_GAIN = 5;
 
 export default function Dealer() {
   const router = useRouter();
   const socketRef = useRef<Socket>(null);
+  const cardDrawAudioPoolRef = useRef<HTMLAudioElement[]>([]);
+  const blackjackLoseAudioRef = useRef<HTMLAudioElement>(null);
+  const prevPlayerCardCountRef = useRef(0);
+  const prevDealerCardCountRef = useRef(0);
   const [gameStatus, setGameStatus] = useState<GameStatus>("betting");
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
@@ -95,9 +106,115 @@ export default function Dealer() {
 
   const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+  const getScaledVolume = (gain: number): number => {
+    return Math.min(1, Math.max(0, getEffectVolume() * gain));
+  };
+
+  const playCardDrawSound = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (cardDrawAudioPoolRef.current.length === 0) {
+      const pool = Array.from({ length: 4 }, () => {
+        const audio = new Audio(CARD_DRAW_SOUND_SRC);
+        audio.preload = "auto";
+        audio.load();
+        return audio;
+      });
+      cardDrawAudioPoolRef.current = pool;
+    }
+
+    const audio = cardDrawAudioPoolRef.current.find((item) => item.paused || item.ended) || cardDrawAudioPoolRef.current[0];
+    audio.pause();
+    audio.currentTime = CARD_DRAW_SOUND_START_AT_SECONDS;
+    audio.volume = getScaledVolume(CARD_DRAW_SOUND_GAIN);
+    void audio.play().catch(() => {
+      // Ignore browser/media playback errors.
+    });
+  }, []);
+
+  const playBlackjackLoseSound = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!blackjackLoseAudioRef.current) {
+      blackjackLoseAudioRef.current = new Audio(BLACKJACK_LOSE_SOUND_SRC);
+      blackjackLoseAudioRef.current.preload = "auto";
+      blackjackLoseAudioRef.current.load();
+    }
+
+    const audio = blackjackLoseAudioRef.current;
+    audio.pause();
+    audio.currentTime = BLACKJACK_LOSE_SOUND_START_AT_SECONDS;
+    audio.volume = getScaledVolume(BLACKJACK_LOSE_SOUND_GAIN);
+    void audio.play().catch(() => {
+      // Ignore browser/media playback errors.
+    });
+  }, []);
+
+  useEffect(() => {
+    const pool = Array.from({ length: 4 }, () => {
+      const audio = new Audio(CARD_DRAW_SOUND_SRC);
+      audio.preload = "auto";
+      audio.load();
+      return audio;
+    });
+    cardDrawAudioPoolRef.current = pool;
+
+    return () => {
+      for (const audio of cardDrawAudioPoolRef.current) {
+        audio.pause();
+      }
+      cardDrawAudioPoolRef.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = new Audio(BLACKJACK_LOSE_SOUND_SRC);
+    audio.preload = "auto";
+    audio.load();
+    blackjackLoseAudioRef.current = audio;
+
+    return () => {
+      blackjackLoseAudioRef.current?.pause();
+      blackjackLoseAudioRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     playerChipsRef.current = playerChips;
   }, [playerChips]);
+
+  useEffect(() => {
+    if (gameStatus === "betting") {
+      prevPlayerCardCountRef.current = playerHand.length;
+      prevDealerCardCountRef.current = dealerHand.length;
+      return;
+    }
+
+    const playerDiff = playerHand.length - prevPlayerCardCountRef.current;
+    const dealerDiff = dealerHand.length - prevDealerCardCountRef.current;
+    const drawCount = Math.max(playerDiff, 0) + Math.max(dealerDiff, 0);
+
+    for (let i = 0; i < drawCount; i++) {
+      window.setTimeout(() => {
+        playCardDrawSound();
+      }, i * 40);
+    }
+
+    prevPlayerCardCountRef.current = playerHand.length;
+    prevDealerCardCountRef.current = dealerHand.length;
+  }, [dealerHand.length, gameStatus, playCardDrawSound, playerHand.length]);
+
+  useEffect(() => {
+    const lower = result.toLowerCase();
+    if (lower.includes("blackjack") && lower.includes("dealer")) {
+      playBlackjackLoseSound();
+    }
+  }, [playBlackjackLoseSound, result]);
+
   useEffect(() => {
     const syncSkins = () => {
       setCardSkin(getCardSkin());
@@ -264,6 +381,12 @@ export default function Dealer() {
 
     return () => {
       stopTimer();
+      for (const audio of cardDrawAudioPoolRef.current) {
+        audio.pause();
+      }
+      cardDrawAudioPoolRef.current = [];
+      blackjackLoseAudioRef.current?.pause();
+      blackjackLoseAudioRef.current = null;
       socketRef.current?.disconnect();
     };
   }, [router]);
@@ -410,12 +533,14 @@ export default function Dealer() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
+      <Navbar disabled />
       <div className={styles.main}>
         <div className={styles.tableWrap}>
-          <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
-            ← Back
-          </button>
+          {gameStatus === "betting" && (
+            <button type="button" onClick={() => router.push("/play")} className={styles.backButton}>
+              ← Back
+            </button>
+          )}
           <div className={styles.table}>
             <Image src={getTableImage(tableSkin)} alt="game table" fill style={{ objectFit: "fill", zIndex: 0 }} unoptimized />
             <div className={styles.innerShadow} />
@@ -508,8 +633,6 @@ export default function Dealer() {
                 {message && <p className={styles.inlineError}>{message}</p>}
               </div>
             )}
-
-        
           </div>
           {result && !popupType && <div className={`${styles.resultBadge} ${resultClassName}`.trim()}>{result}</div>}
 
@@ -689,8 +812,6 @@ export default function Dealer() {
               </div>
             </>
           )}
-
-         
 
           {message && gameStatus !== "betting" && <p className={styles.bottomMessage}>{message}</p>}
         </div>

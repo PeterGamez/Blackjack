@@ -19,17 +19,6 @@ export default function TableSettingPage() {
   const [startingMoneyType, setStartingMoneyType] = useState("Coin");
   const [minimumBetType, setMinimumBetType] = useState("Coin");
 
-  const createTable = () => {
-    console.log({
-      roomId,
-      roomPassword,
-      startingMoney,
-      startingMoneyType,
-      minimumBet,
-      minimumBetType,
-    });
-  };
-
   return (
     <div className={styles.container}>
       <Navbar />
@@ -97,7 +86,7 @@ export default function TableSettingPage() {
 
       {/* Create Button */}
       <div className={styles.createButtonWrapper}>
-        <button className={styles.createButton} onClick={createTable}>
+        <button className={styles.createButton} onClick={() => router.push("/comingsoon")}>
           CREATE TABLE
         </button>
       </div>

@@ -130,7 +130,13 @@ export default class PaymentRoute implements RouteInterface {
 
                 if (!response.success) {
                     this.server.warn("PaymentRoute", `Failed to verify slip: ${response.message}`);
-                    return c.json({ error: "Failed to verify slip" }, 400);
+                    if (response.code == 1011) {
+                        return c.json({ error: "Invalid or expired bank slip" }, 400);
+                    } else if (response.code == 1012) {
+                        return c.json({ error: "This bank slip has already been used" }, 400);
+                    } else {
+                        return c.json({ error: "Failed to verify slip", message: response.message }, 400);
+                    }
                 }
 
                 const data = response.data;
@@ -139,16 +145,21 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Paid amount does not match package price" }, 400);
                 }
 
-                if (data.transTimestamp.getTime() < Date.now() - 15 * 60 * 1000) {
+                const transTimestampMs = new Date(data.transTimestamp).getTime();
+                if (Number.isNaN(transTimestampMs)) {
+                    return c.json({ error: "Invalid bank slip timestamp" }, 400);
+                }
+
+                if (transTimestampMs < Date.now() - 15 * 60 * 1000) {
                     return c.json({ error: "Bank slip is older than 15 minutes" }, 400);
                 }
 
-                const isDuplicate = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
-                if (isDuplicate) {
+                const duplicatePayments = await PaymentModel.selectAllPaymentsByReceiptRef(data.transRef);
+                if (duplicatePayments.length > 0) {
                     return c.json({ error: "This bank slip has already been used" }, 400);
                 }
 
-                await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount);
+                await PaymentModel.createPayment(user.id, data.transRef, "bank", data.paidLocalAmount, pack.tokens);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Bank slip verified successfully" });
@@ -208,7 +219,7 @@ export default class PaymentRoute implements RouteInterface {
                     return c.json({ error: "Failed to redeem voucher", message: redeemResponse.status.message }, 400);
                 }
 
-                await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount);
+                await PaymentModel.createPayment(user.id, voucher.voucher_id, "truemoney", redeemAmount, pack.tokens);
                 await UserModel.increaseBalance(user.id, "tokens", pack.tokens);
 
                 return c.json({ message: "Voucher redeemed successfully" });
@@ -216,6 +227,52 @@ export default class PaymentRoute implements RouteInterface {
                 this.server.error("PaymentRoute", `Error processing TrueMoney:`);
                 console.error(error);
                 return c.json({ error: "Error processing TrueMoney" }, 500);
+            }
+        });
+
+        this.app.post("/tokenconvert", async (c) => {
+            try {
+                let body: { tokens: number; type: "coin" };
+                try {
+                    body = await c.req.json();
+                } catch {
+                    return c.json({ error: "Invalid request body" }, 400);
+                }
+
+                const { tokens, type } = body;
+
+                if (!tokens || !type) {
+                    return c.json({ error: "Missing tokens or type" }, 400);
+                }
+
+                if (type !== "coin") {
+                    return c.json({ error: "Invalid conversion type" }, 400);
+                }
+
+                const user = await this.server.Middleware.getUser(c);
+                if (!user) {
+                    return c.json({ error: "User not found" }, 404);
+                }
+
+                if (tokens <= 0) {
+                    return c.json({ error: "Tokens must be greater than 0" }, 400);
+                }
+
+                if (user.tokens < tokens) {
+                    return c.json({ error: "Insufficient tokens" }, 400);
+                }
+
+                if (type === "coin") {
+                    const coinsToAdd = tokens * 5;
+                    await UserModel.decreaseBalance(user.id, "tokens", tokens);
+                    await UserModel.increaseBalance(user.id, "coins", coinsToAdd);
+                }
+
+                return c.json({ message: "Token conversion successful" });
+            } catch (error) {
+                this.server.error("PaymentRoute", `Error processing token conversion:`);
+                console.error(error);
+                return c.json({ error: "Error processing token conversion" }, 500);
             }
         });
     }

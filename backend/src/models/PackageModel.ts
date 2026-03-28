@@ -76,4 +76,14 @@ export default class PackageModel {
             connection.release();
         }
     }
+
+    public static async deletePackage(id: number): Promise<void> {
+        const sql = `UPDATE ${this.table} SET deletedAt = NOW() WHERE id = ? AND deletedAt IS NULL`;
+        const connection = await this.DB.getConnection();
+        try {
+            await connection.execute(sql, [id]);
+        } finally {
+            connection.release();
+        }
+    }
 }

@@ -68,7 +68,7 @@ const FORCED_CARD_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J
 const CARD_DRAW_SOUND_SRC = "/sounds/draw.mp3";
 const BLACKJACK_LOSE_SOUND_SRC = "/sounds/lose.mp3";
 const BLACKJACK_WIN_SOUND_SRC = "/sounds/win.mp3";
-const BLACKJACK_DRAW_SOUND_SRC = "/sounds/draw.mp3";
+const BLACKJACK_DRAW_SOUND_SRC = "/sounds/gamedraw.mp3";
 const DEALER_BLACKJACK_SOUND_SRC = "/sounds/blackjack.mp3";
 const CARD_DRAW_SOUND_START_AT_SECONDS = 0;
 const BLACKJACK_LOSE_SOUND_START_AT_SECONDS = 0;
@@ -79,10 +79,10 @@ const BLACKJACK_WIN_SOUND_DELAY_MS = 0;
 const BLACKJACK_DRAW_SOUND_DELAY_MS = 0;
 const DEALER_BLACKJACK_SOUND_DELAY_MS = 0;
 const CARD_DRAW_SOUND_GAIN = 1;
-const BLACKJACK_LOSE_SOUND_GAIN = 1;
-const BLACKJACK_WIN_SOUND_GAIN = 1;
-const BLACKJACK_DRAW_SOUND_GAIN = 1;
-const DEALER_BLACKJACK_SOUND_GAIN = 1;
+const BLACKJACK_LOSE_SOUND_GAIN = 0.5;
+const BLACKJACK_WIN_SOUND_GAIN = 0.5;
+const BLACKJACK_DRAW_SOUND_GAIN = 0.5;
+const DEALER_BLACKJACK_SOUND_GAIN = 0.5;
 
 export default function Dealer() {
   const router = useRouter();

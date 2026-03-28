@@ -90,14 +90,25 @@
 
 .backButton {
   position: absolute;
-  top: 210px;
-  left: 40px;
-  padding: 10px 18px;
-  background: #e3b75c;
+  top: 230px;
+  left: 50px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
+  color: #1f2a44;
+  font-size: 0.95rem;
   cursor: pointer;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
   font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  z-index: 50;
+  text-transform: uppercase;
+}
+
+.backButton:hover {
+  background: #d4a74a;
+  transform: translateX(-3px);
 }
 
 .title {

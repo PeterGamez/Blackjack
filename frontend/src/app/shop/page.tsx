@@ -299,8 +299,12 @@ function StorePageContent() {
                       <span style={{ color: "#2f6b2f", fontWeight: 700 }}>Owned</span>
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                        <span>
-                          {isTokenPayment ? "🎟️" : "🪙"} {priceText}
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          {isTokenPayment ? (
+                            <img src="/icons/token.png" alt="ticket" style={{ width: 35 }} />
+                            ) : (
+                              <img src="/icons/coin.png" alt="coin" style={{ width: 35 }} />
+                            )} {priceText}
                         </span>
                         <button
                           onClick={() => void buy(p)}

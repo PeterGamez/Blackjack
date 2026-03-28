@@ -749,7 +749,6 @@ export default function Dealer() {
             {gameStatus !== "betting" && (
               <div className={`${styles.scoreWrap} ${styles.dealerScoreWrap}`}>
                 <div className={styles.scoreBadge}>{gameStatus === "playing" ? dealerHand.reduce((acc, c) => acc + c.value, 0) : dealerValue}</div>
-                {gameStatus === "playing" && <span className={styles.scoreTimer}>{timer} s</span>}
               </div>
             )}
 

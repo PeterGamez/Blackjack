@@ -20,6 +20,9 @@ export interface SlipOKResponse {
          * HH:mm:ss
          */
         transTime: string;
+        /**
+         *  YYYY-MM-DD:HH:mm:ss
+         */
         transTimestamp: string;
         sender: Author;
         receiver: Author;
